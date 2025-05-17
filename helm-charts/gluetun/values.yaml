@@ -10,11 +10,20 @@ image:
 # VPN / WireGuard settings
 vpn:
   provider: nordvpn
-  type: wireguard
-  country: United Kingdom
+  type: openvpn
   timezone: Europe/London
-  # Kubernetes Secret holding your WireGuard private key:
-  wireguardKeySecret: gluetun-vpn-secret
+  openvpn:
+    enabled: true
+    configFile: ""
+    customConfig: false
+    targetIP: ""
+    targetPort: ""
+    protocol: udp
+    serverRegions:
+      - United Kingdom
+    encryptionPreset: strong
+  envFromSecrets:
+    - name: gluetun-vpn-secret
 
 # Proxy ports to expose
 proxy:
@@ -23,8 +32,15 @@ proxy:
 
 # Service (LoadBalancer) settings
 service:
+  enabled: true
   type: LoadBalancer
-  annotations: {}
+  ports:
+    - name: http
+      port: 8888
+      targetPort: 8888
+    - name: socks
+      port: 1080
+      targetPort: 1080
 
 # Prometheus ServiceMonitor
 prometheus:
