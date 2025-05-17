@@ -1,0 +1,40 @@
+# Namespace where everything will be deployed
+namespace: vpn-gateway
+
+# Gluetun image settings
+image:
+  repository: qmcgaw/gluetun
+  tag: v3.40.0
+  pullPolicy: IfNotPresent
+
+# VPN / WireGuard settings
+vpn:
+  provider: nordvpn
+  type: wireguard
+  country: United Kingdom
+  timezone: Europe/London
+  # Kubernetes Secret holding your WireGuard private key:
+  wireguardKeySecret: gluetun-vpn-secret
+
+# Proxy ports to expose
+proxy:
+  httpPort: 8888
+  socksPort: 1080
+
+# Service (LoadBalancer) settings
+service:
+  type: LoadBalancer
+  annotations: {}
+
+# Prometheus ServiceMonitor
+prometheus:
+  enabled: true
+  port: 8000
+  path: /v1/health
+  labels:
+    release: rancher-monitoring
+
+# Resource caps (request tun device)
+resources:
+  limits:
+    squat.ai/tun: 1
