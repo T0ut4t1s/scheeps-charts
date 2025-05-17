@@ -72,4 +72,4 @@ spec:
             periodSeconds: 20
           resources:
             limits:
-              squat.ai/tun: {{ .Values.resources.limits["squat.ai/tun"] }}
+              "squat.ai/tun": {{ index .Values.resources.limits "squat.ai/tun" | quote }}
