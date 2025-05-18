@@ -59,6 +59,8 @@ spec:
                   name: {{ (index .Values.vpn.envFromSecrets 0).name | quote }}
                   key: OPENVPN_PASSWORD
           securityContext:
+            runAsUser: 0
+            runAsGroup: 0
             privileged: true
             capabilities:
               add:
