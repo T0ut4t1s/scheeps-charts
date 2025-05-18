@@ -48,11 +48,16 @@ spec:
               value: ":{{ .Values.proxy.socksPort }}"
             - name: FIREWALL
               value: "on"
-            - name: WIREGUARD_PRIVATE_KEY
+            - name: OPENVPN_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.vpn.wireguardKeySecret }}
-                  key: WIREGUARD_PRIVATE_KEY
+                  name: {{ .Values.vpn.envFromSecrets | first | quote }}
+                  key: OPENVPN_USER
+            - name: OPENVPN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vpn.envFromSecrets | first | quote }}
+                  key: OPENVPN_PASSWORD
           securityContext:
             capabilities:
               add:
