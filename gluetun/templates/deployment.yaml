@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Chart.Name}}
-  namespace: {{.Values.namespace}}
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Chart.Name}}
+      app: {{ .Chart.Name }}
   template:
     metadata:
       labels:
-        app: {{.Chart.Name}}
+        app: {{ .Chart.Name }}
     spec:
       securityContext:
         runAsUser: 1000
@@ -19,39 +19,39 @@ spec:
         fsGroup: 1000
       containers:
         - name: gluetun
-          image: "{{.Values.image.repository}}:{{.Values.image.tag}}"
-          imagePullPolicy: {{.Values.image.pullPolicy}}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           # Expose proxy + metrics ports
           ports:
             - name: http
-              containerPort: {{.Values.proxy.httpPort}}
+              containerPort: {{ .Values.proxy.httpPort }}
             - name: socks
-              containerPort: {{.Values.proxy.socksPort}}
+              containerPort: {{ .Values.proxy.socksPort }}
             - name: metrics
-              containerPort: {{.Values.prometheus.port}}
+              containerPort: {{ .Values.prometheus.port }}
           env:
             - name: VPN_SERVICE_PROVIDER
-              value: "{{.Values.vpn.provider}}"
+              value: "{{ .Values.vpn.provider }}"
             - name: VPN_TYPE
-              value: "{{.Values.vpn.type}}"
+              value: "{{ .Values.vpn.type }}"
             - name: SERVER_COUNTRIES
-              value: "{{.Values.vpn.country}}"
+              value: "{{ .Values.vpn.country }}"
             - name: TZ
-              value: "{{.Values.vpn.timezone}}"
+              value: "{{ .Values.vpn.timezone }}"
             - name: HTTPPROXY
               value: "on"
             - name: HTTPPROXY_LISTENING_ADDRESS
-              value: ":{{.Values.proxy.httpPort}}"
+              value: ":{{ .Values.proxy.httpPort }}"
             - name: SOCKSPROXY
               value: "on"
             - name: SOCKSPROXY_LISTENING_ADDRESS
-              value: ":{{.Values.proxy.socksPort}}"
+              value: ":{{ .Values.proxy.socksPort }}"
             - name: FIREWALL
               value: "on"
             - name: WIREGUARD_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{.Values.vpn.wireguardKeySecret}}
+                  name: {{ .Values.vpn.wireguardKeySecret }}
                   key: WIREGUARD_PRIVATE_KEY
           securityContext:
             capabilities:
@@ -60,13 +60,13 @@ spec:
           # Health checks to auto-restart on VPN failure
           readinessProbe:
             httpGet:
-              path: {{.Values.prometheus.path}}
+              path: {{ .Values.prometheus.path }}
               port: metrics
             initialDelaySeconds: 30
             periodSeconds: 20
           livenessProbe:
             httpGet:
-              path: {{.Values.prometheus.path}}
+              path: {{ .Values.prometheus.path }}
               port: metrics
             initialDelaySeconds: 30
             periodSeconds: 20
