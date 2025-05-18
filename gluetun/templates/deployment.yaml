@@ -59,6 +59,7 @@ spec:
                   name: {{ (index .Values.vpn.envFromSecrets 0).name | quote }}
                   key: OPENVPN_PASSWORD
           securityContext:
+            privileged: true
             capabilities:
               add:
                 - NET_ADMIN
