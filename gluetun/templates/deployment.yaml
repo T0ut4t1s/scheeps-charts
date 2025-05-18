@@ -75,6 +75,4 @@ spec:
               port: metrics
             initialDelaySeconds: 30
             periodSeconds: 20
-          resources:
-            limits:
-              "squat.ai/tun": {{ index .Values.resources.limits "squat.ai/tun" | quote }}
+          resources: {}
