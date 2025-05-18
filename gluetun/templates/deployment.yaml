@@ -51,12 +51,12 @@ spec:
             - name: OPENVPN_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.vpn.envFromSecrets | first | quote }}
+                  name: {{ (index .Values.vpn.envFromSecrets 0).name | quote }}
                   key: OPENVPN_USER
             - name: OPENVPN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.vpn.envFromSecrets | first | quote }}
+                  name: {{ (index .Values.vpn.envFromSecrets 0).name | quote }}
                   key: OPENVPN_PASSWORD
           securityContext:
             capabilities:
