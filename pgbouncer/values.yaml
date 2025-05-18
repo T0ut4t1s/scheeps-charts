@@ -1,0 +1,27 @@
+replicaCount: 1
+image:
+  repository: bitnami/pgbouncer
+  tag: 1.21.0
+postgresql:
+  host: postgresql-cluster-rw.postgres-system.svc.cluster.local
+  port: 5432
+  username: postgres
+  passwordSecret: postgresql-superuser # Kubernetes Secret name
+auth:
+  type: scram-sha-256
+  poolMode: session
+  databases: |
+    nextcloud = host=postgresql-cluster-rw.postgres-system.svc.cluster.local port=5432 user=nextcloud password=<SCRAM-PASS>
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+tls:
+  enabled: true
+  serverTlsSecret: pgbouncer-postgres-tls
+service:
+  type: ClusterIP
+  port: 5432
