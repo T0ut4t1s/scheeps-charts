@@ -11,7 +11,7 @@ auth:
   type: scram-sha-256
   poolMode: session
   databases: |
-    nextcloud = host=postgresql-cluster-rw.postgres-system.svc.cluster.local port=5432 user=nextcloud password=<SCRAM-PASS>
+    <dbase_name> = host=postgresql-cluster-rw.postgres-system.svc.cluster.local port=5432 user=<username> password=<SCRAM-PASS>
 resources:
   requests:
     cpu: 100m
