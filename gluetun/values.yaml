@@ -12,6 +12,7 @@ vpn:
   provider: nordvpn
   type: openvpn
   timezone: Europe/London
+  country: "United Kingdom"
   openvpn:
     enabled: true
     configFile: ""
@@ -19,9 +20,14 @@ vpn:
     targetIP: ""
     targetPort: ""
     protocol: udp
-    serverRegions:
-      - United Kingdom
     encryptionPreset: strong
+  firewall:
+    outboundSubnets:
+      - 192.168.101.0/24
+      - 192.168.102.0/24
+      - 192.168.103.0/24
+      - 192.168.104.0/24
+      - 192.168.105.0/24
   envFromSecrets:
     - name: gluetun-vpn-secret
 
