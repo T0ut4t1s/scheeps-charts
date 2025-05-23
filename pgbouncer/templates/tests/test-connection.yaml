@@ -9,7 +9,10 @@ metadata:
 spec:
   restartPolicy: Never
   containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args: ['{{ include "pgbouncer.fullname" . }}:{{ .Values.service.port }}']
+    - name: psql-test
+      image: postgres:15-alpine
+      command: 
+        - /bin/sh
+        - -c
+        - |
+          pg_isready -h {{ include "pgbouncer.fullname" . }} -p {{ .Values.service.port }}

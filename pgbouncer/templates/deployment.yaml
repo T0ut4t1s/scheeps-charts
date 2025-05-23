@@ -55,10 +55,10 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         volumeMounts:
-        - name: tls-certs
+        - name: pgbouncer-server-tls
           mountPath: /opt/bitnami/pgbouncer/certs
           readOnly: true
       volumes:
-      - name: tls-certs
+      - name: pgbouncer-server-tls
         secret:
           secretName: {{ .Values.tls.serverTlsSecret }}
