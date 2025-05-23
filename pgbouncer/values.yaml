@@ -22,9 +22,9 @@ postgresql:
 auth:
   type: scram-sha-256
   poolMode: transaction
-  database: freeradius
+  database: ""
   userlist: |
-    "freeradius" "SCRAM-SHA-256$4096:ub3ZGijkzbmHwbLyR009ww==$A7LInGU3x7XRyF1Y4f16plfEiLw4qYmqEPv8RIdRLi0=:ZuMje+e5oce4EEkFc7A3mjg/0dgwOINhASpPH1wQ704="
+    "<Username>" "<SCRAM Password>"
   minPoolSize: 5
 
 tls:
