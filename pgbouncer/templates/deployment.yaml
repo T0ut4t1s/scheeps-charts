@@ -2,17 +2,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "pgbouncer.fullname" . }}
+  labels:
+    {{- include "pgbouncer.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels: {{ include "pgbouncer.selectorLabels" . }}
+    matchLabels:
+      {{- include "pgbouncer.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels: {{ include "pgbouncer.selectorLabels" . }}
+      labels:
+        {{- include "pgbouncer.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - name: pgbouncer
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: 5432
         env:
         - name: POSTGRESQL_HOST
           value: {{ .Values.postgresql.host | quote }}
@@ -29,11 +35,25 @@ spec:
           value: {{ .Values.auth.type | quote }}
         - name: PGBOUNCER_POOL_MODE
           value: {{ .Values.auth.poolMode | quote }}
-        - name: PGBOUNCER_DATABASE
+        - name: PGBOUNCER_PORT
+          value: "5432"
+        - name: PGBOUNCER_USERLIST
           value: |-
-{{ .Values.auth.databases | indent 12 }}
+{{ .Values.auth.userlist | indent 12 }}
+        - name: PGBOUNCER_SERVER_TLS_SSLMODE
+          value: {{ .Values.tls.sslMode | quote }}
+        - name: PGBOUNCER_SERVER_TLS_CA_FILE
+          value: "/opt/bitnami/pgbouncer/certs/ca.crt"
+        - name: PGBOUNCER_SERVER_TLS_CERT_FILE
+          value: "/opt/bitnami/pgbouncer/certs/tls.crt"
+        - name: PGBOUNCER_SERVER_TLS_KEY_FILE
+          value: "/opt/bitnami/pgbouncer/certs/tls.key"
+        - name: PGBOUNCER_MIN_POOL_SIZE
+          value: "{{ .Values.auth.minPoolSize }}"
+        - name: PGBOUNCER_DATABASE
+          value: {{ .Values.auth.database | quote }}
         resources:
-{{ toYaml .Values.resources | indent 8 }}
+          {{- toYaml .Values.resources | nindent 10 }}
         volumeMounts:
         - name: tls-certs
           mountPath: /opt/bitnami/pgbouncer/certs
