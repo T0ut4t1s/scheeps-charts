@@ -22,7 +22,7 @@ postgresql:
 auth:
   type: scram-sha-256
   poolMode: transaction
-  ignoreStartupParameters: "search_path"
+  ignoreStartupParameters: ""
   database: ""
   userlist: |
     "<Username>" "<SCRAM Password>"
