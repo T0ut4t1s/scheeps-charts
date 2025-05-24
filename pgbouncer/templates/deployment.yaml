@@ -52,6 +52,8 @@ spec:
           value: "{{ .Values.auth.minPoolSize }}"
         - name: PGBOUNCER_DATABASE
           value: {{ .Values.auth.database | quote }}
+        - name: PGBOUNCER_IGNORE_STARTUP_PARAMETERS
+          value: {{ .Values.auth.ignoreStartupParameters | quote }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         volumeMounts:
