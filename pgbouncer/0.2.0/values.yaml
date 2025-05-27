@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: bitnami/pgbouncer
-  tag: 1.21.0
+  tag: 1.24.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
