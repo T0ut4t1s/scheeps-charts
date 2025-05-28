@@ -3,4 +3,4 @@ name: pgbouncer
 description: PgBouncer connection pooler for PostgreSQL
 type: application
 version: 0.2.1
-appVersion: 1.24.1
+appVersion: 1.24.0
