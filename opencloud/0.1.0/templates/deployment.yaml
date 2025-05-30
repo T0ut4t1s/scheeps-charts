@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "opencloud.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "opencloud.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "opencloud.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      containers:
+        - name: opencloud
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            # Non-secret database configs from values.yaml
+            - name: OPEN_CLOUD_DB_HOST
+              value: {{ .Values.db.host | quote }}
+            - name: OPEN_CLOUD_DB_PORT
+              value: {{ .Values.db.port | quote }}
+            - name: OPEN_CLOUD_DB_NAME
+              value: {{ .Values.db.name | quote }}
+            # Secret credentials from ExternalSecrets
+            - name: OPEN_CLOUD_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: opencloud-pg-secret
+                  key: OPEN_CLOUD_DB_USER
+            - name: OPEN_CLOUD_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opencloud-pg-secret
+                  key: OPEN_CLOUD_DB_PASSWORD
+            - name: OPEN_CLOUD_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: opencloud-admin-secret
+                  key: OPEN_CLOUD_ADMIN_USER
+            - name: OPEN_CLOUD_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opencloud-admin-secret
+                  key: OPEN_CLOUD_ADMIN_PASSWORD
+            # Set timezone if desired
+            - name: TZ
+              value: {{ .Values.timezone | quote }}
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: userdata
+              mountPath: {{ .Values.persistence.userdata.mountPath }}
+            - name: config
+              mountPath: {{ .Values.persistence.config.mountPath }}
+            - name: cache
+              mountPath: {{ .Values.persistence.cache.mountPath }}
+      volumes:
+        - name: userdata
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.userdata.existingClaim }}
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.config.existingClaim }}
+        - name: cache
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.cache.existingClaim }}

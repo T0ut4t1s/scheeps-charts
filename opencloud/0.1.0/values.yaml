@@ -1,0 +1,36 @@
+replicaCount: 1
+
+image:
+  repository: opencloud/opencloud
+  tag: ""
+  pullPolicy: IfNotPresent
+
+db:
+  host: postgres.opencloud.svc.cluster.local
+  port: 5432
+  name: opencloud
+
+persistence:
+  userdata:
+    enabled: true
+    existingClaim: opencloud-userdata-pvc
+    mountPath: /var/www/html/data
+
+  config:
+    enabled: true
+    existingClaim: opencloud-config-pvc
+    mountPath: /var/www/html/config
+
+  cache:
+    enabled: true
+    existingClaim: opencloud-cache-pvc
+    mountPath: /var/www/html/cache
+
+securityContext:
+  runAsUser: 977
+  runAsGroup: 988
+  fsGroup: 988
+
+resources: {}
+
+timezone: "Europe/London"
