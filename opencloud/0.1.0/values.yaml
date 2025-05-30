@@ -6,7 +6,7 @@ image:
   pullPolicy: IfNotPresent
 
 db:
-  host: postgres.opencloud.svc.cluster.local
+  host: pgbouncer.opencloud.svc.cluster.local
   port: 5432
   name: opencloud
 
