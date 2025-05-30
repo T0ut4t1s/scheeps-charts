@@ -65,7 +65,7 @@ spec:
               mountPath: {{ .Values.persistence.cache.mountPath }}
             - name: opencloud-app-config
               mountPath: /etc/opencloud/config.yaml
-              subPath: config.yaml
+              subPath: {{ .Values.secrets.configFile.key | quote }}
               readOnly: true
 
       volumes:
@@ -80,4 +80,4 @@ spec:
             claimName: {{ .Values.persistence.cache.existingClaim }}
         - name: opencloud-app-config
           secret:
-            secretName: {{ include "opencloud.fullname" . }}-config
+            secretName: {{ .Values.secrets.configFile.name | quote }}
