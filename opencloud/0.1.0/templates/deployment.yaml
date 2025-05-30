@@ -26,14 +26,12 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            # Non-secret database configs from values.yaml
             - name: OPEN_CLOUD_DB_HOST
               value: {{ .Values.db.host | quote }}
             - name: OPEN_CLOUD_DB_PORT
               value: {{ .Values.db.port | quote }}
             - name: OPEN_CLOUD_DB_NAME
               value: {{ .Values.db.name | quote }}
-            # Secret credentials from ExternalSecrets
             - name: OPEN_CLOUD_DB_USER
               valueFrom:
                 secretKeyRef:
@@ -54,12 +52,6 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secrets.admin.name | quote }}
                   key: {{ .Values.secrets.admin.passwordKey | quote }}
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.jwt.name | quote }}
-                  key: {{ .Values.secrets.jwt.key | quote }}
-            # Set timezone if desired
             - name: TZ
               value: {{ .Values.timezone | quote }}
           ports:
@@ -71,6 +63,11 @@ spec:
               mountPath: {{ .Values.persistence.config.mountPath }}
             - name: cache
               mountPath: {{ .Values.persistence.cache.mountPath }}
+            - name: opencloud-app-config
+              mountPath: /etc/opencloud/config.yaml
+              subPath: config.yaml
+              readOnly: true
+
       volumes:
         - name: userdata
           persistentVolumeClaim:
@@ -81,3 +78,6 @@ spec:
         - name: cache
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.cache.existingClaim }}
+        - name: opencloud-app-config
+          secret:
+            secretName: {{ include "opencloud.fullname" . }}-config
