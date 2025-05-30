@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: opencloud/opencloud
-  tag: ""
+  tag: 2.0.2
   pullPolicy: IfNotPresent
 
 db:

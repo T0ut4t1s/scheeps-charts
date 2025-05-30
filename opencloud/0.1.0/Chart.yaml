@@ -3,4 +3,4 @@ name: opencloud
 description: A Helm chart for deploying OpenCloud
 type: application
 version: 0.1.0
-appVersion: "2.3.0"
+appVersion: "2.0.2"
