@@ -54,6 +54,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secrets.admin.name | quote }}
                   key: {{ .Values.secrets.admin.passwordKey | quote }}
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.jwt.name | quote }}
+                  key: {{ .Values.secrets.jwt.key | quote }}
             # Set timezone if desired
             - name: TZ
               value: {{ .Values.timezone | quote }}

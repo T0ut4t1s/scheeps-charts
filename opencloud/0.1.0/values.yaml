@@ -35,6 +35,9 @@ secrets:
     name: opencloud-admin-secret
     userKey: username
     passwordKey: password
+  jwt:
+    name: opencloud-jwt-secret
+    key: jwt_secret
 
 service:
   type: ClusterIP
