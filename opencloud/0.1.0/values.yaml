@@ -26,6 +26,16 @@ persistence:
     existingClaim: opencloud-cache-pvc
     mountPath: /var/www/html/cache
 
+secrets:
+  db:
+    name: opencloud-pg-secret
+    userKey: username
+    passwordKey: password
+  admin:
+    name: opencloud-admin-secret
+    userKey: username
+    passwordKey: password
+
 securityContext:
   runAsUser: 977
   runAsGroup: 988

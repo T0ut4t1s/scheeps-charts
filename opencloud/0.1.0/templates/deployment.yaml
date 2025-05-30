@@ -37,23 +37,23 @@ spec:
             - name: OPEN_CLOUD_DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: opencloud-pg-secret
-                  key: OPEN_CLOUD_DB_USER
+                  name: {{ .Values.secrets.db.name | quote }}
+                  key: {{ .Values.secrets.db.userKey | quote }}
             - name: OPEN_CLOUD_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: opencloud-pg-secret
-                  key: OPEN_CLOUD_DB_PASSWORD
+                  name: {{ .Values.secrets.db.name | quote }}
+                  key: {{ .Values.secrets.db.passwordKey | quote }}
             - name: OPEN_CLOUD_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: opencloud-admin-secret
-                  key: OPEN_CLOUD_ADMIN_USER
+                  name: {{ .Values.secrets.admin.name | quote }}
+                  key: {{ .Values.secrets.admin.userKey | quote }}
             - name: OPEN_CLOUD_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: opencloud-admin-secret
-                  key: OPEN_CLOUD_ADMIN_PASSWORD
+                  name: {{ .Values.secrets.admin.name | quote }}
+                  key: {{ .Values.secrets.admin.passwordKey | quote }}
             # Set timezone if desired
             - name: TZ
               value: {{ .Values.timezone | quote }}
