@@ -21,6 +21,14 @@ spec:
         runAsUser: {{ .Values.securityContext.runAsUser }}
         runAsGroup: {{ .Values.securityContext.runAsGroup }}
         fsGroup: {{ .Values.securityContext.fsGroup }}
+      initContainers:
+        - name: debug-config
+          image: busybox
+          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/config.yaml || echo 'no config.yaml'"]
+          volumeMounts:
+            - name: opencloud-app-config
+              mountPath: /etc/opencloud/config.yaml
+              subPath: config.yaml
       containers:
         - name: opencloud
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
