@@ -36,6 +36,10 @@ secrets:
     userKey: username
     passwordKey: password
 
+service:
+  type: ClusterIP
+  port: 8080
+
 securityContext:
   runAsUser: 977
   runAsGroup: 988

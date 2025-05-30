@@ -5,8 +5,12 @@ metadata:
 spec:
   selector:
     app.kubernetes.io/name: {{ include "opencloud.name" . }}
+  {{- if .Values.service.type }}
+  type: {{ .Values.service.type }}
+  {{- end }}
+  {{- if .Values.service.port }}
   ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
-      targetPort: 8080
-  type: {{ .Values.service.type }}
+      targetPort: {{ .Values.service.targetPort | default .Values.service.port }}
+  {{- end }}
