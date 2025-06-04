@@ -22,11 +22,12 @@ vpn:
     protocol: udp
     encryptionPreset: strong
   firewall:
+    enabled: true
     outboundSubnets:
+      - 192.168.100.0/24
       - 192.168.101.0/24
       - 192.168.102.0/24
       - 192.168.103.0/24
-      #- 192.168.104.0/24
       - 192.168.105.0/24
   envFromSecrets:
     - name: gluetun-vpn-secret

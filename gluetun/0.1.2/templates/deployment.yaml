@@ -46,8 +46,15 @@ spec:
               value: "on"
             - name: SOCKSPROXY_LISTENING_ADDRESS
               value: ":{{ .Values.proxy.socksPort }}"
+            {{- if .Values.vpn.firewall.enabled }}
             - name: FIREWALL
               value: "on"
+            - name: FIREWALL_OUTBOUND_SUBNETS
+              value: "{{ .Values.vpn.firewall.outboundSubnets | join \",\" }}"
+            {{- else }}
+            - name: FIREWALL
+              value: "off"
+            {{- end }}
             - name: OPENVPN_USER
               valueFrom:
                 secretKeyRef:
