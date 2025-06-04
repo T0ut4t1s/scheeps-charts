@@ -50,7 +50,7 @@ spec:
             - name: FIREWALL
               value: "on"
             - name: FIREWALL_OUTBOUND_SUBNETS
-              value: "{{ .Values.vpn.firewall.outboundSubnets | join \",\" }}"
+              value: "{{ .Values.vpn.firewall.outboundSubnets | join "," }}"
             {{- else }}
             - name: FIREWALL
               value: "off"
