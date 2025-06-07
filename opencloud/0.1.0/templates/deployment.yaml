@@ -59,6 +59,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.opencloud.adminPasswordSecret.name }}
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
+            - name: OCIS_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.jwtSecretSecret.name }}
+                  key: {{ .Values.opencloud.jwtSecretSecret.key }}
             {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}

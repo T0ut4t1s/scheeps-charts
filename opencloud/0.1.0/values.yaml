@@ -1,4 +1,3 @@
-# Default values for opencloud-custom
 replicaCount: 1
 
 image:
@@ -9,70 +8,59 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-# OpenCloud Configuration
 opencloud:
-  # Domain configuration
   domain: "opencloud.local"
 
-  # Admin settings
   adminPasswordSecret:
     name: "opencloud-admin-secret"
     key: "password"
 
-  # Log settings
+  jwtSecretSecret:
+    name: "opencloud-jwt-secret"
+    key: "jwt_secret"
+
   logLevel: "info"
   logColor: false
   logPretty: false
 
-  # Security settings
-  insecure: true # Set to false for production
+  insecure: true
   enableBasicAuth: false
 
-  # Demo users
   createDemoUsers: false
 
-# Database Configuration (pgbouncer in same namespace)
 database:
-  # External PostgreSQL via pgbouncer (same namespace, no TLS needed)
   external:
     enabled: true
-    host: "pgbouncer" # Service name in same namespace
+    host: "pgbouncer"
     port: 5432
     database: "opencloud"
     username: "opencloud"
-    # Password should be provided via secret or values override
     passwordSecret:
-      name: "opencloud-pg-secret" # ✅ Your existing secret
+      name: "opencloud-pg-secret"
       key: "password"
-    sslmode: "disable" # No TLS needed for same-namespace communication
+    sslmode: "disable"
 
-# Storage Configuration
 storage:
-  # Data storage (NFS) - Use existing PVC
   data:
     enabled: true
-    claimName: "opencloud-unas-pvc" # Your existing NFS PVC
+    claimName: "opencloud-unas-pvc"
     mountPath: "/var/lib/ocis/data"
 
-  # Config storage - Use existing PVC
   config:
     enabled: true
-    claimName: "opencloud-config-pvc" # Your existing config PVC
+    claimName: "opencloud-config-pvc"
     mountPath: "/etc/ocis"
 
-  # Cache storage - Use existing PVC
   cache:
     enabled: true
-    claimName: "opencloud-cache-pvc" # Your existing cache PVC
+    claimName: "opencloud-cache-pvc"
     mountPath: "/var/cache/ocis"
 
-# Service Configuration
 service:
   type: ClusterIP
   port: 9200
   targetPort: 9200
 
-# Resource Configuration
 resources:
   limits:
     cpu: 1000m
@@ -81,27 +69,22 @@ resources:
     cpu: 500m
     memory: 1Gi
 
-# Node Selection
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
 
-# Security Context
 securityContext:
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
 
-# Pod Security Context
 podSecurityContext:
   fsGroup: 1000
 
-# Environment Variables
 env:
-  # Add any additional environment variables here
   - name: OCIS_LOG_LEVEL
     value: "info"
   - name: OCIS_LOG_COLOR
