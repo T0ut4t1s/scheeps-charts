@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "opencloud-custom.fullname" . }}
+  name: {{ include "opencloud.fullname" . }}
   labels:
-    {{- include "opencloud-custom.labels" . | nindent 4 }}
+    {{- include "opencloud.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "opencloud-custom.selectorLabels" . | nindent 4 }}
+    {{- include "opencloud.selectorLabels" . | nindent 4 }}

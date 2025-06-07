@@ -15,7 +15,9 @@ opencloud:
   domain: "opencloud.local"
 
   # Admin settings
-  adminPassword: "admin"
+  adminPasswordSecret:
+    name: "opencloud-admin-secret"
+    key: "admin-password"
 
   # Log settings
   logLevel: "info"
@@ -39,7 +41,9 @@ database:
     database: "opencloud"
     username: "opencloud"
     # Password should be provided via secret or values override
-    password: "changeme"
+    passwordSecret:
+      name: "opencloud-pg-secret" # ✅ Your existing secret
+      key: "password"
     sslmode: "disable" # No TLS needed for same-namespace communication
 
 # Storage Configuration
