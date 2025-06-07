@@ -1,5 +1,5 @@
 apiVersion: v2
-name: opencloud-custom
+name: opencloud
 description: A simplified Helm chart for OpenCloud EU with external dependencies
 type: application
 version: 0.1.0
