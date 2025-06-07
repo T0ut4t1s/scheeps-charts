@@ -9,15 +9,11 @@ nameOverride: ""
 fullnameOverride: ""
 
 opencloud:
-  domain: "opencloud.local"
+  domain: "cloud.scheeps.online"
 
   adminPasswordSecret:
     name: "opencloud-admin-secret"
     key: "password"
-
-  jwtSecretSecret:
-    name: "opencloud-jwt-secret"
-    key: "jwt_secret"
 
   logLevel: "info"
   logColor: false
@@ -31,7 +27,7 @@ opencloud:
 database:
   external:
     enabled: true
-    host: "pgbouncer"
+    host: "pgbouncer.opencloud.svc.cluster.local"
     port: 5432
     database: "opencloud"
     username: "opencloud"
