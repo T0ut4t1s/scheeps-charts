@@ -17,7 +17,7 @@ opencloud:
   # Admin settings
   adminPasswordSecret:
     name: "opencloud-admin-secret"
-    key: "admin-password"
+    key: "password"
 
   # Log settings
   logLevel: "info"
