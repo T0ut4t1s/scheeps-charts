@@ -51,7 +51,7 @@ storage:
   config:
     enabled: true
     claimName: "opencloud-config-pvc"
-    mountPath: "/etc/ocis"
+    mountPath: "/etc/opencloud"
 
   cache:
     enabled: true
