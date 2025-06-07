@@ -44,26 +44,22 @@ database:
 
 # Storage Configuration
 storage:
-  # Data storage (NFS) - Create PVC separately
+  # Data storage (NFS) - Use existing PVC
   data:
     enabled: true
-    claimName: "opencloud-data-pvc" # Reference to your existing PVC
+    claimName: "opencloud-unas-pvc" # Your existing NFS PVC
     mountPath: "/var/lib/ocis/data"
 
-  # Config storage (for persistent configuration)
+  # Config storage - Use existing PVC
   config:
     enabled: true
-    storageClass: "" # Use default or specify your preferred storage class
-    accessMode: ReadWriteOnce
-    size: 1Gi
+    claimName: "opencloud-config-pvc" # Your existing config PVC
     mountPath: "/etc/ocis"
 
-  # Cache storage (fast SSD for temporary data and caches)
+  # Cache storage - Use existing PVC
   cache:
     enabled: true
-    storageClass: "fast-ssd" # Specify your SSD storage class
-    accessMode: ReadWriteOnce
-    size: 10Gi # Adjust based on your needs
+    claimName: "opencloud-cache-pvc" # Your existing cache PVC
     mountPath: "/var/cache/ocis"
 
 # Service Configuration

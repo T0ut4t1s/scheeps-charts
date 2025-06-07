@@ -42,23 +42,13 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  {{- if .Values.database.external.passwordSecret }}
                   name: {{ .Values.database.external.passwordSecret.name }}
                   key: {{ .Values.database.external.passwordSecret.key }}
-                  {{- else }}
-                  name: {{ include "opencloud-custom.fullname" . }}-db-secret
-                  key: password
-                  {{- end }}
             - name: OCIS_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  {{- if .Values.opencloud.adminPasswordSecret }}
                   name: {{ .Values.opencloud.adminPasswordSecret.name }}
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
-                  {{- else }}
-                  name: {{ include "opencloud-custom.fullname" . }}-admin-secret
-                  key: admin-password
-                  {{- end }}
             {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}
@@ -90,12 +80,12 @@ spec:
         {{- if .Values.storage.config.enabled }}
         - name: config
           persistentVolumeClaim:
-            claimName: {{ include "opencloud-custom.fullname" . }}-config
+            claimName: {{ .Values.storage.config.claimName }}
         {{- end }}
         {{- if .Values.storage.cache.enabled }}
         - name: cache
           persistentVolumeClaim:
-            claimName: {{ include "opencloud-custom.fullname" . }}-cache
+            claimName: {{ .Values.storage.cache.claimName }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
