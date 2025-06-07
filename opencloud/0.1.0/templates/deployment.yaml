@@ -1,91 +1,111 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "opencloud.fullname" . }}
+  name: {{ include "opencloud-custom.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "opencloud.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "opencloud-custom.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "opencloud.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "opencloud-custom.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "opencloud.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "opencloud-custom.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
-        runAsUser: {{ .Values.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.securityContext.fsGroup }}
-      initContainers:
-        - name: debug-config
-          image: busybox
-          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/config.yaml || echo 'no config.yaml'"]
-          volumeMounts:
-            - name: opencloud-app-config
-              mountPath: /etc/opencloud/config.yaml
-              subPath: config.yaml
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: opencloud
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: OPEN_CLOUD_DB_HOST
-              value: {{ .Values.db.host | quote }}
-            - name: OPEN_CLOUD_DB_PORT
-              value: {{ .Values.db.port | quote }}
-            - name: OPEN_CLOUD_DB_NAME
-              value: {{ .Values.db.name | quote }}
-            - name: OPEN_CLOUD_DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.db.name | quote }}
-                  key: {{ .Values.secrets.db.userKey | quote }}
-            - name: OPEN_CLOUD_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.db.name | quote }}
-                  key: {{ .Values.secrets.db.passwordKey | quote }}
-            - name: OPEN_CLOUD_ADMIN_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.admin.name | quote }}
-                  key: {{ .Values.secrets.admin.userKey | quote }}
-            - name: OPEN_CLOUD_ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.admin.name | quote }}
-                  key: {{ .Values.secrets.admin.passwordKey | quote }}
-            - name: TZ
-              value: {{ .Values.timezone | quote }}
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /status.php
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /status.php
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.database.external.passwordSecret }}
+                  name: {{ .Values.database.external.passwordSecret.name }}
+                  key: {{ .Values.database.external.passwordSecret.key }}
+                  {{- else }}
+                  name: {{ include "opencloud-custom.fullname" . }}-db-secret
+                  key: password
+                  {{- end }}
+            - name: OCIS_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.opencloud.adminPasswordSecret }}
+                  name: {{ .Values.opencloud.adminPasswordSecret.name }}
+                  key: {{ .Values.opencloud.adminPasswordSecret.key }}
+                  {{- else }}
+                  name: {{ include "opencloud-custom.fullname" . }}-admin-secret
+                  key: admin-password
+                  {{- end }}
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "opencloud-custom.fullname" . }}-config
           volumeMounts:
-            - name: userdata
-              mountPath: {{ .Values.persistence.userdata.mountPath }}
+            {{- if .Values.storage.data.enabled }}
+            - name: data
+              mountPath: {{ .Values.storage.data.mountPath }}
+            {{- end }}
+            {{- if .Values.storage.config.enabled }}
             - name: config
-              mountPath: {{ .Values.persistence.config.mountPath }}
+              mountPath: {{ .Values.storage.config.mountPath }}
+            {{- end }}
+            {{- if .Values.storage.cache.enabled }}
             - name: cache
-              mountPath: {{ .Values.persistence.cache.mountPath }}
-            - name: opencloud-app-config
-              mountPath: /etc/opencloud/config.yaml
-              subPath: {{ .Values.secrets.configFile.key | quote }}
-              readOnly: true
-
+              mountPath: {{ .Values.storage.cache.mountPath }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       volumes:
-        - name: userdata
+        {{- if .Values.storage.data.enabled }}
+        - name: data
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.userdata.existingClaim }}
+            claimName: {{ .Values.storage.data.claimName }}
+        {{- end }}
+        {{- if .Values.storage.config.enabled }}
         - name: config
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.config.existingClaim }}
+            claimName: {{ include "opencloud-custom.fullname" . }}-config
+        {{- end }}
+        {{- if .Values.storage.cache.enabled }}
         - name: cache
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.cache.existingClaim }}
-        - name: opencloud-app-config
-          secret:
-            secretName: {{ .Values.secrets.configFile.name | quote }}
+            claimName: {{ include "opencloud-custom.fullname" . }}-cache
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,6 +1,8 @@
 apiVersion: v2
-name: opencloud
-description: A Helm chart for deploying OpenCloud
+name: opencloud-custom
+description: A simplified Helm chart for OpenCloud EU with external dependencies
 type: application
 version: 0.1.0
-appVersion: "2.0.2"
+appVersion: "latest"
+
+dependencies: []

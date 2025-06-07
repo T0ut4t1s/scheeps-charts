@@ -1,53 +1,110 @@
+# Default values for opencloud-custom
 replicaCount: 1
 
 image:
-  repository: opencloudeu/opencloud
-  tag: 2.0.2
+  repository: opencloudeu/opencloud-rolling
   pullPolicy: IfNotPresent
+  tag: "latest"
 
-db:
-  host: pgbouncer.opencloud.svc.cluster.local
-  port: 5432
-  name: opencloud
+nameOverride: ""
+fullnameOverride: ""
 
-persistence:
-  userdata:
+# OpenCloud Configuration
+opencloud:
+  # Domain configuration
+  domain: "opencloud.local"
+
+  # Admin settings
+  adminPassword: "admin"
+
+  # Log settings
+  logLevel: "info"
+  logColor: false
+  logPretty: false
+
+  # Security settings
+  insecure: true # Set to false for production
+  enableBasicAuth: false
+
+  # Demo users
+  createDemoUsers: false
+
+# Database Configuration (pgbouncer in same namespace)
+database:
+  # External PostgreSQL via pgbouncer (same namespace, no TLS needed)
+  external:
     enabled: true
-    existingClaim: opencloud-userdata-pvc
-    mountPath: /var/www/html/data
+    host: "pgbouncer" # Service name in same namespace
+    port: 5432
+    database: "opencloud"
+    username: "opencloud"
+    # Password should be provided via secret or values override
+    password: "changeme"
+    sslmode: "disable" # No TLS needed for same-namespace communication
 
+# Storage Configuration
+storage:
+  # Data storage (NFS) - Create PVC separately
+  data:
+    enabled: true
+    claimName: "opencloud-data-pvc" # Reference to your existing PVC
+    mountPath: "/var/lib/ocis/data"
+
+  # Config storage (for persistent configuration)
   config:
     enabled: true
-    existingClaim: opencloud-config-pvc
-    mountPath: /var/www/html/config
+    storageClass: "" # Use default or specify your preferred storage class
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    mountPath: "/etc/ocis"
 
+  # Cache storage (fast SSD for temporary data and caches)
   cache:
     enabled: true
-    existingClaim: opencloud-cache-pvc
-    mountPath: /var/www/html/cache
+    storageClass: "fast-ssd" # Specify your SSD storage class
+    accessMode: ReadWriteOnce
+    size: 10Gi # Adjust based on your needs
+    mountPath: "/var/cache/ocis"
 
-secrets:
-  db:
-    name: opencloud-pg-secret
-    userKey: username
-    passwordKey: password
-  admin:
-    name: opencloud-admin-secret
-    userKey: username
-    passwordKey: password
-  configFile:
-    name: opencloud-app-config
-    key: config.yaml
-
+# Service Configuration
 service:
   type: ClusterIP
-  port: 8080
+  port: 9200
+  targetPort: 9200
 
+# Resource Configuration
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+# Node Selection
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Security Context
 securityContext:
-  runAsUser: 977
-  runAsGroup: 988
-  fsGroup: 988
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
 
-resources: {}
+# Pod Security Context
+podSecurityContext:
+  fsGroup: 1000
 
-timezone: "Europe/London"
+# Environment Variables
+env:
+  # Add any additional environment variables here
+  - name: OCIS_LOG_LEVEL
+    value: "info"
+  - name: OCIS_LOG_COLOR
+    value: "false"
+  - name: OCIS_LOG_PRETTY
+    value: "false"
