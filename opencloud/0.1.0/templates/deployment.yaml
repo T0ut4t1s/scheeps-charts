@@ -17,7 +17,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       
-      # Init container to run 'ocis init' and generate config
+      # Generate secure secrets in init container if not provided
       initContainers:
         - name: ocis-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -25,25 +25,53 @@ spec:
             - /bin/sh
             - -c
             - |
-              echo "Initializing OCIS configuration..."
-              # Check if config already exists
-              if [ ! -f "{{ .Values.storage.config.mountPath }}/ocis.yaml" ]; then
-                echo "No existing config found. Running ocis init..."
-                # Run ocis init to generate initial config
-                OCIS_CONFIG_DIR="{{ .Values.storage.config.mountPath }}" \
-                OCIS_INSECURE="{{ .Values.opencloud.insecure }}" \
-                OCIS_URL="https://{{ .Values.opencloud.domain }}" \
-                /usr/bin/ocis init --insecure
-                echo "OCIS configuration initialized successfully."
+              echo "Generating OCIS secrets if needed..."
+              
+              # Generate JWT secret if not provided
+              if [ -z "$OCIS_JWT_SECRET" ]; then
+                JWT_SECRET=$(openssl rand -base64 32)
+                echo "Generated JWT secret: $JWT_SECRET"
+                echo "$JWT_SECRET" > /tmp/secrets/jwt_secret
               else
-                echo "Existing config found at {{ .Values.storage.config.mountPath }}/ocis.yaml"
+                echo "Using provided JWT secret"
+                echo "$OCIS_JWT_SECRET" > /tmp/secrets/jwt_secret
               fi
-              echo "Init container completed."
+              
+              # Generate transfer secret
+              TRANSFER_SECRET=$(openssl rand -base64 32)
+              echo "$TRANSFER_SECRET" > /tmp/secrets/transfer_secret
+              
+              # Generate machine auth API key
+              API_KEY=$(openssl rand -base64 32)
+              echo "$API_KEY" > /tmp/secrets/api_key
+              
+              echo "Secret generation completed."
+          
+          env:
+            # All OCIS secrets from the main secret
+            - name: OCIS_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.ocisSecrets.name }}
+                  key: {{ .Values.opencloud.ocisSecrets.jwtSecretKey }}
+                  optional: true
+            - name: OCIS_TRANSFER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.ocisSecrets.name }}
+                  key: {{ .Values.opencloud.ocisSecrets.transferSecretKey }}
+                  optional: true
+            - name: OCIS_MACHINE_AUTH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.ocisSecrets.name }}
+                  key: {{ .Values.opencloud.ocisSecrets.apiKeyKey }}
+                  optional: true
+          
           volumeMounts:
-            {{- if .Values.storage.config.enabled }}
-            - name: config
-              mountPath: {{ .Values.storage.config.mountPath }}
-            {{- end }}
+            - name: secret-files
+              mountPath: /tmp/secrets
+          
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
       
@@ -82,19 +110,41 @@ spec:
             successThreshold: 1
           
           env:
-            # Override specific secrets after init
+            # Core OCIS secrets - use generated or provided values
+            - name: OCIS_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.ocisSecrets.name }}
+                  key: {{ .Values.opencloud.ocisSecrets.jwtSecretKey }}
+                  optional: true
+            - name: OCIS_TRANSFER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.ocisSecrets.name }}
+                  key: {{ .Values.opencloud.ocisSecrets.transferSecretKey }}
+                  optional: true
+            - name: OCIS_MACHINE_AUTH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.ocisSecrets.name }}
+                  key: {{ .Values.opencloud.ocisSecrets.apiKeyKey }}
+                  optional: true
+            
+            # Database credentials
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.database.external.passwordSecret.name }}
                   key: {{ .Values.database.external.passwordSecret.key }}
+            
+            # Admin credentials
             - name: IDM_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.adminPasswordSecret.name }}
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
-            # Note: OCIS_JWT_SECRET is generated by ocis init and stored in config file
-            # Environment variables override config, so we let init handle JWT secret generation
+            
+            # Additional user-defined environment variables
             {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}
@@ -117,6 +167,9 @@ spec:
             - name: cache
               mountPath: {{ .Values.storage.cache.mountPath }}
             {{- end }}
+            - name: secret-files
+              mountPath: /tmp/secrets
+              readOnly: true
           
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -137,6 +190,8 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.storage.cache.claimName }}
         {{- end }}
+        - name: secret-files
+          emptyDir: {}
       
       {{- with .Values.nodeSelector }}
       nodeSelector:
