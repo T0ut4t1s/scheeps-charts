@@ -52,7 +52,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
         - name: debug-after-init
           image: busybox
-          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/config.yaml || echo 'no config after init'"]
+          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/opencloud.yaml || echo 'no config after init'"]
           volumeMounts:
             - name: config
               mountPath: /etc/opencloud
