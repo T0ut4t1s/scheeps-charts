@@ -56,6 +56,21 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/opencloud
+        - name: env-after-init
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              echo "=== ENV VARS ===";
+              env;
+              echo "=== CONFIG FILE ===";
+              ls -l /etc/opencloud;
+              cat /etc/opencloud/opencloud.yaml || echo 'no config after init';
+          volumeMounts:
+            - name: config
+              mountPath: /etc/opencloud
+
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
