@@ -25,21 +25,21 @@ spec:
               mountPath: /etc/opencloud
         - name: opencloud-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["sh", "-c", "opencloud init --config-dir=/etc/opencloud || true"]
+          command: ["sh", "-c", "opencloud init --config-path=/etc/opencloud/config.yaml || true"]
           env:
-            - name: OCIS_JWT_SECRET
+            - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
                   key: {{ .Values.opencloud.ocisSecrets.jwtSecretKey }}
                   optional: true
-            - name: OCIS_TRANSFER_SECRET
+            - name: TRANSFER_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
                   key: {{ .Values.opencloud.ocisSecrets.transferSecretKey }}
                   optional: true
-            - name: OCIS_MACHINE_AUTH_API_KEY
+            - name: MACHINE_AUTH_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
@@ -60,7 +60,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["sh", "-c", "opencloud server --config-dir=/etc/opencloud"]
+          command: ["sh", "-c", "opencloud server --config-path=/etc/opencloud/config.yaml"]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
@@ -83,19 +83,19 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
           env:
-            - name: OCIS_JWT_SECRET
+            - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
                   key: {{ .Values.opencloud.ocisSecrets.jwtSecretKey }}
                   optional: true
-            - name: OCIS_TRANSFER_SECRET
+            - name: TRANSFER_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
                   key: {{ .Values.opencloud.ocisSecrets.transferSecretKey }}
                   optional: true
-            - name: OCIS_MACHINE_AUTH_API_KEY
+            - name: MACHINE_AUTH_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
