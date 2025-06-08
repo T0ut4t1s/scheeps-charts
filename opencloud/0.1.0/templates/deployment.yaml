@@ -121,7 +121,7 @@ spec:
                   name: {{ .Values.opencloud.adminPasswordSecret.name }}
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
             - name: STORAGE_USERS_DRIVER
-              value: "sql"
+              value: "owncloudsql"
             - name: STORAGE_USERS_SQL_DSN
               value: "postgres://opencloud:$(DB_PASSWORD)@pgbouncer.opencloud.svc.cluster.local:5432/opencloud?sslmode=disable"
           envFrom:
