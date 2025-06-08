@@ -17,6 +17,12 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
+        - name: debug-config
+          image: busybox
+          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/ocis.yaml || echo 'no config'"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/opencloud
         - name: ocis-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: ["sh", "-c", "ocis init --config-dir=/etc/opencloud || true"]
