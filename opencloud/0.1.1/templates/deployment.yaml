@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencloud.fullname" . }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "opencloud.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "opencloud.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: ocis-init
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["sh", "-c", "rm -f /etc/opencloud/ocis.yaml && ocis init --config-dir=/etc/opencloud"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/opencloud
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          # Only keep necessary envs: DB and admin password
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.external.passwordSecret.name }}
+                  key: {{ .Values.database.external.passwordSecret.key }}
+            - name: IDM_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.opencloud.adminPasswordSecret.name }}
+                  key: {{ .Values.opencloud.adminPasswordSecret.key }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "opencloud.fullname" . }}-config
+          volumeMounts:
+            {{- if .Values.storage.data.enabled }}
+            - name: data
+              mountPath: {{ .Values.storage.data.mountPath }}
+            {{- end }}
+            {{- if .Values.storage.cache.enabled }}
+            - name: cache
+              mountPath: {{ .Values.storage.cache.mountPath }}
+            {{- end }}
+            - name: config
+              mountPath: /etc/opencloud
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        {{- if .Values.storage.data.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.data.claimName }}
+        {{- end }}
+        {{- if .Values.storage.cache.enabled }}
+        - name: cache
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.cache.claimName }}
+        {{- end }}
+        - name: config
+          emptyDir: {}

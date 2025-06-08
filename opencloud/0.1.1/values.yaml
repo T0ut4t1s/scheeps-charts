@@ -1,0 +1,87 @@
+replicaCount: 1
+
+image:
+  repository: opencloudeu/opencloud-rolling
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+
+opencloud:
+  domain: "cloud.scheeps.online"
+
+  adminPasswordSecret:
+    name: "opencloud-admin-secret"
+    key: "password"
+
+  ocisSecrets:
+    name: opencloud-ocis-secret
+    jwtSecretKey: OCIS_JWT_SECRET
+    transferSecretKey: OCIS_TRANSFER_SECRET
+    apiKeyKey: OCIS_MACHINE_AUTH_API_KEY
+
+  logLevel: "info"
+  logColor: false
+  logPretty: false
+
+  insecure: true
+  enableBasicAuth: false
+
+  createDemoUsers: false
+
+database:
+  external:
+    enabled: true
+    host: "pgbouncer.opencloud.svc.cluster.local"
+    port: 5432
+    database: "opencloud"
+    username: "opencloud"
+    passwordSecret:
+      name: "opencloud-pg-secret"
+      key: "password"
+    sslmode: "disable"
+
+storage:
+  data:
+    enabled: true
+    claimName: "opencloud-unas-pvc"
+    mountPath: "/var/lib/ocis/data"
+
+  cache:
+    enabled: true
+    claimName: "opencloud-cache-pvc"
+    mountPath: "/var/cache/ocis"
+
+service:
+  type: ClusterIP
+  port: 9200
+  targetPort: 9200
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+podSecurityContext:
+  fsGroup: 1000
+
+env:
+  - name: OCIS_LOG_LEVEL
+    value: "info"
+  - name: OCIS_LOG_COLOR
+    value: "false"
+  - name: OCIS_LOG_PRETTY
+    value: "false"
