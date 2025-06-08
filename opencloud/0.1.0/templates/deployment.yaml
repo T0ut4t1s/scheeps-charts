@@ -19,13 +19,13 @@ spec:
       initContainers:
         - name: debug-config
           image: busybox
-          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/ocis.yaml || echo 'no config'"]
+          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/config.yaml || echo 'no config'"]
           volumeMounts:
             - name: config
               mountPath: /etc/opencloud
-        - name: ocis-init
+        - name: opencloud-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["sh", "-c", "ocis init --config-dir=/etc/opencloud || true"]
+          command: ["sh", "-c", "opencloud init --config-dir=/etc/opencloud || true"]
           env:
             - name: OCIS_JWT_SECRET
               valueFrom:
@@ -50,9 +50,9 @@ spec:
               mountPath: /etc/opencloud
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-        - name: debug-after-ocis
+        - name: debug-after-init
           image: busybox
-          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/ocis.yaml || echo 'no config after ocis-init'"]
+          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/config.yaml || echo 'no config after init'"]
           volumeMounts:
             - name: config
               mountPath: /etc/opencloud
@@ -60,6 +60,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["sh", "-c", "opencloud server --config-dir=/etc/opencloud"]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           ports:
