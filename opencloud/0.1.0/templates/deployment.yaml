@@ -50,6 +50,12 @@ spec:
               mountPath: /etc/opencloud
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+        - name: debug-after-ocis
+          image: busybox
+          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/ocis.yaml || echo 'no config after ocis-init'"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/opencloud
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
