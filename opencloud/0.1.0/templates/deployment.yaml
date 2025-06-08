@@ -25,7 +25,7 @@ spec:
               mountPath: /etc/opencloud
         - name: opencloud-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["sh", "-c", "opencloud init --config-path=/etc/opencloud/config.yaml || true"]
+          command: ["sh", "-c", "opencloud init --config-path=/etc/opencloud/config.yaml --insecure yes || true"]
           env:
             - name: JWT_SECRET
               valueFrom:
