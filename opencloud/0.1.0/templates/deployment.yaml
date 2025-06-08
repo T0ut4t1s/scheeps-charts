@@ -52,12 +52,6 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
         - name: debug-after-init
           image: busybox
-          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/opencloud.yaml || echo 'no config after init'"]
-          volumeMounts:
-            - name: config
-              mountPath: /etc/opencloud
-        - name: env-after-init
-          image: busybox
           command:
             - sh
             - -c
@@ -126,6 +120,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.opencloud.adminPasswordSecret.name }}
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
+            - name: STORAGE_USERS_DRIVER
+              value: "sql"
+            - name: STORAGE_USERS_SQL_DSN
+              value: "postgres://opencloud:$(DB_PASSWORD)@pgbouncer.opencloud.svc.cluster.local:5432/opencloud?sslmode=disable"
           envFrom:
             - configMapRef:
                 name: {{ include "opencloud.fullname" . }}-config
