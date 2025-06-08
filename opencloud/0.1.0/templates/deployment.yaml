@@ -18,31 +18,8 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: ocis-init
-          # Use a lightweight Alpine image to ensure openssl is available
-          image: alpine:3.18
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              # Install openssl at runtime
-              apk add --no-cache openssl >/dev/null 2>&1
-              echo "Generating OCIS secrets..."
-              
-              # Generate JWT secret if not provided
-              if [ -z "$OCIS_JWT_SECRET" ]; then
-                openssl rand -base64 32 > /tmp/secrets/jwt_secret
-              else
-                echo "$OCIS_JWT_SECRET" > /tmp/secrets/jwt_secret
-              fi
-              
-              # Generate transfer secret
-              openssl rand -base64 32 > /tmp/secrets/transfer_secret
-              
-              # Generate machine auth API key
-              openssl rand -base64 32 > /tmp/secrets/api_key
-              
-              echo "Secret generation completed."
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: [ "ocis", "init", "--config-dir=/etc/opencloud" ]
           env:
             - name: OCIS_JWT_SECRET
               valueFrom:
@@ -63,8 +40,8 @@ spec:
                   key: {{ .Values.opencloud.ocisSecrets.apiKeyKey }}
                   optional: true
           volumeMounts:
-            - name: secret-files
-              mountPath: /tmp/secrets
+            - name: config
+              mountPath: /etc/opencloud
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
       containers:
@@ -136,6 +113,8 @@ spec:
             - name: secret-files
               mountPath: /tmp/secrets
               readOnly: true
+            - name: config
+              mountPath: /etc/opencloud
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -150,4 +129,6 @@ spec:
             claimName: {{ .Values.storage.cache.claimName }}
         {{- end }}
         - name: secret-files
+          emptyDir: {}
+        - name: config
           emptyDir: {}
