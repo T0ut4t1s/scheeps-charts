@@ -16,39 +16,21 @@ spec:
     spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      
-      # Generate secure secrets in init container if not provided
       initContainers:
         - name: ocis-init
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          command: 
-            - /bin/sh
-            - -c
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["/bin/sh", "-c"]
+          args:
             - |
-              echo "Generating OCIS secrets if needed..."
-              
-              # Generate JWT secret if not provided
+              echo "Generating OCIS secrets..."
               if [ -z "$OCIS_JWT_SECRET" ]; then
-                JWT_SECRET=$(openssl rand -base64 32)
-                echo "Generated JWT secret: $JWT_SECRET"
-                echo "$JWT_SECRET" > /tmp/secrets/jwt_secret
+                openssl rand -base64 32 > /tmp/secrets/jwt_secret
               else
-                echo "Using provided JWT secret"
                 echo "$OCIS_JWT_SECRET" > /tmp/secrets/jwt_secret
               fi
-              
-              # Generate transfer secret
-              TRANSFER_SECRET=$(openssl rand -base64 32)
-              echo "$TRANSFER_SECRET" > /tmp/secrets/transfer_secret
-              
-              # Generate machine auth API key
-              API_KEY=$(openssl rand -base64 32)
-              echo "$API_KEY" > /tmp/secrets/api_key
-              
-              echo "Secret generation completed."
-          
+              openssl rand -base64 32 > /tmp/secrets/transfer_secret
+              openssl rand -base64 32 > /tmp/secrets/api_key
           env:
-            # All OCIS secrets from the main secret
             - name: OCIS_JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -67,50 +49,37 @@ spec:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
                   key: {{ .Values.opencloud.ocisSecrets.apiKeyKey }}
                   optional: true
-          
           volumeMounts:
             - name: secret-files
               mountPath: /tmp/secrets
-          
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-      
       containers:
         - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
-              protocol: TCP
-          
-          # OpenCloud doesn't have a dedicated health endpoint
-          # Using the main web interface for health checks
           livenessProbe:
             httpGet:
               path: /
               port: http
               scheme: HTTP
-            initialDelaySeconds: 120  # OpenCloud needs time to initialize all services
+            initialDelaySeconds: 120
             periodSeconds: 30
             timeoutSeconds: 10
-            failureThreshold: 3
-            successThreshold: 1
           readinessProbe:
             httpGet:
               path: /
               port: http
               scheme: HTTP
-            initialDelaySeconds: 60   # Allow services to start before accepting traffic
+            initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 3
-            successThreshold: 1
-          
           env:
-            # Core OCIS secrets - use generated or provided values
             - name: OCIS_JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -129,39 +98,23 @@ spec:
                   name: {{ .Values.opencloud.ocisSecrets.name }}
                   key: {{ .Values.opencloud.ocisSecrets.apiKeyKey }}
                   optional: true
-            
-            # Database credentials
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.database.external.passwordSecret.name }}
                   key: {{ .Values.database.external.passwordSecret.key }}
-            
-            # Admin credentials
             - name: IDM_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.adminPasswordSecret.name }}
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
-            
-            # Additional user-defined environment variables
-            {{- range .Values.env }}
-            - name: {{ .name }}
-              value: {{ .value | quote }}
-            {{- end }}
-          
           envFrom:
             - configMapRef:
                 name: {{ include "opencloud.fullname" . }}-config
-          
           volumeMounts:
             {{- if .Values.storage.data.enabled }}
             - name: data
               mountPath: {{ .Values.storage.data.mountPath }}
-            {{- end }}
-            {{- if .Values.storage.config.enabled }}
-            - name: config
-              mountPath: {{ .Values.storage.config.mountPath }}
             {{- end }}
             {{- if .Values.storage.cache.enabled }}
             - name: cache
@@ -170,20 +123,13 @@ spec:
             - name: secret-files
               mountPath: /tmp/secrets
               readOnly: true
-          
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      
       volumes:
         {{- if .Values.storage.data.enabled }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ .Values.storage.data.claimName }}
-        {{- end }}
-        {{- if .Values.storage.config.enabled }}
-        - name: config
-          persistentVolumeClaim:
-            claimName: {{ .Values.storage.config.claimName }}
         {{- end }}
         {{- if .Values.storage.cache.enabled }}
         - name: cache
@@ -192,16 +138,21 @@ spec:
         {{- end }}
         - name: secret-files
           emptyDir: {}
-      
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+
+---
+# templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opencloud.fullname" . }}
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "opencloud.selectorLabels" . | nindent 4 }}

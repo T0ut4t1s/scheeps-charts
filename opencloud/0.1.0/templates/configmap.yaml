@@ -5,46 +5,32 @@ metadata:
   labels:
     {{- include "opencloud.labels" . | nindent 4 }}
 data:
-  # Core OpenCloud configuration
   OCIS_URL: "https://{{ .Values.opencloud.domain }}"
   OCIS_LOG_LEVEL: {{ .Values.opencloud.logLevel | quote }}
   OCIS_LOG_COLOR: {{ .Values.opencloud.logColor | quote }}
   OCIS_LOG_PRETTY: {{ .Values.opencloud.logPretty | quote }}
   OCIS_INSECURE: {{ .Values.opencloud.insecure | quote }}
-  
-  # Configuration and data directories
-  OCIS_CONFIG_DIR: "{{ .Values.storage.config.mountPath }}"
+
   OCIS_BASE_DATA_PATH: "{{ .Values.storage.data.mountPath }}"
-  
-  # Database configuration
+  OCIS_CACHE_STORE: "memory"
+  OCIS_CACHE_STORE_NODES: "127.0.0.1:9233"
+
   {{- if .Values.database.external.enabled }}
   STORAGE_USERS_DRIVER: "sql"
   STORAGE_USERS_SQL_DSN: "postgres://{{ .Values.database.external.username }}:$(DB_PASSWORD)@{{ .Values.database.external.host }}:{{ .Values.database.external.port }}/{{ .Values.database.external.database }}?sslmode={{ .Values.database.external.sslmode }}"
   STORAGE_GROUPS_DRIVER: "sql"
   STORAGE_GROUPS_SQL_DSN: "postgres://{{ .Values.database.external.username }}:$(DB_PASSWORD)@{{ .Values.database.external.host }}:{{ .Values.database.external.port }}/{{ .Values.database.external.database }}?sslmode={{ .Values.database.external.sslmode }}"
   {{- end }}
-  
-  # Proxy configuration
+
   PROXY_HTTP_ADDR: "0.0.0.0:9200"
   PROXY_TLS: "false"
-  
-  # Gateway configuration  
   GATEWAY_GRPC_ADDR: "0.0.0.0:9142"
-  
-  # Basic auth settings
+
   {{- if .Values.opencloud.enableBasicAuth }}
   PROXY_ENABLE_BASIC_AUTH: "true"
   {{- end }}
-  
-  # Demo users
   {{- if .Values.opencloud.createDemoUsers }}
   IDM_CREATE_DEMO_USERS: "true"
   {{- end }}
-  
-  # Disable TLS for internal communications
   OCIS_EVENTS_ENABLE_TLS: "false"
   OCIS_GRPC_PROTOCOL: "tcp"
-  
-  # Cache and performance settings
-  OCIS_CACHE_STORE: "memory"
-  OCIS_CACHE_STORE_NODES: "127.0.0.1:9233"

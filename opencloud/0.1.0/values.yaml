@@ -48,11 +48,6 @@ storage:
     claimName: "opencloud-unas-pvc"
     mountPath: "/var/lib/ocis/data"
 
-  config:
-    enabled: true
-    claimName: "opencloud-config-pvc"
-    mountPath: "/etc/opencloud"
-
   cache:
     enabled: true
     claimName: "opencloud-cache-pvc"
@@ -72,9 +67,7 @@ resources:
     memory: 1Gi
 
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
 
 securityContext:
