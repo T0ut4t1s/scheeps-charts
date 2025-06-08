@@ -1,3 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opencloud.fullname" . }}-config
+  labels:
+    {{- include "opencloud.labels" . | nindent 4 }}
+data:
+  OCIS_URL: "https://{{ .Values.opencloud.domain }}"
+  OCIS_LOG_LEVEL: {{ .Values.opencloud.logLevel | quote }}
+  OCIS_LOG_COLOR: {{ .Values.opencloud.logColor | quote }}
+  OCIS_LOG_PRETTY: {{ .Values.opencloud.logPretty | quote }}
+  OCIS_INSECURE: {{ .Values.opencloud.insecure | quote }}
+
+  OCIS_BASE_DATA_PATH: "{{ .Values.storage.data.mountPath }}"
+  OCIS_CACHE_STORE: "memory"
+  OCIS_CACHE_STORE_NODES: "127.0.0.1:9233"
+
+  {{- if .Values.database.external.enabled }}
+  STORAGE_USERS_DRIVER: "sql"
+  STORAGE_USERS_SQL_DSN: "postgres://{{ .Values.database.external.username }}:$(DB_PASSWORD)@{{ .Values.database.external.host }}:{{ .Values.database.external.port }}/{{ .Values.database.external.database }}?sslmode={{ .Values.database.external.sslmode }}"
+  STORAGE_GROUPS_DRIVER: "sql"
+  STORAGE_GROUPS_SQL_DSN: "postgres://{{ .Values.database.external.username }}:$(DB_PASSWORD)@{{ .Values.database.external.host }}:{{ .Values.database.external.port }}/{{ .Values.database.external.database }}?sslmode={{ .Values.database.external.sslmode }}"
+  {{- end }}
+
+  PROXY_HTTP_ADDR: "0.0.0.0:9200"
+  PROXY_TLS: "false"
+  GATEWAY_GRPC_ADDR: "0.0.0.0:9142"
+
+  {{- if .Values.opencloud.enableBasicAuth }}
+  PROXY_ENABLE_BASIC_AUTH: "true"
+  {{- end }}
+  {{- if .Values.opencloud.createDemoUsers }}
+  IDM_CREATE_DEMO_USERS: "true"
+  {{- end }}
+  OCIS_EVENTS_ENABLE_TLS: "false"
+  OCIS_GRPC_PROTOCOL: "tcp"
+
+---
+# templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,18 +57,31 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: ocis-init
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["/bin/sh", "-c"]
+          # Use a lightweight Alpine image to ensure openssl is available
+          image: alpine:3.18
+          command:
+            - /bin/sh
+            - -c
           args:
             - |
+              # Install openssl at runtime
+              apk add --no-cache openssl >/dev/null 2>&1
               echo "Generating OCIS secrets..."
+              
+              # Generate JWT secret if not provided
               if [ -z "$OCIS_JWT_SECRET" ]; then
                 openssl rand -base64 32 > /tmp/secrets/jwt_secret
               else
                 echo "$OCIS_JWT_SECRET" > /tmp/secrets/jwt_secret
               fi
+              
+              # Generate transfer secret
               openssl rand -base64 32 > /tmp/secrets/transfer_secret
+              
+              # Generate machine auth API key
               openssl rand -base64 32 > /tmp/secrets/api_key
+              
+              echo "Secret generation completed."
           env:
             - name: OCIS_JWT_SECRET
               valueFrom:
@@ -138,21 +190,3 @@ spec:
         {{- end }}
         - name: secret-files
           emptyDir: {}
-
----
-# templates/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "opencloud.fullname" . }}
-  labels:
-    {{- include "opencloud.labels" . | nindent 4 }}
-spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      protocol: TCP
-      name: http
-  selector:
-    {{- include "opencloud.selectorLabels" . | nindent 4 }}
