@@ -19,7 +19,7 @@ spec:
       initContainers:
         - name: ocis-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: [ "ocis", "init", "--config-dir=/etc/opencloud" ]
+          command: ["sh", "-c", "ocis init --config-dir=/etc/opencloud || true"]
           env:
             - name: OCIS_JWT_SECRET
               valueFrom:
@@ -110,9 +110,6 @@ spec:
             - name: cache
               mountPath: {{ .Values.storage.cache.mountPath }}
             {{- end }}
-            - name: secret-files
-              mountPath: /tmp/secrets
-              readOnly: true
             - name: config
               mountPath: /etc/opencloud
           resources:
@@ -128,7 +125,5 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.storage.cache.claimName }}
         {{- end }}
-        - name: secret-files
-          emptyDir: {}
         - name: config
           emptyDir: {}
