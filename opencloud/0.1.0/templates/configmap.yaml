@@ -15,13 +15,6 @@ data:
   OCIS_CACHE_STORE: "memory"
   OCIS_CACHE_STORE_NODES: "127.0.0.1:9233"
 
-  {{- if .Values.database.external.enabled }}
-  STORAGE_USERS_DRIVER: "owncloudsql"
-  STORAGE_USERS_SQL_DSN: "postgres://{{ .Values.database.external.username }}:$(DB_PASSWORD)@{{ .Values.database.external.host }}:{{ .Values.database.external.port }}/{{ .Values.database.external.database }}?sslmode={{ .Values.database.external.sslmode }}"
-  STORAGE_GROUPS_DRIVER: "owncloudsql"
-  STORAGE_GROUPS_SQL_DSN: "postgres://{{ .Values.database.external.username }}:$(DB_PASSWORD)@{{ .Values.database.external.host }}:{{ .Values.database.external.port }}/{{ .Values.database.external.database }}?sslmode={{ .Values.database.external.sslmode }}"
-  {{- end }}
-
   PROXY_HTTP_ADDR: "0.0.0.0:9200"
   PROXY_TLS: "false"
   GATEWAY_GRPC_ADDR: "0.0.0.0:9142"

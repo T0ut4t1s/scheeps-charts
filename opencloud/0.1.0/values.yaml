@@ -15,12 +15,6 @@ opencloud:
     name: "opencloud-admin-secret"
     key: "password"
 
-  ocisSecrets:
-    name: opencloud-ocis-secret
-    jwtSecretKey: OCIS_JWT_SECRET
-    transferSecretKey: OCIS_TRANSFER_SECRET
-    apiKeyKey: OCIS_MACHINE_AUTH_API_KEY
-
   logLevel: "info"
   logColor: false
   logPretty: false
@@ -29,18 +23,6 @@ opencloud:
   enableBasicAuth: false
 
   createDemoUsers: false
-
-database:
-  external:
-    enabled: true
-    host: "pgbouncer.opencloud.svc.cluster.local"
-    port: 5432
-    database: "opencloud"
-    username: "opencloud"
-    passwordSecret:
-      name: "opencloud-pg-secret"
-      key: "password"
-    sslmode: "disable"
 
 storage:
   data:
@@ -52,6 +34,11 @@ storage:
     enabled: true
     claimName: "opencloud-cache-pvc"
     mountPath: "/var/cache/ocis"
+
+  config:
+    enabled: true
+    claimName: "opencloud-config-pvc"
+    mountPath: "/etc/opencloud"
 
 service:
   type: ClusterIP

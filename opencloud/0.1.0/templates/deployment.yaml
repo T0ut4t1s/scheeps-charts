@@ -19,35 +19,16 @@ spec:
       initContainers:
         - name: debug-config
           image: busybox
-          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/config.yaml || echo 'no config'"]
+          command: ["sh", "-c", "ls -l /etc/opencloud && cat /etc/opencloud/opencloud.yaml || echo 'no config'"]
           volumeMounts:
             - name: config
-              mountPath: /etc/opencloud
+              mountPath: {{ .Values.storage.config.mountPath }}
         - name: opencloud-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: ["sh", "-c", "opencloud init --insecure yes || true"]
-          env:
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.opencloud.ocisSecrets.name }}
-                  key: {{ .Values.opencloud.ocisSecrets.jwtSecretKey }}
-                  optional: true
-            - name: TRANSFER_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.opencloud.ocisSecrets.name }}
-                  key: {{ .Values.opencloud.ocisSecrets.transferSecretKey }}
-                  optional: true
-            - name: MACHINE_AUTH_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.opencloud.ocisSecrets.name }}
-                  key: {{ .Values.opencloud.ocisSecrets.apiKeyKey }}
-                  optional: true
           volumeMounts:
             - name: config
-              mountPath: /etc/opencloud
+              mountPath: {{ .Values.storage.config.mountPath }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
         - name: debug-after-init
@@ -63,7 +44,7 @@ spec:
               cat /etc/opencloud/opencloud.yaml || echo 'no config after init';
           volumeMounts:
             - name: config
-              mountPath: /etc/opencloud
+              mountPath: {{ .Values.storage.config.mountPath }}
 
       containers:
         - name: {{ .Chart.Name }}
@@ -92,38 +73,11 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
           env:
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.opencloud.ocisSecrets.name }}
-                  key: {{ .Values.opencloud.ocisSecrets.jwtSecretKey }}
-                  optional: true
-            - name: TRANSFER_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.opencloud.ocisSecrets.name }}
-                  key: {{ .Values.opencloud.ocisSecrets.transferSecretKey }}
-                  optional: true
-            - name: MACHINE_AUTH_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.opencloud.ocisSecrets.name }}
-                  key: {{ .Values.opencloud.ocisSecrets.apiKeyKey }}
-                  optional: true
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.database.external.passwordSecret.name }}
-                  key: {{ .Values.database.external.passwordSecret.key }}
             - name: IDM_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.opencloud.adminPasswordSecret.name }}
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
-            - name: STORAGE_USERS_DRIVER
-              value: "owncloudsql"
-            - name: STORAGE_USERS_SQL_DSN
-              value: "postgres://opencloud:$(DB_PASSWORD)@pgbouncer.opencloud.svc.cluster.local:5432/opencloud?sslmode=disable"
           envFrom:
             - configMapRef:
                 name: {{ include "opencloud.fullname" . }}-config
@@ -137,7 +91,7 @@ spec:
               mountPath: {{ .Values.storage.cache.mountPath }}
             {{- end }}
             - name: config
-              mountPath: /etc/opencloud
+              mountPath: {{ .Values.storage.config.mountPath }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -151,5 +105,11 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.storage.cache.claimName }}
         {{- end }}
+        {{- if .Values.storage.config.enabled }}
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.config.claimName }}
+        {{- else }}
         - name: config
           emptyDir: {}
+        {{- end }}
