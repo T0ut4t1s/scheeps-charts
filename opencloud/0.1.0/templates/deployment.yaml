@@ -80,7 +80,7 @@ spec:
                   key: {{ .Values.opencloud.adminPasswordSecret.key }}
           envFrom:
             - configMapRef:
-                name: {{ include "opencloud.fullname" . }}-config
+                name: {{ include "opencloud.fullname" . }}-env-config
           volumeMounts:
             {{- if .Values.storage.data.enabled }}
             - name: data
@@ -94,6 +94,9 @@ spec:
               mountPath: {{ .Values.storage.config.mountPath }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+            - name: web-config
+              mountPath: /etc/opencloud/config.json
+              subPath: config.json
       volumes:
         {{- if .Values.storage.data.enabled }}
         - name: data
@@ -113,3 +116,9 @@ spec:
         - name: config
           emptyDir: {}
         {{- end }}
+        - name: web-config
+          configMap:
+            name: {{ include "opencloud.fullname" . }}-frontend-config
+            items:
+              - key: config.json
+                path: config.json

@@ -28,7 +28,7 @@ storage:
   data:
     enabled: true
     claimName: "opencloud-unas-pvc"
-    mountPath: "/var/lib/ocis/data"
+    mountPath: "/var/lib/opencloud/"
 
   cache:
     enabled: true
