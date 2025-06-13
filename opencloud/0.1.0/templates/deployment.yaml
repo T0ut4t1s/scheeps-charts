@@ -45,7 +45,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: {{ .Values.storage.config.mountPath }}
-
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -92,11 +91,11 @@ spec:
             {{- end }}
             - name: config
               mountPath: {{ .Values.storage.config.mountPath }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
             - name: web-config
               mountPath: /etc/opencloud/config.json
               subPath: config.json
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         {{- if .Values.storage.data.enabled }}
         - name: data
