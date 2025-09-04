@@ -82,8 +82,6 @@ secrets:
   clientSecretKey: "client_secret"
   cookieSecretKey: "cookie_secret"
 
-# Namespace configuration
-namespace: "network-management"
 
 # Pod annotations
 podAnnotations: {}
