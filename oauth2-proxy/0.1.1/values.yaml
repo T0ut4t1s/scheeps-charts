@@ -44,32 +44,32 @@ oauth2Proxy:
   # Provider configuration
   provider: "oidc"
   oidcIssuerUrl: "https://auth.scheeps.online/realms/scheeps"
-  clientId: "vlan-manager"
-  
+  clientId: "" # e.g. vlan-manager
+
   # URLs
-  redirectUrl: "https://vlan.scheeps.online/oauth2/callback"
-  upstreams: "http://vlan-manager-frontend.network-management.svc.cluster.local:80"
-  
+  redirectUrl: "" # e.g. https://vlan.scheeps.online/oauth2/callback
+  upstreams: "" # e.g. http://vlan-manager-frontend.network-management.svc.cluster.local:80
+
   # Server configuration
   httpAddress: "0.0.0.0:4180"
   reverseProxy: true
   skipProviderButton: true
-  
+
   # Cookie configuration
-  cookieDomains: "vlan.scheeps.online"
+  cookieDomains: "" # e.g. vlan.scheeps.online
   cookieSecure: true
   cookiePath: "/"
   cookieSamesite: "lax"
   cookieRefresh: "1m"
   cookieExpire: "4h"
-  
+
   # Authentication configuration
   emailDomains: "*"
   scope: "openid profile email roles"
   oidcGroupsClaim: "realm_access_roles"
-  allowedGroups: "vlan-manager-admin,vlan-manager-user"
+  allowedGroups: "" # e.g. vlan-manager-admin,vlan-manager-user
   whitelistDomains: "auth.scheeps.online"
-  
+
   # Headers
   setAuthorizationHeader: true
   setXAuthRequest: true
@@ -78,10 +78,9 @@ oauth2Proxy:
 # Secret configuration
 secrets:
   # Name of the secret containing client_secret and cookie_secret
-  name: "vlan-keycloak-secret"
+  name: "" # e.g. vlan-auth-secret
   clientSecretKey: "client_secret"
   cookieSecretKey: "cookie_secret"
-
 
 # Pod annotations
 podAnnotations: {}
