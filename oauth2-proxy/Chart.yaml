@@ -1,0 +1,17 @@
+apiVersion: v2
+name: oauth2-proxy
+description: OAuth2 Proxy for OIDC authentication with Keycloak integration
+type: application
+version: 0.1.0
+appVersion: v7.4.0
+maintainers:
+  - name: theunis
+keywords:
+  - oauth2
+  - proxy
+  - authentication
+  - oidc
+  - keycloak
+home: https://github.com/oauth2-proxy/oauth2-proxy
+sources:
+  - https://github.com/oauth2-proxy/oauth2-proxy
