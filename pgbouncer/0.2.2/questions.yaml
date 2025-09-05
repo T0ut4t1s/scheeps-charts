@@ -1,0 +1,235 @@
+categories:
+- Database
+- Connection Pool
+- PostgreSQL
+
+questions:
+# Basic Configuration
+- variable: replicaCount
+  default: 1
+  description: "Number of PgBouncer replicas"
+  type: int
+  label: Replica Count
+  group: "Basic Configuration"
+
+- variable: image.tag
+  default: "1.24.1"
+  description: "PgBouncer image tag/version"
+  type: string
+  label: Image Version
+  group: "Basic Configuration"
+
+- variable: image.repository
+  default: "bitnami/pgbouncer"
+  description: "PgBouncer image repository"
+  type: string
+  label: Image Repository
+  group: "Basic Configuration"
+
+# PostgreSQL Connection Configuration
+- variable: postgresql.host
+  default: "postgresql-cluster-rw.postgres-system.svc.cluster.local"
+  description: "PostgreSQL server hostname or service name"
+  type: string
+  label: PostgreSQL Host
+  group: "PostgreSQL Connection"
+  required: true
+
+- variable: postgresql.port
+  default: 5432
+  description: "PostgreSQL server port"
+  type: int
+  label: PostgreSQL Port
+  group: "PostgreSQL Connection"
+
+- variable: postgresql.username
+  default: "postgres"
+  description: "PostgreSQL username for PgBouncer to connect with"
+  type: string
+  label: PostgreSQL Username
+  group: "PostgreSQL Connection"
+  required: true
+
+- variable: postgresql.passwordSecret
+  default: "postgresql-superuser"
+  description: "Name of Kubernetes secret containing PostgreSQL password"
+  type: string
+  label: Password Secret Name
+  group: "PostgreSQL Connection"
+  required: true
+
+# Authentication Configuration
+- variable: auth.type
+  default: "scram-sha-256"
+  description: "PostgreSQL authentication method"
+  type: enum
+  label: Authentication Type
+  group: "Authentication"
+  options:
+    - "scram-sha-256"
+    - "md5"
+    - "plain"
+    - "trust"
+
+- variable: auth.poolMode
+  default: "transaction"
+  description: "PgBouncer pool mode"
+  type: enum
+  label: Pool Mode
+  group: "Authentication"
+  options:
+    - "session"
+    - "transaction"
+    - "statement"
+
+- variable: auth.database
+  default: ""
+  description: "Specific database to pool (leave empty for all databases)"
+  type: string
+  label: Target Database
+  group: "Authentication"
+
+- variable: auth.userlist
+  default: |
+    "<Username>" "<SCRAM Password>"
+  description: "PgBouncer user authentication list (format: \"username\" \"password\")"
+  type: multiline
+  label: User Authentication List
+  group: "Authentication"
+
+- variable: auth.minPoolSize
+  default: 5
+  description: "Minimum pool size per user/database pair"
+  type: int
+  label: Minimum Pool Size
+  group: "Authentication"
+
+- variable: auth.ignoreStartupParameters
+  default: ""
+  description: "Comma-separated list of startup parameters to ignore"
+  type: string
+  label: Ignore Startup Parameters
+  group: "Authentication"
+
+# TLS Configuration
+- variable: tls.enabled
+  default: true
+  description: "Enable TLS for PostgreSQL connections"
+  type: boolean
+  label: Enable TLS
+  group: "TLS Configuration"
+
+- variable: tls.serverTlsSecret
+  default: "pgbouncer-postgres-tls"
+  description: "Name of Kubernetes secret containing TLS certificates"
+  type: string
+  label: TLS Secret Name
+  group: "TLS Configuration"
+  show_if: "tls.enabled=true"
+
+- variable: tls.sslMode
+  default: "verify-full"
+  description: "PostgreSQL SSL mode"
+  type: enum
+  label: SSL Mode
+  group: "TLS Configuration"
+  show_if: "tls.enabled=true"
+  options:
+    - "disable"
+    - "allow"
+    - "prefer"
+    - "require"
+    - "verify-ca"
+    - "verify-full"
+
+# Service Configuration
+- variable: service.type
+  default: "ClusterIP"
+  description: "Kubernetes service type"
+  type: enum
+  label: Service Type
+  group: "Service Configuration"
+  options:
+    - "ClusterIP"
+    - "NodePort"
+    - "LoadBalancer"
+
+- variable: service.port
+  default: 5432
+  description: "Service port for client connections"
+  type: int
+  label: Service Port
+  group: "Service Configuration"
+
+# Resource Configuration
+- variable: resources.requests.memory
+  default: "128Mi"
+  description: "Memory request for PgBouncer pods"
+  type: string
+  label: Memory Request
+  group: "Resources"
+
+- variable: resources.requests.cpu
+  default: "100m"
+  description: "CPU request for PgBouncer pods"
+  type: string
+  label: CPU Request
+  group: "Resources"
+
+- variable: resources.limits.memory
+  default: "256Mi"
+  description: "Memory limit for PgBouncer pods"
+  type: string
+  label: Memory Limit
+  group: "Resources"
+
+- variable: resources.limits.cpu
+  default: "200m"
+  description: "CPU limit for PgBouncer pods"
+  type: string
+  label: CPU Limit
+  group: "Resources"
+
+# Security Configuration
+- variable: securityContext.runAsNonRoot
+  default: true
+  description: "Run container as non-root user"
+  type: boolean
+  label: Run as Non-Root
+  group: "Security"
+
+- variable: securityContext.runAsUser
+  default: 1001
+  description: "User ID to run container as"
+  type: int
+  label: Run as User ID
+  group: "Security"
+
+- variable: podSecurityContext.fsGroup
+  default: 1001
+  description: "File system group ID for pod volumes"
+  type: int
+  label: FS Group ID
+  group: "Security"
+
+# Scheduling Configuration
+- variable: nodeSelector
+  default: {}
+  description: "Node selector constraints for pod scheduling"
+  type: map
+  label: Node Selector
+  group: "Scheduling"
+
+- variable: tolerations
+  default: []
+  description: "Pod tolerations for node taints"
+  type: array
+  label: Tolerations
+  group: "Scheduling"
+
+- variable: affinity
+  default: {}
+  description: "Pod affinity and anti-affinity rules"
+  type: map
+  label: Affinity Rules
+  group: "Scheduling"
