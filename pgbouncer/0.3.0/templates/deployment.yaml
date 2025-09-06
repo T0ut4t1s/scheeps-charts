@@ -37,22 +37,15 @@ spec:
           # Use external userlist from Secret as-is  
           cp /opt/bitnami/pgbouncer/conf/userlist.txt /tmp/pgbouncer/userlist.txt
           {{- else if and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name }}
-          # Generate userlist from secret credentials
+          # Generate userlist from secret credentials  
           USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.usernameKey | default "username" }} | tr -d '\n')
           PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.passwordKey | default "password" }} | tr -d '\n')
-          SCRAM_HASH=$(echo -n "$PASSWORD" | python3 -c "
-          import sys, hashlib, secrets, base64
-          password = sys.stdin.read().strip()
-          salt = secrets.token_bytes(16)
-          key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 4096, 32)
-          stored_key = hashlib.sha256(key + b'Client Key').digest()
-          server_key = hashlib.sha256(key + b'Server Key').digest()
-          salt_b64 = base64.b64encode(salt).decode()
-          stored_key_b64 = base64.b64encode(stored_key).decode()
-          server_key_b64 = base64.b64encode(server_key).decode()
-          print(f'SCRAM-SHA-256\${4096}:{salt_b64}\${stored_key_b64}:{server_key_b64}')
-          ")
-          echo "\"$USERNAME\" \"$SCRAM_HASH\"" > /tmp/pgbouncer/userlist.txt
+          
+          # Generate MD5 hash for PostgreSQL authentication (compatible with all systems)
+          # Format: md5 + md5(password + username)  
+          MD5_HASH=$(echo -n "${PASSWORD}${USERNAME}" | md5sum | cut -d' ' -f1)
+          
+          echo "\"$USERNAME\" \"md5$MD5_HASH\"" > /tmp/pgbouncer/userlist.txt
           {{- end }}
           {{- else if .Values.auth.users }}
           # Generate userlist from user configurations
