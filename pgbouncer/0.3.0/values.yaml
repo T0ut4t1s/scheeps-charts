@@ -16,7 +16,10 @@ fullnameOverride: ""
 postgresql:
   host: postgresql-cluster-rw.postgres-system.svc.cluster.local
   port: 5432
-  username: postgres
+  username: postgres  # Static username (legacy)
+  usernameSecret:     # Username from secret (recommended)
+    name: postgresql-superuser
+    key: username
   passwordSecret: postgresql-superuser
 
 auth:

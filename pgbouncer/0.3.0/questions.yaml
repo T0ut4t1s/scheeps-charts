@@ -44,11 +44,24 @@ questions:
 
 - variable: postgresql.username
   default: "postgres"
-  description: "PostgreSQL username for PgBouncer to connect with"
+  description: "Static PostgreSQL username for PgBouncer to connect with (legacy)"
   type: string
-  label: PostgreSQL Username
+  label: PostgreSQL Username (Static)
   group: "PostgreSQL Connection"
-  required: true
+
+- variable: postgresql.usernameSecret.name
+  default: "postgresql-superuser"
+  description: "Name of Kubernetes secret containing PostgreSQL username"
+  type: string
+  label: Username Secret Name
+  group: "PostgreSQL Connection"
+
+- variable: postgresql.usernameSecret.key
+  default: "username"
+  description: "Key within the secret containing the PostgreSQL username"
+  type: string
+  label: Username Secret Key
+  group: "PostgreSQL Connection"
 
 - variable: postgresql.passwordSecret
   default: "postgresql-superuser"

@@ -42,7 +42,9 @@ The following table lists the configurable parameters of the PgBouncer chart and
 |-----------|-------------|---------|
 | `postgresql.host` | PostgreSQL server hostname | `postgresql-cluster-rw.postgres-system.svc.cluster.local` |
 | `postgresql.port` | PostgreSQL server port | `5432` |
-| `postgresql.username` | PostgreSQL username for PgBouncer | `postgres` |
+| `postgresql.username` | Static PostgreSQL username (legacy) | `postgres` |
+| `postgresql.usernameSecret.name` | Secret name containing PostgreSQL username | `postgresql-superuser` |
+| `postgresql.usernameSecret.key` | Secret key containing PostgreSQL username | `username` |
 | `postgresql.passwordSecret` | Name of Kubernetes secret containing PostgreSQL password | `postgresql-superuser` |
 
 ### Authentication Configuration
@@ -127,8 +129,21 @@ The following table lists the configurable parameters of the PgBouncer chart and
 
 This chart requires Kubernetes secrets for proper operation:
 
-### PostgreSQL Password Secret
+### PostgreSQL Connection Secret
 
+**Complete PostgreSQL Credentials (Recommended)**
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-superuser
+type: Opaque
+data:
+  username: <base64-encoded-postgres-username>
+  password: <base64-encoded-postgres-password>
+```
+
+**Password Only (Legacy)**
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -157,6 +172,20 @@ data:
 
 ### Basic Configuration
 
+**Using PostgreSQL Username from Secret (Recommended)**
+```yaml
+replicaCount: 2
+
+postgresql:
+  host: "my-postgres-service.default.svc.cluster.local"
+  port: 5432
+  usernameSecret:
+    name: "my-postgres-secret"
+    key: "username"
+  passwordSecret: "my-postgres-secret"
+```
+
+**Using Static PostgreSQL Username (Legacy)**
 ```yaml
 replicaCount: 2
 
