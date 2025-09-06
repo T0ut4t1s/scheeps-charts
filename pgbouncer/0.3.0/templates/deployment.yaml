@@ -41,11 +41,9 @@ spec:
           USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.usernameKey | default "username" }} | tr -d '\n')
           PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.passwordKey | default "password" }} | tr -d '\n')
           
-          # Generate MD5 hash for PostgreSQL authentication (compatible with all systems)
-          # Format: md5 + md5(password + username)  
-          MD5_HASH=$(echo -n "${PASSWORD}${USERNAME}" | md5sum | cut -d' ' -f1)
-          
-          echo "\"$USERNAME\" \"md5$MD5_HASH\"" > /tmp/pgbouncer/userlist.txt
+          # Use plain text passwords to allow PgBouncer to handle SCRAM authentication to backend
+          # PgBouncer can generate SCRAM on-the-fly when connecting to PostgreSQL backend
+          echo "\"$USERNAME\" \"$PASSWORD\"" > /tmp/pgbouncer/userlist.txt
           {{- end }}
           {{- else if .Values.auth.users }}
           # Generate userlist from user configurations
