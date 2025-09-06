@@ -25,7 +25,7 @@ postgresql:
     key: password
 
 auth:
-  type: scram-sha-256
+  type: md5  # Changed to md5 for compatibility with automatic hash generation
   poolMode: transaction
   ignoreStartupParameters: ""
   database: ""

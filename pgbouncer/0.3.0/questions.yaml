@@ -80,7 +80,7 @@ questions:
 
 # Authentication Configuration
 - variable: auth.type
-  default: "scram-sha-256"
+  default: "md5"
   description: "PostgreSQL authentication method"
   type: enum
   label: Authentication Type
