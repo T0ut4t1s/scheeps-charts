@@ -135,6 +135,21 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.existingSecrets.database.name }}
                   key: {{ .Values.existingSecrets.database.password }}
+            
+            # Redis configuration (if enabled)
+            {{- if .Values.redis.enabled }}
+            - name: QUEUE_BULL_REDIS_HOST
+              value: {{ .Values.redis.host | quote }}
+            - name: QUEUE_BULL_REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+            {{- if .Values.redis.credentialsSecret }}
+            - name: QUEUE_BULL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.redis.credentialsSecret.name }}
+                  key: {{ .Values.redis.credentialsSecret.passwordKey }}
+            {{- end }}
+            {{- end }}
           {{- if .Values.main.persistence.enabled }}
           volumeMounts:
             - name: n8n-data
@@ -164,7 +179,7 @@ spec:
       volumes:
         - name: n8n-data
           persistentVolumeClaim:
-            claimName: {{ include "n8n.pvcName" . }}
+            claimName: {{ .Values.main.persistence.pvcName }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

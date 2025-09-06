@@ -26,13 +26,28 @@
    - Protocol: {{ .Values.config.N8N_PROTOCOL }}
    - Database: {{ .Values.db.type }} ({{ .Values.db.host }}:{{ .Values.db.port }}/{{ .Values.db.name }})
    {{- if .Values.main.persistence.enabled }}
-   - Persistence: Enabled ({{ .Values.main.persistence.size }})
+   - Persistence: Enabled (External PVC: {{ .Values.main.persistence.pvcName }})
    {{- else }}
    - Persistence: Disabled
    {{- end }}
+   {{- if .Values.redis.enabled }}
+   - Queue Mode: Enabled (Redis: {{ .Values.redis.host }}:{{ .Values.redis.port }})
+   {{- else }}
+   - Queue Mode: Disabled (Single instance mode)
+   {{- end }}
 
-3. Required Secrets:
+3. Required External Resources:
+   {{- if .Values.main.persistence.enabled }}
+   - PVC: {{ .Values.main.persistence.pvcName }} (must exist in {{ .Release.Namespace }} namespace)
+   {{- end }}
+
+4. Required Secrets:
    - Application secrets: {{ .Values.existingSecrets.app.name }}
    - Database credentials: {{ .Values.existingSecrets.database.name }}
+   {{- if .Values.redis.enabled }}
+   {{- if .Values.redis.credentialsSecret }}
+   - Redis credentials: {{ .Values.redis.credentialsSecret.name }}
+   {{- end }}
+   {{- end }}
 
-Make sure these secrets exist in the {{ .Release.Namespace }} namespace before the pod can start successfully.
+Make sure these secrets{{- if .Values.main.persistence.enabled }} and PVC{{- end }} exist in the {{ .Release.Namespace }} namespace before the pod can start successfully.

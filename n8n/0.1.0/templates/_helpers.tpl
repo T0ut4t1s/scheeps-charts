@@ -68,9 +68,3 @@ Generate ConfigMap name for n8n configuration
 {{- printf "%s-config" (include "n8n.fullname" .) }}
 {{- end }}
 
-{{/*
-Generate PVC name for n8n data
-*/}}
-{{- define "n8n.pvcName" -}}
-{{- printf "%s-data" (include "n8n.fullname" .) }}
-{{- end }}
