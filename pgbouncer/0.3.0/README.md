@@ -42,28 +42,22 @@ The following table lists the configurable parameters of the PgBouncer chart and
 |-----------|-------------|---------|
 | `postgresql.host` | PostgreSQL server hostname | `postgresql-cluster-rw.postgres-system.svc.cluster.local` |
 | `postgresql.port` | PostgreSQL server port | `5432` |
-| `postgresql.username` | Static PostgreSQL username (legacy) | `postgres` |
-| `postgresql.usernameSecret.name` | Secret name containing PostgreSQL username | `postgresql-superuser` |
-| `postgresql.usernameSecret.key` | Secret key containing PostgreSQL username | `username` |
-| `postgresql.passwordSecret.name` | Secret name containing PostgreSQL password | `postgresql-superuser` |
-| `postgresql.passwordSecret.key` | Secret key containing PostgreSQL password | `password` |
+| `postgresql.connectionSecret.name` | Secret name containing PostgreSQL connection credentials | `postgresql-superuser` |
+| `postgresql.connectionSecret.usernameKey` | Secret key containing PostgreSQL username | `username` |
+| `postgresql.connectionSecret.passwordKey` | Secret key containing PostgreSQL password | `password` |
 
 ### Authentication Configuration
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `auth.type` | PostgreSQL authentication method | `scram-sha-256` |
+| `auth.type` | PostgreSQL authentication method | `md5` |
 | `auth.poolMode` | PgBouncer pool mode | `transaction` |
-| `auth.database` | Specific database to pool (empty for all) | `""` |
 | `auth.minPoolSize` | Minimum pool size per user/database pair | `5` |
 | `auth.ignoreStartupParameters` | Startup parameters to ignore | `""` |
-| `auth.users` | List of users with flexible authentication options | `[]` |
-| `auth.externalUserlist.enabled` | Use external userlist from ConfigMap or Secret | `false` |
-| `auth.externalUserlist.configMap.name` | ConfigMap name containing userlist | - |
-| `auth.externalUserlist.configMap.key` | ConfigMap key containing userlist | - |
-| `auth.externalUserlist.secret.name` | Secret name containing userlist | - |
-| `auth.externalUserlist.secret.key` | Secret key containing userlist | - |
-| `auth.userlist` | Legacy static userlist (backward compatibility) | `"<Username>" "<SCRAM Password>"` |
+| `auth.userSecret.name` | Secret name containing user authentication credentials | `pgbouncer-user-credentials` |
+| `auth.userSecret.usernameKey` | Secret key containing username | `username` |
+| `auth.userSecret.passwordKey` | Secret key containing password | `password` |
+| `auth.userSecret.databaseKey` | Secret key containing database name | `database` |
 
 #### Pool Modes
 
@@ -266,213 +260,94 @@ affinity:
 
 ## User Authentication
 
-Version 0.3.0 introduces flexible user authentication options. You can configure users in several ways:
+Version 0.3.0 introduces a simplified two-secret authentication system for easy configuration and management.
 
-### Method 1: Flexible User Configuration (New in 0.3.0)
+### Configuration Overview
 
-#### Secret-based Authentication
+PgBouncer 0.3.0 uses **two secrets**:
 
-**Both Username and Password from Secrets (Recommended)**
+1. **PostgreSQL Connection Secret**: Contains credentials for PgBouncer to connect to PostgreSQL backend
+2. **User Authentication Secret**: Contains user credentials and database name for client authentication
+
+### Authentication Configuration
+
 ```yaml
-auth:
-  type: "scram-sha-256"
-  users:
-    - usernameSecret:
-        name: "app-credentials"
-        key: "username"
-      passwordSecret:
-        name: "app-credentials"
-        key: "password"
-    - usernameSecret:
-        name: "readonly-credentials"
-        key: "username"
-      passwordSecret:
-        name: "readonly-credentials"
-        key: "password"
-```
+# PostgreSQL backend connection
+postgresql:
+  host: "postgresql-cluster-rw.postgres-system.svc.cluster.local"
+  port: 5432
+  connectionSecret:
+    name: "postgresql-superuser"
+    usernameKey: "username"    # flexible key name
+    passwordKey: "password"    # flexible key name
 
-**Static Username with Password from Secret**
-```yaml
-auth:
-  type: "scram-sha-256"
-  users:
-    - name: "app_user"
-      passwordSecret:
-        name: "app-credentials"
-        key: "password"
-    - name: "readonly_user"
-      passwordSecret:
-        name: "readonly-credentials"  
-        key: "password"
-```
-
-#### Plain Password Authentication (Auto-hashed)
-
-**Username from Secret with Plain Password**
-```yaml
-auth:
-  type: "scram-sha-256"
-  users:
-    - usernameSecret:
-        name: "app-credentials"
-        key: "username"
-      password: "my_plain_password"  # Automatically converted to SCRAM-SHA-256
-```
-
-**Static Username with Plain Password**
-```yaml
-auth:
-  type: "scram-sha-256"
-  users:
-    - name: "app_user"
-      password: "my_plain_password"  # Automatically converted to SCRAM-SHA-256
-    - name: "readonly_user"
-      password: "readonly_password"
-```
-
-### Method 2: External Userlist
-
-#### From ConfigMap (Pre-built Userlist)
-```yaml
-auth:
-  type: "scram-sha-256"
-  externalUserlist:
-    enabled: true
-    configMap:
-      name: "pgbouncer-users"
-      key: "userlist"
-```
-
-#### From Secret (Pre-built Userlist)
-```yaml
-auth:
-  type: "scram-sha-256"
-  externalUserlist:
-    enabled: true
-    secret:
-      name: "pgbouncer-users-list"
-      key: "userlist"
-```
-
-#### From Secret Credentials (Auto-generates Userlist)
-```yaml
-auth:
-  type: "scram-sha-256"
-  externalUserlist:
-    enabled: true
-    secretCredentials:
-      name: "pgbouncer-users-creds"
-      usernameKey: "username"
-      passwordKey: "password"
-```
-
-### Method 3: Legacy Static Userlist (Backward Compatibility)
-
-#### SCRAM-SHA-256 (Recommended)
-```yaml
-auth:
-  type: "scram-sha-256"
-  userlist: |
-    "user1" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
-    "user2" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
-```
-
-#### MD5 Authentication
-```yaml
+# User authentication  
 auth:
   type: "md5"
-  userlist: |
-    "user1" "md5hash"
-    "user2" "md5hash"
+  userSecret:
+    name: "pgbouncer-user-credentials" 
+    usernameKey: "username"    # flexible key name
+    passwordKey: "password"    # flexible key name
+    databaseKey: "database"    # flexible key name
 ```
 
-#### Plain Text (Development Only)
+### Required Secrets
+
+#### Secret 1: PostgreSQL Connection Secret
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-superuser
+type: Opaque
+data:
+  username: <base64-encoded-postgres-username>
+  password: <base64-encoded-postgres-password>
+```
+
+#### Secret 2: User Authentication Secret
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgbouncer-user-credentials
+type: Opaque
+data:
+  username: <base64-encoded-app-username>
+  password: <base64-encoded-app-password>
+  database: <base64-encoded-database-name>
+```
+
+### Example with Custom Key Names
+
+If your secrets use different key names, you can configure them:
+
+```yaml
+postgresql:
+  connectionSecret:
+    name: "my-postgres-secret"
+    usernameKey: "pg_user"        # custom key name
+    passwordKey: "pg_password"    # custom key name
+
+auth:
+  userSecret:
+    name: "my-app-secret"
+    usernameKey: "app_user"       # custom key name
+    passwordKey: "app_password"   # custom key name  
+    databaseKey: "app_database"   # custom key name
+```
+
+### Using Your Existing test-pg-secret
+
+For your current `test-pg-secret`, you can configure:
+
 ```yaml
 auth:
-  type: "plain"
-  userlist: |
-    "user1" "password1"
-    "user2" "password2"
-```
-
-### Required Secrets for New Authentication Methods
-
-When using secret-based authentication, create secrets with username and/or password:
-
-**Complete User Credentials (Recommended)**
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: app-credentials
-type: Opaque
-data:
-  username: <base64-encoded-username>
-  password: <base64-encoded-password>
-```
-
-**Password Only**
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: app-credentials
-type: Opaque
-data:
-  password: <base64-encoded-password>
-```
-
-### Using Your Existing Secret
-
-If you have a secret like `test-pg-secret` with both `username` and `password` keys:
-
-```yaml
-auth:
-  type: "scram-sha-256"
-  users:
-    - usernameSecret:
-        name: "test-pg-secret"
-        key: "username"
-      passwordSecret:
-        name: "test-pg-secret"
-        key: "password"
-```
-
-### External ConfigMap/Secret for Userlist
-
-**ConfigMap with Pre-built Userlist**
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pgbouncer-users
-data:
-  userlist: |
-    "user1" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
-    "user2" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
-```
-
-**Secret with Pre-built Userlist**
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: pgbouncer-users-list
-type: Opaque
-data:
-  userlist: <base64-encoded-userlist>
-```
-
-**Secret with Credentials (Auto-generates Userlist)**
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: pgbouncer-users-creds
-type: Opaque
-data:
-  username: <base64-encoded-username>
-  password: <base64-encoded-password>
+  userSecret:
+    name: "test-pg-secret"
+    usernameKey: "username"
+    passwordKey: "password"
+    databaseKey: "database"  # add this key to your secret
 ```
 
 ## Connection Pooling Best Practices

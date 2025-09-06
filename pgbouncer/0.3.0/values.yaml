@@ -13,61 +13,28 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# PostgreSQL Backend Connection
 postgresql:
   host: postgresql-cluster-rw.postgres-system.svc.cluster.local
   port: 5432
-  username: postgres  # Static username (legacy)
-  usernameSecret:     # Username from secret (recommended)
+  connectionSecret:
     name: postgresql-superuser
-    key: username
-  passwordSecret:     # Password from secret
-    name: postgresql-superuser
-    key: password
+    usernameKey: username
+    passwordKey: password
 
+# Authentication Configuration  
 auth:
-  type: md5  # Changed to md5 for compatibility with automatic hash generation
+  type: md5
   poolMode: transaction
   ignoreStartupParameters: ""
-  database: ""
   minPoolSize: 5
   
-  # New flexible user authentication options
-  users: []
-    # Example configurations:
-    # - name: "app_user"  # Static username
-    #   passwordSecret:
-    #     name: "app-credentials" 
-    #     key: "password"
-    # - name: "readonly_user"  # Static username
-    #   password: "plain_password"  # Will be auto-hashed to SCRAM
-    # - usernameSecret:  # Username from secret
-    #     name: "app-credentials"
-    #     key: "username"
-    #   passwordSecret:
-    #     name: "app-credentials"
-    #     key: "password"
-    # - usernameSecret:  # Username from secret with plain password
-    #     name: "readonly-credentials"
-    #     key: "username"
-    #   password: "plain_password"
-  
-  # External userlist from ConfigMap or Secret
-  externalUserlist:
-    enabled: false
-    # configMap:  # Pre-built userlist in ConfigMap
-    #   name: "pgbouncer-users"
-    #   key: "userlist"
-    # secret:  # Pre-built userlist in Secret
-    #   name: "pgbouncer-users-list"
-    #   key: "userlist"
-    # secretCredentials:  # Username/password from Secret (auto-generates userlist)
-    #   name: "pgbouncer-users-creds"
-    #   usernameKey: "username"
-    #   passwordKey: "password"
-  
-  # Legacy static userlist (backward compatibility)
-  userlist: |
-    "<Username>" "<SCRAM Password>"
+  # User authentication from secret
+  userSecret:
+    name: pgbouncer-user-credentials
+    usernameKey: username
+    passwordKey: password
+    databaseKey: database
 
 tls:
   enabled: true

@@ -42,40 +42,26 @@ questions:
   label: PostgreSQL Port
   group: "PostgreSQL Connection"
 
-- variable: postgresql.username
-  default: "postgres"
-  description: "Static PostgreSQL username for PgBouncer to connect with (legacy)"
-  type: string
-  label: PostgreSQL Username (Static)
-  group: "PostgreSQL Connection"
-
-- variable: postgresql.usernameSecret.name
+- variable: postgresql.connectionSecret.name
   default: "postgresql-superuser"
-  description: "Name of Kubernetes secret containing PostgreSQL username"
+  description: "Name of Kubernetes secret containing PostgreSQL connection credentials"
   type: string
-  label: Username Secret Name
-  group: "PostgreSQL Connection"
-
-- variable: postgresql.usernameSecret.key
-  default: "username"
-  description: "Key within the secret containing the PostgreSQL username"
-  type: string
-  label: Username Secret Key
-  group: "PostgreSQL Connection"
-
-- variable: postgresql.passwordSecret.name
-  default: "postgresql-superuser"
-  description: "Name of Kubernetes secret containing PostgreSQL password"
-  type: string
-  label: Password Secret Name
+  label: PostgreSQL Connection Secret Name
   group: "PostgreSQL Connection"
   required: true
 
-- variable: postgresql.passwordSecret.key
+- variable: postgresql.connectionSecret.usernameKey
+  default: "username"
+  description: "Key within the secret containing the PostgreSQL username"
+  type: string
+  label: PostgreSQL Username Key
+  group: "PostgreSQL Connection"
+
+- variable: postgresql.connectionSecret.passwordKey
   default: "password"
   description: "Key within the secret containing the PostgreSQL password"
   type: string
-  label: Password Secret Key
+  label: PostgreSQL Password Key
   group: "PostgreSQL Connection"
 
 # Authentication Configuration
@@ -86,8 +72,8 @@ questions:
   label: Authentication Type
   group: "Authentication"
   options:
-    - "scram-sha-256"
     - "md5"
+    - "scram-sha-256"
     - "plain"
     - "trust"
 
@@ -101,13 +87,6 @@ questions:
     - "session"
     - "transaction"
     - "statement"
-
-- variable: auth.database
-  default: ""
-  description: "Specific database to pool (leave empty for all databases)"
-  type: string
-  label: Target Database
-  group: "Authentication"
 
 - variable: auth.minPoolSize
   default: 5
@@ -123,125 +102,35 @@ questions:
   label: Ignore Startup Parameters
   group: "Authentication"
 
-# New Flexible User Authentication (v0.3.0)
-- variable: auth.users
-  default: []
-  description: "List of users with flexible authentication options (NEW in v0.3.0)"
-  type: array[object]
-  label: User List (New Authentication Method)
-  group: "Flexible Authentication"
-  schema:
-    type: object
-    properties:
-      name:
-        type: string
-        title: Username (Static)
-        description: "Static username for PgBouncer authentication"
-      usernameSecret:
-        type: object
-        title: Username from Secret
-        description: "Reference to Kubernetes secret containing username"
-        properties:
-          name:
-            type: string
-            title: Secret Name
-            description: "Name of the Kubernetes secret containing username"
-          key:
-            type: string
-            title: Secret Key
-            description: "Key within the secret containing the username"
-            default: "username"
-      password:
-        type: string
-        title: Plain Password (Auto-hashed)
-        description: "Plain text password (automatically converted to SCRAM-SHA-256)"
-      passwordSecret:
-        type: object
-        title: Password from Secret
-        description: "Reference to Kubernetes secret containing password"
-        properties:
-          name:
-            type: string
-            title: Secret Name
-            description: "Name of the Kubernetes secret"
-          key:
-            type: string
-            title: Secret Key
-            description: "Key within the secret containing the password"
-            default: "password"
-
-# External Userlist Configuration
-- variable: auth.externalUserlist.enabled
-  default: false
-  description: "Use external userlist from ConfigMap or Secret"
-  type: boolean
-  label: Enable External Userlist
-  group: "External Userlist"
-
-- variable: auth.externalUserlist.configMap.name
-  default: ""
-  description: "ConfigMap name containing pre-built userlist"
+# User Authentication Secret
+- variable: auth.userSecret.name
+  default: "pgbouncer-user-credentials"
+  description: "Name of Kubernetes secret containing user authentication credentials"
   type: string
-  label: ConfigMap Name (Pre-built Userlist)
-  group: "External Userlist"
-  show_if: "auth.externalUserlist.enabled=true"
+  label: User Credentials Secret Name
+  group: "User Authentication"
+  required: true
 
-- variable: auth.externalUserlist.configMap.key
-  default: "userlist"
-  description: "ConfigMap key containing userlist data"
-  type: string
-  label: ConfigMap Key
-  group: "External Userlist"
-  show_if: "auth.externalUserlist.configMap.name!="
-
-- variable: auth.externalUserlist.secret.name
-  default: ""
-  description: "Secret name containing pre-built userlist"
-  type: string
-  label: Secret Name (Pre-built Userlist)
-  group: "External Userlist"
-  show_if: "auth.externalUserlist.enabled=true"
-
-- variable: auth.externalUserlist.secret.key
-  default: "userlist"
-  description: "Secret key containing userlist data"
-  type: string
-  label: Secret Key
-  group: "External Userlist"
-  show_if: "auth.externalUserlist.secret.name!="
-
-- variable: auth.externalUserlist.secretCredentials.name
-  default: ""
-  description: "Secret name containing username and password (auto-generates userlist)"
-  type: string
-  label: Credentials Secret Name
-  group: "External Userlist"
-  show_if: "auth.externalUserlist.enabled=true"
-
-- variable: auth.externalUserlist.secretCredentials.usernameKey
+- variable: auth.userSecret.usernameKey
   default: "username"
   description: "Key within the secret containing the username"
   type: string
   label: Username Key
-  group: "External Userlist"
-  show_if: "auth.externalUserlist.secretCredentials.name!="
+  group: "User Authentication"
 
-- variable: auth.externalUserlist.secretCredentials.passwordKey
+- variable: auth.userSecret.passwordKey
   default: "password"
   description: "Key within the secret containing the password"
   type: string
   label: Password Key
-  group: "External Userlist"
-  show_if: "auth.externalUserlist.secretCredentials.name!="
+  group: "User Authentication"
 
-# Legacy Authentication (Backward Compatibility)
-- variable: auth.userlist
-  default: |
-    "<Username>" "<SCRAM Password>"
-  description: "Legacy static userlist (backward compatibility)"
-  type: multiline
-  label: Legacy User Authentication List
-  group: "Legacy Authentication"
+- variable: auth.userSecret.databaseKey
+  default: "database"
+  description: "Key within the secret containing the database name"
+  type: string
+  label: Database Key
+  group: "User Authentication"
 
 # TLS Configuration
 - variable: tls.enabled

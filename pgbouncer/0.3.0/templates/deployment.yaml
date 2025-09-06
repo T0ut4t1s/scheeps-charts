@@ -14,7 +14,6 @@ spec:
       labels:
         {{- include "pgbouncer.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
       initContainers:
       - name: auth-processor
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -28,123 +27,21 @@ spec:
           # Create processed userlist directory
           mkdir -p /tmp/pgbouncer
           
-          # Process authentication configuration
-          {{- if .Values.auth.externalUserlist.enabled }}
-          {{- if and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name }}
-          # Use external userlist from ConfigMap as-is
-          cp /opt/bitnami/pgbouncer/conf/userlist.txt /tmp/pgbouncer/userlist.txt
-          {{- else if and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name }}
-          # Use external userlist from Secret as-is  
-          cp /opt/bitnami/pgbouncer/conf/userlist.txt /tmp/pgbouncer/userlist.txt
-          {{- else if and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name }}
-          # Generate userlist from secret credentials  
-          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.usernameKey | default "username" }} | tr -d '\n')
-          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.passwordKey | default "password" }} | tr -d '\n')
+          # Generate userlist from user secret
+          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/user-credentials/{{ .Values.auth.userSecret.usernameKey }} | tr -d '\n')
+          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/user-credentials/{{ .Values.auth.userSecret.passwordKey }} | tr -d '\n')
           
           # Use plain text passwords to allow PgBouncer to handle SCRAM authentication to backend
-          # PgBouncer can generate SCRAM on-the-fly when connecting to PostgreSQL backend
           echo "\"$USERNAME\" \"$PASSWORD\"" > /tmp/pgbouncer/userlist.txt
-          {{- end }}
-          {{- else if .Values.auth.users }}
-          # Generate userlist from user configurations
-          cat > /tmp/pgbouncer/userlist.txt << 'EOF'
-          {{- range .Values.auth.users }}
-          {{- if and .usernameSecret .passwordSecret }}
-          "$(cat /opt/bitnami/pgbouncer/secrets/{{ .usernameSecret.name }}/{{ .usernameSecret.key }} | tr -d '\n')" "$(cat /opt/bitnami/pgbouncer/secrets/{{ .passwordSecret.name }}/{{ .passwordSecret.key }} | tr -d '\n' | python3 -c "
-          import sys, hashlib, secrets, base64
-          password = sys.stdin.read().strip()
-          salt = secrets.token_bytes(16)
-          key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 4096, 32)
-          stored_key = hashlib.sha256(key + b'Client Key').digest()
-          server_key = hashlib.sha256(key + b'Server Key').digest()
-          salt_b64 = base64.b64encode(salt).decode()
-          stored_key_b64 = base64.b64encode(stored_key).decode()
-          server_key_b64 = base64.b64encode(server_key).decode()
-          print(f'SCRAM-SHA-256${4096}:{salt_b64}${stored_key_b64}:{server_key_b64}')
-          ")"
-          {{- else if and .usernameSecret .password }}
-          "$(cat /opt/bitnami/pgbouncer/secrets/{{ .usernameSecret.name }}/{{ .usernameSecret.key }} | tr -d '\n')" "$(echo -n '{{ .password }}' | python3 -c "
-          import sys, hashlib, secrets, base64
-          password = sys.stdin.read().strip()
-          salt = secrets.token_bytes(16)
-          key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 4096, 32)
-          stored_key = hashlib.sha256(key + b'Client Key').digest()
-          server_key = hashlib.sha256(key + b'Server Key').digest()
-          salt_b64 = base64.b64encode(salt).decode()
-          stored_key_b64 = base64.b64encode(stored_key).decode()
-          server_key_b64 = base64.b64encode(server_key).decode()
-          print(f'SCRAM-SHA-256${4096}:{salt_b64}${stored_key_b64}:{server_key_b64}')
-          ")"
-          {{- else if and .name .passwordSecret }}
-          "{{ .name }}" "$(cat /opt/bitnami/pgbouncer/secrets/{{ .passwordSecret.name }}/{{ .passwordSecret.key }} | tr -d '\n' | python3 -c "
-          import sys, hashlib, secrets, base64
-          password = sys.stdin.read().strip()
-          salt = secrets.token_bytes(16)
-          key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 4096, 32)
-          stored_key = hashlib.sha256(key + b'Client Key').digest()
-          server_key = hashlib.sha256(key + b'Server Key').digest()
-          salt_b64 = base64.b64encode(salt).decode()
-          stored_key_b64 = base64.b64encode(stored_key).decode()
-          server_key_b64 = base64.b64encode(server_key).decode()
-          print(f'SCRAM-SHA-256${4096}:{salt_b64}${stored_key_b64}:{server_key_b64}')
-          ")"
-          {{- else if and .name .password }}
-          "{{ .name }}" "$(echo -n '{{ .password }}' | python3 -c "
-          import sys, hashlib, secrets, base64
-          password = sys.stdin.read().strip()
-          salt = secrets.token_bytes(16)
-          key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 4096, 32)
-          stored_key = hashlib.sha256(key + b'Client Key').digest()
-          server_key = hashlib.sha256(key + b'Server Key').digest()
-          salt_b64 = base64.b64encode(salt).decode()
-          stored_key_b64 = base64.b64encode(stored_key).decode()
-          server_key_b64 = base64.b64encode(server_key).decode()
-          print(f'SCRAM-SHA-256${4096}:{salt_b64}${stored_key_b64}:{server_key_b64}')
-          ")"
-          {{- end }}
-          {{- end }}
-          EOF
-          {{- else }}
-          # Use legacy static userlist
-          cat > /tmp/pgbouncer/userlist.txt << 'EOF'
-{{ .Values.auth.userlist }}
-          EOF
-          {{- end }}
           
           echo "Generated userlist:"
           cat /tmp/pgbouncer/userlist.txt
         volumeMounts:
         - name: processed-auth
           mountPath: /tmp/pgbouncer
-        {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name }}
-        - name: pgbouncer-userlist
-          mountPath: /opt/bitnami/pgbouncer/conf
+        - name: user-credentials-secret
+          mountPath: /opt/bitnami/pgbouncer/secrets/user-credentials
           readOnly: true
-        {{- else if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name }}
-        - name: pgbouncer-userlist
-          mountPath: /opt/bitnami/pgbouncer/conf
-          readOnly: true
-        {{- end }}
-        {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name }}
-        - name: external-credentials-secret
-          mountPath: /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}
-          readOnly: true
-        {{- end }}
-        {{- range .Values.auth.users }}
-        {{- if .passwordSecret }}
-        - name: user-secret-{{ .passwordSecret.name }}
-          mountPath: /opt/bitnami/pgbouncer/secrets/{{ .passwordSecret.name }}
-          readOnly: true
-        {{- end }}
-        {{- if .usernameSecret }}
-        {{- if ne .usernameSecret.name .passwordSecret.name }}
-        - name: user-secret-{{ .usernameSecret.name }}
-          mountPath: /opt/bitnami/pgbouncer/secrets/{{ .usernameSecret.name }}
-          readOnly: true
-        {{- end }}
-        {{- end }}
-        {{- end }}
-      {{- end }}
       containers:
       - name: pgbouncer
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -155,35 +52,24 @@ spec:
           value: {{ .Values.postgresql.host | quote }}
         - name: POSTGRESQL_PORT
           value: "{{ .Values.postgresql.port }}"
-        {{- if .Values.postgresql.usernameSecret }}
         - name: POSTGRESQL_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgresql.usernameSecret.name }}
-              key: {{ .Values.postgresql.usernameSecret.key }}
-        {{- else }}
-        - name: POSTGRESQL_USERNAME
-          value: {{ .Values.postgresql.username | quote }}
-        {{- end }}
+              name: {{ .Values.postgresql.connectionSecret.name }}
+              key: {{ .Values.postgresql.connectionSecret.usernameKey }}
         - name: POSTGRESQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgresql.passwordSecret.name }}
-              key: {{ .Values.postgresql.passwordSecret.key }}
+              name: {{ .Values.postgresql.connectionSecret.name }}
+              key: {{ .Values.postgresql.connectionSecret.passwordKey }}
         - name: PGBOUNCER_AUTH_TYPE
           value: {{ .Values.auth.type | quote }}
         - name: PGBOUNCER_POOL_MODE
           value: {{ .Values.auth.poolMode | quote }}
         - name: PGBOUNCER_PORT
           value: "5432"
-        {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
         - name: PGBOUNCER_USERLIST_FILE
           value: "/opt/bitnami/pgbouncer/processed-auth/userlist.txt"
-        {{- else }}
-        - name: PGBOUNCER_USERLIST
-          value: |-
-{{ .Values.auth.userlist | indent 12 }}
-        {{- end }}
         - name: PGBOUNCER_SERVER_TLS_SSLMODE
           value: {{ .Values.tls.sslMode | quote }}
         - name: PGBOUNCER_SERVER_TLS_CA_FILE
@@ -195,7 +81,10 @@ spec:
         - name: PGBOUNCER_MIN_POOL_SIZE
           value: "{{ .Values.auth.minPoolSize }}"
         - name: PGBOUNCER_DATABASE
-          value: {{ .Values.auth.database | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.auth.userSecret.name }}
+              key: {{ .Values.auth.userSecret.databaseKey }}
         - name: PGBOUNCER_IGNORE_STARTUP_PARAMETERS
           value: {{ .Values.auth.ignoreStartupParameters | quote }}
         resources:
@@ -204,51 +93,15 @@ spec:
         - name: pgbouncer-server-tls
           mountPath: /opt/bitnami/pgbouncer/certs
           readOnly: true
-        {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
         - name: processed-auth
           mountPath: /opt/bitnami/pgbouncer/processed-auth
           readOnly: true
-        {{- end }}
       volumes:
       - name: pgbouncer-server-tls
         secret:
           secretName: {{ .Values.tls.serverTlsSecret }}
-      {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
       - name: processed-auth
         emptyDir: {}
-      {{- end }}
-      {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name }}
-      - name: pgbouncer-userlist
-        configMap:
-          name: {{ .Values.auth.externalUserlist.configMap.name }}
-          items:
-          - key: {{ .Values.auth.externalUserlist.configMap.key | default "userlist" }}
-            path: userlist.txt
-      {{- end }}
-      {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name }}
-      - name: pgbouncer-userlist
+      - name: user-credentials-secret
         secret:
-          secretName: {{ .Values.auth.externalUserlist.secret.name }}
-          items:
-          - key: {{ .Values.auth.externalUserlist.secret.key | default "userlist" }}
-            path: userlist.txt
-      {{- end }}
-      {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name }}
-      - name: external-credentials-secret
-        secret:
-          secretName: {{ .Values.auth.externalUserlist.secretCredentials.name }}
-      {{- end }}
-      {{- $secrets := dict }}
-      {{- range .Values.auth.users }}
-      {{- if .passwordSecret }}
-      {{- $_ := set $secrets .passwordSecret.name true }}
-      {{- end }}
-      {{- if .usernameSecret }}
-      {{- $_ := set $secrets .usernameSecret.name true }}
-      {{- end }}
-      {{- end }}
-      {{- range $secretName, $_ := $secrets }}
-      - name: user-secret-{{ $secretName }}
-        secret:
-          secretName: {{ $secretName }}
-      {{- end }}
+          secretName: {{ .Values.auth.userSecret.name }}
