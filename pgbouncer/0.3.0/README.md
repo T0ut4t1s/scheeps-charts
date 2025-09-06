@@ -52,9 +52,15 @@ The following table lists the configurable parameters of the PgBouncer chart and
 | `auth.type` | PostgreSQL authentication method | `scram-sha-256` |
 | `auth.poolMode` | PgBouncer pool mode | `transaction` |
 | `auth.database` | Specific database to pool (empty for all) | `""` |
-| `auth.userlist` | PgBouncer user authentication list | `"<Username>" "<SCRAM Password>"` |
 | `auth.minPoolSize` | Minimum pool size per user/database pair | `5` |
 | `auth.ignoreStartupParameters` | Startup parameters to ignore | `""` |
+| `auth.users` | List of users with flexible authentication options | `[]` |
+| `auth.externalUserlist.enabled` | Use external userlist from ConfigMap or Secret | `false` |
+| `auth.externalUserlist.configMap.name` | ConfigMap name containing userlist | - |
+| `auth.externalUserlist.configMap.key` | ConfigMap key containing userlist | - |
+| `auth.externalUserlist.secret.name` | Secret name containing userlist | - |
+| `auth.externalUserlist.secret.key` | Secret key containing userlist | - |
+| `auth.userlist` | Legacy static userlist (backward compatibility) | `"<Username>" "<SCRAM Password>"` |
 
 #### Pool Modes
 
@@ -226,10 +232,63 @@ affinity:
 
 ## User Authentication
 
-PgBouncer requires a userlist for authentication. You can configure users in several ways:
+Version 0.3.0 introduces flexible user authentication options. You can configure users in several ways:
 
-### SCRAM-SHA-256 (Recommended)
+### Method 1: Flexible User Configuration (New in 0.3.0)
 
+#### Secret-based Authentication
+```yaml
+auth:
+  type: "scram-sha-256"
+  users:
+    - name: "app_user"
+      passwordSecret:
+        name: "app-credentials"
+        key: "password"
+    - name: "readonly_user"
+      passwordSecret:
+        name: "readonly-credentials"  
+        key: "password"
+```
+
+#### Plain Password Authentication (Auto-hashed)
+```yaml
+auth:
+  type: "scram-sha-256"
+  users:
+    - name: "app_user"
+      password: "my_plain_password"  # Automatically converted to SCRAM-SHA-256
+    - name: "readonly_user"
+      password: "readonly_password"
+```
+
+### Method 2: External Userlist
+
+#### From ConfigMap
+```yaml
+auth:
+  type: "scram-sha-256"
+  externalUserlist:
+    enabled: true
+    configMap:
+      name: "pgbouncer-users"
+      key: "userlist"
+```
+
+#### From Secret
+```yaml
+auth:
+  type: "scram-sha-256"
+  externalUserlist:
+    enabled: true
+    secret:
+      name: "pgbouncer-users-secret"
+      key: "userlist"
+```
+
+### Method 3: Legacy Static Userlist (Backward Compatibility)
+
+#### SCRAM-SHA-256 (Recommended)
 ```yaml
 auth:
   type: "scram-sha-256"
@@ -238,8 +297,7 @@ auth:
     "user2" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
 ```
 
-### MD5 Authentication
-
+#### MD5 Authentication
 ```yaml
 auth:
   type: "md5"
@@ -248,14 +306,42 @@ auth:
     "user2" "md5hash"
 ```
 
-### Plain Text (Development Only)
-
+#### Plain Text (Development Only)
 ```yaml
 auth:
   type: "plain"
   userlist: |
     "user1" "password1"
     "user2" "password2"
+```
+
+### Required Secrets for New Authentication Methods
+
+When using secret-based authentication, create secrets like:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-credentials
+type: Opaque
+data:
+  password: <base64-encoded-password>
+```
+
+### External ConfigMap/Secret for Userlist
+
+For external userlist, create a ConfigMap or Secret:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgbouncer-users
+data:
+  userlist: |
+    "user1" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
+    "user2" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
 ```
 
 ## Connection Pooling Best Practices

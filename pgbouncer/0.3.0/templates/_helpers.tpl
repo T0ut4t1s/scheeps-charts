@@ -49,3 +49,29 @@ Selector labels
 app.kubernetes.io/name: {{ include "pgbouncer.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Generate userlist for PgBouncer authentication
+*/}}
+{{- define "pgbouncer.userlist" -}}
+{{- $userlist := "" -}}
+{{- if .Values.auth.externalUserlist.enabled -}}
+  {{- if .Values.auth.externalUserlist.configMap -}}
+    {{- $userlist = "EXTERNAL_CONFIGMAP" -}}
+  {{- else if .Values.auth.externalUserlist.secret -}}
+    {{- $userlist = "EXTERNAL_SECRET" -}}
+  {{- end -}}
+{{- else if .Values.auth.users -}}
+  {{- range .Values.auth.users -}}
+    {{- if .passwordSecret -}}
+      {{- $userlist = printf "%s\"%s\" \"SCRAM_FROM_SECRET_%s_%s\"\n" $userlist .name .passwordSecret.name .passwordSecret.key -}}
+    {{- else if .password -}}
+      {{- $userlist = printf "%s\"%s\" \"SCRAM_%s\"\n" $userlist .name .password -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $userlist -}}
+  {{- $userlist = .Values.auth.userlist -}}
+{{- end -}}
+{{- $userlist -}}
+{{- end }}

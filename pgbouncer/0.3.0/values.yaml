@@ -24,9 +24,31 @@ auth:
   poolMode: transaction
   ignoreStartupParameters: ""
   database: ""
+  minPoolSize: 5
+  
+  # New flexible user authentication options
+  users: []
+    # Example configurations:
+    # - name: "app_user"
+    #   passwordSecret:
+    #     name: "app-credentials" 
+    #     key: "password"
+    # - name: "readonly_user"
+    #   password: "plain_password"  # Will be auto-hashed to SCRAM
+  
+  # External userlist from ConfigMap or Secret
+  externalUserlist:
+    enabled: false
+    # configMap:
+    #   name: "pgbouncer-users"
+    #   key: "userlist"
+    # secret:
+    #   name: "pgbouncer-users"
+    #   key: "userlist"
+  
+  # Legacy static userlist (backward compatibility)
   userlist: |
     "<Username>" "<SCRAM Password>"
-  minPoolSize: 5
 
 tls:
   enabled: true
