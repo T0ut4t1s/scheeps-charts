@@ -45,12 +45,39 @@ questions:
   required: true
 
 # Application Configuration
-- variable: oauth2Proxy.upstreams
-  default: "http://vlan-manager-frontend.network-management.svc.cluster.local:80"
-  description: "Upstream application URL to proxy to"
+- variable: oauth2Proxy.upstream.service
+  default: "vlan-manager-frontend"
+  description: "Name of the upstream service"
   type: string
-  label: Upstream URL
+  label: Upstream Service Name
   group: "Application"
+  required: true
+
+- variable: oauth2Proxy.upstream.namespace
+  default: "network-management"
+  description: "Namespace of the upstream service"
+  type: string
+  label: Upstream Service Namespace
+  group: "Application"
+  required: true
+
+- variable: oauth2Proxy.upstream.port
+  default: 80
+  description: "Port of the upstream service"
+  type: int
+  label: Upstream Service Port
+  group: "Application"
+  required: true
+
+- variable: oauth2Proxy.upstream.protocol
+  default: "http"
+  description: "Protocol for upstream service (http or https)"
+  type: enum
+  label: Upstream Protocol
+  group: "Application"
+  options:
+    - "http"
+    - "https"
   required: true
 
 - variable: oauth2Proxy.cookieDomains

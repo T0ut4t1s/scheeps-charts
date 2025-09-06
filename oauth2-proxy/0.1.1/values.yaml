@@ -48,8 +48,13 @@ oauth2Proxy:
 
   # URLs
   redirectUrl: "" # e.g. https://vlan.scheeps.online/oauth2/callback
-  upstreams: "" # e.g. http://vlan-manager-frontend.network-management.svc.cluster.local:80
-  # Note: Make sure to include port number for upstreams (e.g. :5678 for n8n)
+  
+  # Upstream service configuration (replaces single upstreams field)
+  upstream:
+    service: "" # e.g. n8n
+    namespace: "" # e.g. n8n
+    port: 80 # e.g. 5678 for n8n
+    protocol: "http" # http or https
 
   # Server configuration
   httpAddress: "0.0.0.0:4180"
