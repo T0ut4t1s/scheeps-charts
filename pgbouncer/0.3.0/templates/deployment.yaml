@@ -14,7 +14,7 @@ spec:
       labels:
         {{- include "pgbouncer.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secretCredentials)) }}
+      {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
       initContainers:
       - name: auth-processor
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -125,17 +125,19 @@ spec:
         volumeMounts:
         - name: processed-auth
           mountPath: /tmp/pgbouncer
-        {{- if .Values.auth.externalUserlist.enabled }}
-        {{- if or .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.secret }}
+        {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name }}
+        - name: pgbouncer-userlist
+          mountPath: /opt/bitnami/pgbouncer/conf
+          readOnly: true
+        {{- else if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name }}
         - name: pgbouncer-userlist
           mountPath: /opt/bitnami/pgbouncer/conf
           readOnly: true
         {{- end }}
-        {{- if .Values.auth.externalUserlist.secretCredentials }}
+        {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name }}
         - name: external-credentials-secret
           mountPath: /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}
           readOnly: true
-        {{- end }}
         {{- end }}
         {{- range .Values.auth.users }}
         {{- if .passwordSecret }}
@@ -183,7 +185,7 @@ spec:
           value: {{ .Values.auth.poolMode | quote }}
         - name: PGBOUNCER_PORT
           value: "5432"
-        {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secretCredentials)) }}
+        {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
         - name: PGBOUNCER_USERLIST_FILE
           value: "/opt/bitnami/pgbouncer/processed-auth/userlist.txt"
         {{- else }}
@@ -211,7 +213,7 @@ spec:
         - name: pgbouncer-server-tls
           mountPath: /opt/bitnami/pgbouncer/certs
           readOnly: true
-        {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secretCredentials)) }}
+        {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
         - name: processed-auth
           mountPath: /opt/bitnami/pgbouncer/processed-auth
           readOnly: true
@@ -220,30 +222,30 @@ spec:
       - name: pgbouncer-server-tls
         secret:
           secretName: {{ .Values.tls.serverTlsSecret }}
-      {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secretCredentials)) }}
+      {{- if or .Values.auth.users (and .Values.auth.externalUserlist.enabled (or (and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name) (and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name) (and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name))) }}
       - name: processed-auth
         emptyDir: {}
       {{- end }}
-      {{- if .Values.auth.externalUserlist.enabled }}
-      {{- if .Values.auth.externalUserlist.configMap }}
+      {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name }}
       - name: pgbouncer-userlist
         configMap:
           name: {{ .Values.auth.externalUserlist.configMap.name }}
           items:
-          - key: {{ .Values.auth.externalUserlist.configMap.key }}
+          - key: {{ .Values.auth.externalUserlist.configMap.key | default "userlist" }}
             path: userlist.txt
-      {{- else if .Values.auth.externalUserlist.secret }}
+      {{- end }}
+      {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name }}
       - name: pgbouncer-userlist
         secret:
           secretName: {{ .Values.auth.externalUserlist.secret.name }}
           items:
-          - key: {{ .Values.auth.externalUserlist.secret.key }}
+          - key: {{ .Values.auth.externalUserlist.secret.key | default "userlist" }}
             path: userlist.txt
-      {{- else if .Values.auth.externalUserlist.secretCredentials }}
+      {{- end }}
+      {{- if and .Values.auth.externalUserlist.enabled .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name }}
       - name: external-credentials-secret
         secret:
           secretName: {{ .Values.auth.externalUserlist.secretCredentials.name }}
-      {{- end }}
       {{- end }}
       {{- $secrets := dict }}
       {{- range .Values.auth.users }}
