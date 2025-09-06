@@ -36,17 +36,17 @@ db:
 config:
   # Environment
   NODE_ENV: production
-  
+
   # Host and protocol
   N8N_HOST: n8n.scheeps.online
   N8N_PORT: "5678"
   N8N_PROTOCOL: https
   WEBHOOK_URL: https://n8n.scheeps.online
-  
+
   # Logging and monitoring
   N8N_LOG_LEVEL: info
   N8N_METRICS: "true"
-  
+
   # Feature toggles
   N8N_DIAGNOSTICS_ENABLED: "false"
   N8N_PERSONALIZATION_ENABLED: "false"
@@ -61,7 +61,7 @@ redis:
   port: 6379
   # Redis credentials from external secret (if authentication enabled)
   credentialsSecret:
-    name: redis-n8n-secret
+    name: n8n-redis-secret
     passwordKey: password
 
 # External secrets
