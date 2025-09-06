@@ -89,14 +89,6 @@ questions:
   label: Target Database
   group: "Authentication"
 
-- variable: auth.userlist
-  default: |
-    "<Username>" "<SCRAM Password>"
-  description: "PgBouncer user authentication list (format: \"username\" \"password\")"
-  type: multiline
-  label: User Authentication List
-  group: "Authentication"
-
 - variable: auth.minPoolSize
   default: 5
   description: "Minimum pool size per user/database pair"
@@ -110,6 +102,89 @@ questions:
   type: string
   label: Ignore Startup Parameters
   group: "Authentication"
+
+# New Flexible User Authentication (v0.3.0)
+- variable: auth.users
+  default: []
+  description: "List of users with flexible authentication options (NEW in v0.3.0)"
+  type: array[object]
+  label: User List (New Authentication Method)
+  group: "Flexible Authentication"
+  schema:
+    type: object
+    properties:
+      name:
+        type: string
+        title: Username
+        description: "Username for PgBouncer authentication"
+        required: true
+      password:
+        type: string
+        title: Plain Password (Auto-hashed)
+        description: "Plain text password (automatically converted to SCRAM-SHA-256)"
+      passwordSecret:
+        type: object
+        title: Password from Secret
+        description: "Reference to Kubernetes secret containing password"
+        properties:
+          name:
+            type: string
+            title: Secret Name
+            description: "Name of the Kubernetes secret"
+          key:
+            type: string
+            title: Secret Key
+            description: "Key within the secret containing the password"
+            default: "password"
+
+# External Userlist Configuration
+- variable: auth.externalUserlist.enabled
+  default: false
+  description: "Use external userlist from ConfigMap or Secret"
+  type: boolean
+  label: Enable External Userlist
+  group: "External Userlist"
+
+- variable: auth.externalUserlist.configMap.name
+  default: ""
+  description: "ConfigMap name containing pre-built userlist"
+  type: string
+  label: ConfigMap Name
+  group: "External Userlist"
+  show_if: "auth.externalUserlist.enabled=true"
+
+- variable: auth.externalUserlist.configMap.key
+  default: "userlist"
+  description: "ConfigMap key containing userlist data"
+  type: string
+  label: ConfigMap Key
+  group: "External Userlist"
+  show_if: "auth.externalUserlist.enabled=true"
+
+- variable: auth.externalUserlist.secret.name
+  default: ""
+  description: "Secret name containing pre-built userlist"
+  type: string
+  label: Secret Name
+  group: "External Userlist"
+  show_if: "auth.externalUserlist.enabled=true"
+
+- variable: auth.externalUserlist.secret.key
+  default: "userlist"
+  description: "Secret key containing userlist data"
+  type: string
+  label: Secret Key
+  group: "External Userlist"
+  show_if: "auth.externalUserlist.enabled=true"
+
+# Legacy Authentication (Backward Compatibility)
+- variable: auth.userlist
+  default: |
+    "<Username>" "<SCRAM Password>"
+  description: "Legacy static userlist (backward compatibility)"
+  type: multiline
+  label: Legacy User Authentication List
+  group: "Legacy Authentication"
 
 # TLS Configuration
 - variable: tls.enabled
