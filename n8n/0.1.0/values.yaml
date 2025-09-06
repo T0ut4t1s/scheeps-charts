@@ -104,16 +104,17 @@ readinessProbe:
 postgresql:
   enabled: false
 
-# Disable built-in Redis 
-redis:
-  enabled: false
-
 # Namespace override
 namespaceOverride: n8n
 
 # Security contexts
-securityContext: {}
-podSecurityContext: {}
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  readOnlyRootFilesystem: false
+podSecurityContext:
+  fsGroup: 1000
 
 # Node selector, tolerations and affinity
 nodeSelector: {}
