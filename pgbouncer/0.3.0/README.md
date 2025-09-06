@@ -45,7 +45,8 @@ The following table lists the configurable parameters of the PgBouncer chart and
 | `postgresql.username` | Static PostgreSQL username (legacy) | `postgres` |
 | `postgresql.usernameSecret.name` | Secret name containing PostgreSQL username | `postgresql-superuser` |
 | `postgresql.usernameSecret.key` | Secret key containing PostgreSQL username | `username` |
-| `postgresql.passwordSecret` | Name of Kubernetes secret containing PostgreSQL password | `postgresql-superuser` |
+| `postgresql.passwordSecret.name` | Secret name containing PostgreSQL password | `postgresql-superuser` |
+| `postgresql.passwordSecret.key` | Secret key containing PostgreSQL password | `password` |
 
 ### Authentication Configuration
 
@@ -182,7 +183,9 @@ postgresql:
   usernameSecret:
     name: "my-postgres-secret"
     key: "username"
-  passwordSecret: "my-postgres-secret"
+  passwordSecret:
+    name: "my-postgres-secret" 
+    key: "password"
 ```
 
 **Using Static PostgreSQL Username (Legacy)**
@@ -193,7 +196,9 @@ postgresql:
   host: "my-postgres-service.default.svc.cluster.local"
   port: 5432
   username: "pgbouncer_user"
-  passwordSecret: "my-postgres-secret"
+  passwordSecret:
+    name: "my-postgres-secret"
+    key: "password"
 
 auth:
   type: "scram-sha-256"
@@ -327,7 +332,7 @@ auth:
 
 ### Method 2: External Userlist
 
-#### From ConfigMap
+#### From ConfigMap (Pre-built Userlist)
 ```yaml
 auth:
   type: "scram-sha-256"
@@ -338,15 +343,27 @@ auth:
       key: "userlist"
 ```
 
-#### From Secret
+#### From Secret (Pre-built Userlist)
 ```yaml
 auth:
   type: "scram-sha-256"
   externalUserlist:
     enabled: true
     secret:
-      name: "pgbouncer-users-secret"
+      name: "pgbouncer-users-list"
       key: "userlist"
+```
+
+#### From Secret Credentials (Auto-generates Userlist)
+```yaml
+auth:
+  type: "scram-sha-256"
+  externalUserlist:
+    enabled: true
+    secretCredentials:
+      name: "pgbouncer-users-creds"
+      usernameKey: "username"
+      passwordKey: "password"
 ```
 
 ### Method 3: Legacy Static Userlist (Backward Compatibility)
@@ -423,8 +440,7 @@ auth:
 
 ### External ConfigMap/Secret for Userlist
 
-For external userlist, create a ConfigMap or Secret:
-
+**ConfigMap with Pre-built Userlist**
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -434,6 +450,29 @@ data:
   userlist: |
     "user1" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
     "user2" "SCRAM-SHA-256$4096:salt$storedkey:serverkey"
+```
+
+**Secret with Pre-built Userlist**
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgbouncer-users-list
+type: Opaque
+data:
+  userlist: <base64-encoded-userlist>
+```
+
+**Secret with Credentials (Auto-generates Userlist)**
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgbouncer-users-creds
+type: Opaque
+data:
+  username: <base64-encoded-username>
+  password: <base64-encoded-password>
 ```
 
 ## Connection Pooling Best Practices

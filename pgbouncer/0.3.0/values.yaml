@@ -20,7 +20,9 @@ postgresql:
   usernameSecret:     # Username from secret (recommended)
     name: postgresql-superuser
     key: username
-  passwordSecret: postgresql-superuser
+  passwordSecret:     # Password from secret
+    name: postgresql-superuser
+    key: password
 
 auth:
   type: scram-sha-256
@@ -52,12 +54,16 @@ auth:
   # External userlist from ConfigMap or Secret
   externalUserlist:
     enabled: false
-    # configMap:
+    # configMap:  # Pre-built userlist in ConfigMap
     #   name: "pgbouncer-users"
     #   key: "userlist"
-    # secret:
-    #   name: "pgbouncer-users"
+    # secret:  # Pre-built userlist in Secret
+    #   name: "pgbouncer-users-list"
     #   key: "userlist"
+    # secretCredentials:  # Username/password from Secret (auto-generates userlist)
+    #   name: "pgbouncer-users-creds"
+    #   usernameKey: "username"
+    #   passwordKey: "password"
   
   # Legacy static userlist (backward compatibility)
   userlist: |

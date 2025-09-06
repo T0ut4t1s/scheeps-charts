@@ -63,13 +63,20 @@ questions:
   label: Username Secret Key
   group: "PostgreSQL Connection"
 
-- variable: postgresql.passwordSecret
+- variable: postgresql.passwordSecret.name
   default: "postgresql-superuser"
   description: "Name of Kubernetes secret containing PostgreSQL password"
   type: string
   label: Password Secret Name
   group: "PostgreSQL Connection"
   required: true
+
+- variable: postgresql.passwordSecret.key
+  default: "password"
+  description: "Key within the secret containing the PostgreSQL password"
+  type: string
+  label: Password Secret Key
+  group: "PostgreSQL Connection"
 
 # Authentication Configuration
 - variable: auth.type
@@ -175,7 +182,7 @@ questions:
   default: ""
   description: "ConfigMap name containing pre-built userlist"
   type: string
-  label: ConfigMap Name
+  label: ConfigMap Name (Pre-built Userlist)
   group: "External Userlist"
   show_if: "auth.externalUserlist.enabled=true"
 
@@ -185,13 +192,13 @@ questions:
   type: string
   label: ConfigMap Key
   group: "External Userlist"
-  show_if: "auth.externalUserlist.enabled=true"
+  show_if: "auth.externalUserlist.configMap.name!="
 
 - variable: auth.externalUserlist.secret.name
   default: ""
   description: "Secret name containing pre-built userlist"
   type: string
-  label: Secret Name
+  label: Secret Name (Pre-built Userlist)
   group: "External Userlist"
   show_if: "auth.externalUserlist.enabled=true"
 
@@ -201,7 +208,31 @@ questions:
   type: string
   label: Secret Key
   group: "External Userlist"
+  show_if: "auth.externalUserlist.secret.name!="
+
+- variable: auth.externalUserlist.secretCredentials.name
+  default: ""
+  description: "Secret name containing username and password (auto-generates userlist)"
+  type: string
+  label: Credentials Secret Name
+  group: "External Userlist"
   show_if: "auth.externalUserlist.enabled=true"
+
+- variable: auth.externalUserlist.secretCredentials.usernameKey
+  default: "username"
+  description: "Key within the secret containing the username"
+  type: string
+  label: Username Key
+  group: "External Userlist"
+  show_if: "auth.externalUserlist.secretCredentials.name!="
+
+- variable: auth.externalUserlist.secretCredentials.passwordKey
+  default: "password"
+  description: "Key within the secret containing the password"
+  type: string
+  label: Password Key
+  group: "External Userlist"
+  show_if: "auth.externalUserlist.secretCredentials.name!="
 
 # Legacy Authentication (Backward Compatibility)
 - variable: auth.userlist
