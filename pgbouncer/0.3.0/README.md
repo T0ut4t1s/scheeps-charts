@@ -237,6 +237,27 @@ Version 0.3.0 introduces flexible user authentication options. You can configure
 ### Method 1: Flexible User Configuration (New in 0.3.0)
 
 #### Secret-based Authentication
+
+**Both Username and Password from Secrets (Recommended)**
+```yaml
+auth:
+  type: "scram-sha-256"
+  users:
+    - usernameSecret:
+        name: "app-credentials"
+        key: "username"
+      passwordSecret:
+        name: "app-credentials"
+        key: "password"
+    - usernameSecret:
+        name: "readonly-credentials"
+        key: "username"
+      passwordSecret:
+        name: "readonly-credentials"
+        key: "password"
+```
+
+**Static Username with Password from Secret**
 ```yaml
 auth:
   type: "scram-sha-256"
@@ -252,6 +273,19 @@ auth:
 ```
 
 #### Plain Password Authentication (Auto-hashed)
+
+**Username from Secret with Plain Password**
+```yaml
+auth:
+  type: "scram-sha-256"
+  users:
+    - usernameSecret:
+        name: "app-credentials"
+        key: "username"
+      password: "my_plain_password"  # Automatically converted to SCRAM-SHA-256
+```
+
+**Static Username with Plain Password**
 ```yaml
 auth:
   type: "scram-sha-256"
@@ -317,8 +351,21 @@ auth:
 
 ### Required Secrets for New Authentication Methods
 
-When using secret-based authentication, create secrets like:
+When using secret-based authentication, create secrets with username and/or password:
 
+**Complete User Credentials (Recommended)**
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-credentials
+type: Opaque
+data:
+  username: <base64-encoded-username>
+  password: <base64-encoded-password>
+```
+
+**Password Only**
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -327,6 +374,22 @@ metadata:
 type: Opaque
 data:
   password: <base64-encoded-password>
+```
+
+### Using Your Existing Secret
+
+If you have a secret like `test-pg-secret` with both `username` and `password` keys:
+
+```yaml
+auth:
+  type: "scram-sha-256"
+  users:
+    - usernameSecret:
+        name: "test-pg-secret"
+        key: "username"
+      passwordSecret:
+        name: "test-pg-secret"
+        key: "password"
 ```
 
 ### External ConfigMap/Secret for Userlist

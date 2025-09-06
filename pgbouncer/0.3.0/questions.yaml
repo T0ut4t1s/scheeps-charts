@@ -115,9 +115,22 @@ questions:
     properties:
       name:
         type: string
-        title: Username
-        description: "Username for PgBouncer authentication"
-        required: true
+        title: Username (Static)
+        description: "Static username for PgBouncer authentication"
+      usernameSecret:
+        type: object
+        title: Username from Secret
+        description: "Reference to Kubernetes secret containing username"
+        properties:
+          name:
+            type: string
+            title: Secret Name
+            description: "Name of the Kubernetes secret containing username"
+          key:
+            type: string
+            title: Secret Key
+            description: "Key within the secret containing the username"
+            default: "username"
       password:
         type: string
         title: Plain Password (Auto-hashed)

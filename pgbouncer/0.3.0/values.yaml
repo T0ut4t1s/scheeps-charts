@@ -29,12 +29,22 @@ auth:
   # New flexible user authentication options
   users: []
     # Example configurations:
-    # - name: "app_user"
+    # - name: "app_user"  # Static username
     #   passwordSecret:
     #     name: "app-credentials" 
     #     key: "password"
-    # - name: "readonly_user"
+    # - name: "readonly_user"  # Static username
     #   password: "plain_password"  # Will be auto-hashed to SCRAM
+    # - usernameSecret:  # Username from secret
+    #     name: "app-credentials"
+    #     key: "username"
+    #   passwordSecret:
+    #     name: "app-credentials"
+    #     key: "password"
+    # - usernameSecret:  # Username from secret with plain password
+    #     name: "readonly-credentials"
+    #     key: "username"
+    #   password: "plain_password"
   
   # External userlist from ConfigMap or Secret
   externalUserlist:
