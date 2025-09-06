@@ -1,0 +1,119 @@
+# Default values for n8n.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Image configuration
+image:
+  repository: n8nio/n8n
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 5678
+
+# Main node configuration
+main:
+  count: 1
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 10Gi
+
+# Database configuration
+db:
+  type: postgresdb
+  host: postgresql-cluster-rw.postgres-system.svc.cluster.local
+  port: 5432
+  name: n8n
+
+# N8N Configuration
+config:
+  # Environment
+  NODE_ENV: production
+  
+  # Host and protocol
+  N8N_HOST: n8n.scheeps.online
+  N8N_PORT: "5678"
+  N8N_PROTOCOL: https
+  WEBHOOK_URL: https://n8n.scheeps.online
+  
+  # Logging and monitoring
+  N8N_LOG_LEVEL: info
+  N8N_METRICS: "true"
+  
+  # Feature toggles
+  N8N_DIAGNOSTICS_ENABLED: "false"
+  N8N_PERSONALIZATION_ENABLED: "false"
+  N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+  N8N_TEMPLATES_ENABLED: "true"
+  N8N_PUBLIC_API_DISABLED: "false"
+
+# External secrets
+existingSecrets:
+  app:
+    name: n8n-app-secrets
+    encryptionKey: encryption-key
+  database:
+    name: postgresql-n8n-credentials
+    username: username
+    password: password
+
+# Resources
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 2Gi
+    cpu: 1000m
+
+# Health checks
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /healthz
+    port: 5678
+  initialDelaySeconds: 30
+  periodSeconds: 30
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /healthz
+    port: 5678
+  initialDelaySeconds: 15
+  periodSeconds: 15
+
+# Disable built-in PostgreSQL as we're using external
+postgresql:
+  enabled: false
+
+# Disable built-in Redis 
+redis:
+  enabled: false
+
+# Namespace override
+namespaceOverride: n8n
+
+# Security contexts
+securityContext: {}
+podSecurityContext: {}
+
+# Node selector, tolerations and affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Ingress configuration (disabled by default)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []

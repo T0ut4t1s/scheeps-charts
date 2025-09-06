@@ -1,0 +1,16 @@
+apiVersion: v2
+name: n8n
+description: N8N workflow automation tool with database integration
+type: application
+version: 0.1.0
+appVersion: latest
+maintainers:
+  - name: theunis
+keywords:
+  - workflow
+  - automation
+  - n8n
+  - integration
+home: https://n8n.io
+sources:
+  - https://github.com/n8n-io/n8n
