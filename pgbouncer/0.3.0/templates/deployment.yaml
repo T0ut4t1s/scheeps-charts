@@ -30,16 +30,16 @@ spec:
           
           # Process authentication configuration
           {{- if .Values.auth.externalUserlist.enabled }}
-          {{- if .Values.auth.externalUserlist.configMap }}
+          {{- if and .Values.auth.externalUserlist.configMap .Values.auth.externalUserlist.configMap.name }}
           # Use external userlist from ConfigMap as-is
           cp /opt/bitnami/pgbouncer/conf/userlist.txt /tmp/pgbouncer/userlist.txt
-          {{- else if .Values.auth.externalUserlist.secret }}
+          {{- else if and .Values.auth.externalUserlist.secret .Values.auth.externalUserlist.secret.name }}
           # Use external userlist from Secret as-is  
           cp /opt/bitnami/pgbouncer/conf/userlist.txt /tmp/pgbouncer/userlist.txt
-          {{- else if .Values.auth.externalUserlist.secretCredentials }}
+          {{- else if and .Values.auth.externalUserlist.secretCredentials .Values.auth.externalUserlist.secretCredentials.name }}
           # Generate userlist from secret credentials
-          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.usernameKey }} | tr -d '\n')
-          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.passwordKey }} | tr -d '\n')
+          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.usernameKey | default "username" }} | tr -d '\n')
+          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ .Values.auth.externalUserlist.secretCredentials.name }}/{{ .Values.auth.externalUserlist.secretCredentials.passwordKey | default "password" }} | tr -d '\n')
           SCRAM_HASH=$(echo -n "$PASSWORD" | python3 -c "
           import sys, hashlib, secrets, base64
           password = sys.stdin.read().strip()
