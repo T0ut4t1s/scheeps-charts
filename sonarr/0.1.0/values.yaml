@@ -33,6 +33,10 @@ main:
       enabled: true
       existingPvc: qbittorrent-torrent-pvc
       mountPath: /torrents
+    media:
+      enabled: true
+      existingPvc: arr-media-pvc
+      mountPath: /media
 
 # Database configuration
 db:
