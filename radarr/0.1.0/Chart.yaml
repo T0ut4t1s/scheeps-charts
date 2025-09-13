@@ -1,0 +1,6 @@
+apiVersion: v2
+name: radarr
+description: A Helm chart for Radarr movie collection manager
+type: application
+version: 0.1.0
+appVersion: "5.11.0"

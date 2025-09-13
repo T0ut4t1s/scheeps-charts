@@ -1,0 +1,107 @@
+# Default values for radarr
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Image configuration
+image:
+  repository: lscr.io/linuxserver/radarr
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 7878
+
+# Main radarr configuration
+main:
+  count: 1
+  persistence:
+    config:
+      enabled: true
+      storageClass: longhorn-ha-2
+      size: 2Gi
+    downloads:
+      enabled: true
+      existingPvc: qbittorrent-cache-pvc
+      mountPath: /downloads
+    media:
+      enabled: true
+      existingPvc: qbittorrent-torrent-pvc
+      mountPath: /media
+
+# Database configuration
+db:
+  type: postgresdb
+  host: pgbouncer.media.svc.cluster.local
+  port: 5432
+  name: radarr
+
+# Radarr Configuration
+config:
+  # Environment
+  PUID: "1000"
+  PGID: "1000"
+  TZ: Europe/London
+
+# External secrets
+existingSecrets:
+  database:
+    name: radarr-pg-secret
+    username: username
+    password: password
+
+# Resources
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 100m
+  limits:
+    memory: 2Gi
+    cpu: 1000m
+
+# Health checks
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /ping
+    port: 7878
+  initialDelaySeconds: 30
+  periodSeconds: 30
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /ping
+    port: 7878
+  initialDelaySeconds: 15
+  periodSeconds: 15
+
+# Namespace override
+namespaceOverride: media
+
+# Security contexts
+securityContext:
+  runAsNonRoot: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  readOnlyRootFilesystem: false
+podSecurityContext:
+  fsGroup: 1000
+
+# Node selector, tolerations and affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Ingress configuration (disabled by default)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []

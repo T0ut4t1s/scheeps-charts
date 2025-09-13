@@ -1,0 +1,98 @@
+# Default values for jellyseerr
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Image configuration
+image:
+  repository: fallenbagel/jellyseerr
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 5055
+
+# Main jellyseerr configuration
+main:
+  count: 1
+  persistence:
+    config:
+      enabled: true
+      storageClass: longhorn-ha-2
+      size: 2Gi
+
+# Database configuration
+db:
+  type: postgresdb
+  host: pgbouncer.media.svc.cluster.local
+  port: 5432
+  name: jellyseerr
+
+# Jellyseerr Configuration
+config:
+  # Environment
+  LOG_LEVEL: info
+  TZ: Europe/London
+
+# External secrets
+existingSecrets:
+  database:
+    name: jellyseerr-pg-secret
+    username: username
+    password: password
+
+# Resources
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 1Gi
+    cpu: 500m
+
+# Health checks
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /api/v1/status
+    port: 5055
+  initialDelaySeconds: 30
+  periodSeconds: 30
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /api/v1/status
+    port: 5055
+  initialDelaySeconds: 15
+  periodSeconds: 15
+
+# Namespace override
+namespaceOverride: media
+
+# Security contexts
+securityContext:
+  runAsNonRoot: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  readOnlyRootFilesystem: false
+podSecurityContext:
+  fsGroup: 1000
+
+# Node selector, tolerations and affinity
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Ingress configuration (disabled by default)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []

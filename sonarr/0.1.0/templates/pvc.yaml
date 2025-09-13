@@ -1,0 +1,16 @@
+{{- if .Values.main.persistence.config.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "sonarr.fullname" . }}-config-pvc
+  namespace: {{ .Values.namespaceOverride | default .Release.Namespace }}
+  labels:
+    {{- include "sonarr.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.main.persistence.config.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.main.persistence.config.size }}
+{{- end }}
