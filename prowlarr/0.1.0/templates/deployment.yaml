@@ -74,9 +74,9 @@ spec:
             - name: downloads
               mountPath: {{ .Values.main.persistence.downloads.mountPath }}
             {{- end }}
-            {{- if .Values.main.persistence.media.enabled }}
-            - name: media
-              mountPath: {{ .Values.main.persistence.media.mountPath }}
+            {{- if .Values.main.persistence.torrents.enabled }}
+            - name: torrents
+              mountPath: {{ .Values.main.persistence.torrents.mountPath }}
             {{- end }}
       volumes:
         - name: config
@@ -87,10 +87,10 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.main.persistence.downloads.existingPvc }}
         {{- end }}
-        {{- if .Values.main.persistence.media.enabled }}
-        - name: media
+        {{- if .Values.main.persistence.torrents.enabled }}
+        - name: torrents
           persistentVolumeClaim:
-            claimName: {{ .Values.main.persistence.media.existingPvc }}
+            claimName: {{ .Values.main.persistence.torrents.existingPvc }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
