@@ -1,0 +1,78 @@
+# Default values for pgbouncer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: bitnami/pgbouncer
+  tag: 1.24.1
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# PostgreSQL Backend Connection
+postgresql:
+  host: postgresql-cluster-rw.postgres-system.svc.cluster.local
+  port: 5432
+  connectionSecret:
+    name: postgresql-superuser
+    usernameKey: username
+    passwordKey: password
+
+# Authentication Configuration  
+auth:
+  type: md5
+  poolMode: transaction
+  ignoreStartupParameters: ""
+  minPoolSize: 5
+  
+  # Multiple user/database connections
+  connections:
+    - name: "connection1"
+      userSecret:
+        name: "service1-pg-secret"
+        usernameKey: "username"
+        passwordKey: "password"
+        databaseKey: "database"
+    - name: "connection2"
+      userSecret:
+        name: "service2-pg-secret"
+        usernameKey: "username"
+        passwordKey: "password"
+        databaseKey: "database"
+    - name: "connection3"
+      userSecret:
+        name: "service3-pg-secret"
+        usernameKey: "username"
+        passwordKey: "password"
+        databaseKey: "database"
+
+tls:
+  enabled: true
+  serverTlsSecret: pgbouncer-postgres-tls
+  sslMode: verify-full
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+service:
+  type: ClusterIP
+  port: 5432
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Security context
+securityContext: {}
+podSecurityContext: {}

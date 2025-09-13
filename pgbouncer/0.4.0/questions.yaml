@@ -1,0 +1,337 @@
+categories:
+- Database
+- Connection Pool
+- PostgreSQL
+
+questions:
+# Basic Configuration
+- variable: replicaCount
+  default: 1
+  description: "Number of PgBouncer replicas"
+  type: int
+  label: Replica Count
+  group: "Basic Configuration"
+
+- variable: image.tag
+  default: "1.24.1"
+  description: "PgBouncer image tag/version"
+  type: string
+  label: Image Version
+  group: "Basic Configuration"
+
+- variable: image.repository
+  default: "bitnami/pgbouncer"
+  description: "PgBouncer image repository"
+  type: string
+  label: Image Repository
+  group: "Basic Configuration"
+
+# PostgreSQL Connection Configuration
+- variable: postgresql.host
+  default: "postgresql-cluster-rw.postgres-system.svc.cluster.local"
+  description: "PostgreSQL server hostname or service name"
+  type: string
+  label: PostgreSQL Host
+  group: "PostgreSQL Connection"
+  required: true
+
+- variable: postgresql.port
+  default: 5432
+  description: "PostgreSQL server port"
+  type: int
+  label: PostgreSQL Port
+  group: "PostgreSQL Connection"
+
+- variable: postgresql.connectionSecret.name
+  default: "postgresql-superuser"
+  description: "Name of Kubernetes secret containing PostgreSQL connection credentials"
+  type: string
+  label: PostgreSQL Connection Secret Name
+  group: "PostgreSQL Connection"
+  required: true
+
+- variable: postgresql.connectionSecret.usernameKey
+  default: "username"
+  description: "Key within the secret containing the PostgreSQL username"
+  type: string
+  label: PostgreSQL Username Key
+  group: "PostgreSQL Connection"
+
+- variable: postgresql.connectionSecret.passwordKey
+  default: "password"
+  description: "Key within the secret containing the PostgreSQL password"
+  type: string
+  label: PostgreSQL Password Key
+  group: "PostgreSQL Connection"
+
+# Authentication Configuration
+- variable: auth.type
+  default: "md5"
+  description: "PostgreSQL authentication method"
+  type: enum
+  label: Authentication Type
+  group: "Authentication"
+  options:
+    - "md5"
+    - "scram-sha-256"
+    - "plain"
+    - "trust"
+
+- variable: auth.poolMode
+  default: "transaction"
+  description: "PgBouncer pool mode"
+  type: enum
+  label: Pool Mode
+  group: "Authentication"
+  options:
+    - "session"
+    - "transaction"
+    - "statement"
+
+- variable: auth.minPoolSize
+  default: 5
+  description: "Minimum pool size per user/database pair"
+  type: int
+  label: Minimum Pool Size
+  group: "Authentication"
+
+- variable: auth.ignoreStartupParameters
+  default: ""
+  description: "Comma-separated list of startup parameters to ignore"
+  type: string
+  label: Ignore Startup Parameters
+  group: "Authentication"
+
+# Connection 1 Configuration
+- variable: auth.connections[0].name
+  default: "connection1"
+  description: "Name identifier for the first connection"
+  type: string
+  label: Connection 1 Name
+  group: "Connection 1"
+
+- variable: auth.connections[0].userSecret.name
+  default: "service1-pg-secret"
+  description: "Kubernetes secret name for connection 1 credentials"
+  type: string
+  label: Connection 1 Secret Name
+  group: "Connection 1"
+  required: true
+
+- variable: auth.connections[0].userSecret.usernameKey
+  default: "username"
+  description: "Secret key containing username for connection 1"
+  type: string
+  label: Connection 1 Username Key
+  group: "Connection 1"
+
+- variable: auth.connections[0].userSecret.passwordKey
+  default: "password"
+  description: "Secret key containing password for connection 1"
+  type: string
+  label: Connection 1 Password Key
+  group: "Connection 1"
+
+- variable: auth.connections[0].userSecret.databaseKey
+  default: "database"
+  description: "Secret key containing database name for connection 1"
+  type: string
+  label: Connection 1 Database Key
+  group: "Connection 1"
+
+# Connection 2 Configuration
+- variable: auth.connections[1].name
+  default: "connection2"
+  description: "Name identifier for the second connection"
+  type: string
+  label: Connection 2 Name
+  group: "Connection 2"
+
+- variable: auth.connections[1].userSecret.name
+  default: "service2-pg-secret"
+  description: "Kubernetes secret name for connection 2 credentials"
+  type: string
+  label: Connection 2 Secret Name
+  group: "Connection 2"
+  required: true
+
+- variable: auth.connections[1].userSecret.usernameKey
+  default: "username"
+  description: "Secret key containing username for connection 2"
+  type: string
+  label: Connection 2 Username Key
+  group: "Connection 2"
+
+- variable: auth.connections[1].userSecret.passwordKey
+  default: "password"
+  description: "Secret key containing password for connection 2"
+  type: string
+  label: Connection 2 Password Key
+  group: "Connection 2"
+
+- variable: auth.connections[1].userSecret.databaseKey
+  default: "database"
+  description: "Secret key containing database name for connection 2"
+  type: string
+  label: Connection 2 Database Key
+  group: "Connection 2"
+
+# Connection 3 Configuration
+- variable: auth.connections[2].name
+  default: "connection3"
+  description: "Name identifier for the third connection"
+  type: string
+  label: Connection 3 Name
+  group: "Connection 3"
+
+- variable: auth.connections[2].userSecret.name
+  default: "service3-pg-secret"
+  description: "Kubernetes secret name for connection 3 credentials"
+  type: string
+  label: Connection 3 Secret Name
+  group: "Connection 3"
+  required: true
+
+- variable: auth.connections[2].userSecret.usernameKey
+  default: "username"
+  description: "Secret key containing username for connection 3"
+  type: string
+  label: Connection 3 Username Key
+  group: "Connection 3"
+
+- variable: auth.connections[2].userSecret.passwordKey
+  default: "password"
+  description: "Secret key containing password for connection 3"
+  type: string
+  label: Connection 3 Password Key
+  group: "Connection 3"
+
+- variable: auth.connections[2].userSecret.databaseKey
+  default: "database"
+  description: "Secret key containing database name for connection 3"
+  type: string
+  label: Connection 3 Database Key
+  group: "Connection 3"
+
+# TLS Configuration
+- variable: tls.enabled
+  default: true
+  description: "Enable TLS for PostgreSQL connections"
+  type: boolean
+  label: Enable TLS
+  group: "TLS Configuration"
+
+- variable: tls.serverTlsSecret
+  default: "pgbouncer-postgres-tls"
+  description: "Name of Kubernetes secret containing TLS certificates"
+  type: string
+  label: TLS Secret Name
+  group: "TLS Configuration"
+  show_if: "tls.enabled=true"
+
+- variable: tls.sslMode
+  default: "verify-full"
+  description: "PostgreSQL SSL mode"
+  type: enum
+  label: SSL Mode
+  group: "TLS Configuration"
+  show_if: "tls.enabled=true"
+  options:
+    - "disable"
+    - "allow"
+    - "prefer"
+    - "require"
+    - "verify-ca"
+    - "verify-full"
+
+# Service Configuration
+- variable: service.type
+  default: "ClusterIP"
+  description: "Kubernetes service type"
+  type: enum
+  label: Service Type
+  group: "Service Configuration"
+  options:
+    - "ClusterIP"
+    - "NodePort"
+    - "LoadBalancer"
+
+- variable: service.port
+  default: 5432
+  description: "Service port for client connections"
+  type: int
+  label: Service Port
+  group: "Service Configuration"
+
+# Resource Configuration
+- variable: resources.requests.memory
+  default: "128Mi"
+  description: "Memory request for PgBouncer pods"
+  type: string
+  label: Memory Request
+  group: "Resources"
+
+- variable: resources.requests.cpu
+  default: "100m"
+  description: "CPU request for PgBouncer pods"
+  type: string
+  label: CPU Request
+  group: "Resources"
+
+- variable: resources.limits.memory
+  default: "256Mi"
+  description: "Memory limit for PgBouncer pods"
+  type: string
+  label: Memory Limit
+  group: "Resources"
+
+- variable: resources.limits.cpu
+  default: "200m"
+  description: "CPU limit for PgBouncer pods"
+  type: string
+  label: CPU Limit
+  group: "Resources"
+
+# Security Configuration
+- variable: securityContext.runAsNonRoot
+  default: true
+  description: "Run container as non-root user"
+  type: boolean
+  label: Run as Non-Root
+  group: "Security"
+
+- variable: securityContext.runAsUser
+  default: 1001
+  description: "User ID to run container as"
+  type: int
+  label: Run as User ID
+  group: "Security"
+
+- variable: podSecurityContext.fsGroup
+  default: 1001
+  description: "File system group ID for pod volumes"
+  type: int
+  label: FS Group ID
+  group: "Security"
+
+# Scheduling Configuration
+- variable: nodeSelector
+  default: {}
+  description: "Node selector constraints for pod scheduling"
+  type: map
+  label: Node Selector
+  group: "Scheduling"
+
+- variable: tolerations
+  default: []
+  description: "Pod tolerations for node taints"
+  type: array
+  label: Tolerations
+  group: "Scheduling"
+
+- variable: affinity
+  default: {}
+  description: "Pod affinity and anti-affinity rules"
+  type: map
+  label: Affinity Rules
+  group: "Scheduling"
