@@ -70,14 +70,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
-            {{- if .Values.main.persistence.downloads.enabled }}
-            - name: downloads
-              mountPath: {{ .Values.main.persistence.downloads.mountPath }}
-            {{- end }}
-            {{- if .Values.main.persistence.torrents.enabled }}
-            - name: torrents
-              mountPath: {{ .Values.main.persistence.torrents.mountPath }}
-            {{- end }}
             {{- if .Values.main.persistence.media.enabled }}
             - name: media
               mountPath: {{ .Values.main.persistence.media.mountPath }}
@@ -86,16 +78,6 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: {{ include "sonarr.fullname" . }}-config-pvc
-        {{- if .Values.main.persistence.downloads.enabled }}
-        - name: downloads
-          persistentVolumeClaim:
-            claimName: {{ .Values.main.persistence.downloads.existingPvc }}
-        {{- end }}
-        {{- if .Values.main.persistence.torrents.enabled }}
-        - name: torrents
-          persistentVolumeClaim:
-            claimName: {{ .Values.main.persistence.torrents.existingPvc }}
-        {{- end }}
         {{- if .Values.main.persistence.media.enabled }}
         - name: media
           persistentVolumeClaim:

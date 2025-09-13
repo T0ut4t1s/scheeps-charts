@@ -25,14 +25,10 @@ main:
       enabled: true
       storageClass: longhorn-ha-2
       size: 2Gi
-    downloads:
+    media:
       enabled: true
-      existingPvc: qbittorrent-cache-pvc
-      mountPath: /incomplete
-    torrents:
-      enabled: true
-      existingPvc: qbittorrent-torrent-pvc
-      mountPath: /torrents
+      existingPvc: arr-media-pvc
+      mountPath: /media
 
 # Database configuration
 db:
