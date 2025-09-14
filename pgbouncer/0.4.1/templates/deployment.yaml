@@ -27,31 +27,19 @@ spec:
           # Create processed userlist directory
           mkdir -p /tmp/pgbouncer
           
-          # Generate userlist from multiple connection secrets
+          # Generate userlist and database mappings from multiple connection secrets
           > /tmp/pgbouncer/userlist.txt
+          > /tmp/pgbouncer/databases.ini
+          
           {{- $connections := list -}}
           {{- if .Values.auth.connections -}}
             {{- $connections = .Values.auth.connections -}}
           {{- else -}}
-            {{/* Build connections from questions format */}}
-            {{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
-            {{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
-              {{- $conn1 := dict "name" (.Values.auth.connection1Name | default "app1") "userSecret" (dict "name" (.Values.auth.connection1SecretName | default "app1-pg-secret") "usernameKey" (.Values.auth.connection1UsernameKey | default "username") "passwordKey" (.Values.auth.connection1PasswordKey | default "password") "databaseKey" (.Values.auth.connection1DatabaseKey | default "database")) -}}
-              {{- $connections = append $connections $conn1 -}}
-            {{- end -}}
-            {{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
-              {{- $conn2 := dict "name" (.Values.auth.connection2Name | default "app2") "userSecret" (dict "name" (.Values.auth.connection2SecretName | default "app2-pg-secret") "usernameKey" (.Values.auth.connection2UsernameKey | default "username") "passwordKey" (.Values.auth.connection2PasswordKey | default "password") "databaseKey" (.Values.auth.connection2DatabaseKey | default "database")) -}}
-              {{- $connections = append $connections $conn2 -}}
-            {{- end -}}
-            {{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
-              {{- $conn3 := dict "name" (.Values.auth.connection3Name | default "app3") "userSecret" (dict "name" (.Values.auth.connection3SecretName | default "app3-pg-secret") "usernameKey" (.Values.auth.connection3UsernameKey | default "username") "passwordKey" (.Values.auth.connection3PasswordKey | default "password") "databaseKey" (.Values.auth.connection3DatabaseKey | default "database")) -}}
-              {{- $connections = append $connections $conn3 -}}
-            {{- end -}}
-            {{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
-              {{- $conn4 := dict "name" (.Values.auth.connection4Name | default "app4") "userSecret" (dict "name" (.Values.auth.connection4SecretName | default "app4-pg-secret") "usernameKey" (.Values.auth.connection4UsernameKey | default "username") "passwordKey" (.Values.auth.connection4PasswordKey | default "password") "databaseKey" (.Values.auth.connection4DatabaseKey | default "database")) -}}
-              {{- $connections = append $connections $conn4 -}}
-            {{- end -}}
+            {{- $connections = (include "pgbouncer.connectionsFromQuestions" . | fromYaml) -}}
           {{- end -}}
+          
+          echo "[databases]" > /tmp/pgbouncer/databases.ini
+          
           {{- range $connections }}
           echo "Processing connection: {{ .name }}"
           USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ .name }}/{{ .userSecret.usernameKey }} | tr -d '\n')
@@ -60,11 +48,18 @@ spec:
           
           # Use plain text passwords to allow PgBouncer to handle SCRAM authentication to backend
           echo "\"$USERNAME\" \"$PASSWORD\"" >> /tmp/pgbouncer/userlist.txt
+          
+          # Add database routing: database_name = host=backend port=5432 dbname=actual_db
+          echo "$DATABASE = host={{ .Values.postgresql.host }} port={{ .Values.postgresql.port }} dbname=$DATABASE" >> /tmp/pgbouncer/databases.ini
+          
           echo "Database mapping: $USERNAME -> $DATABASE"
           {{- end }}
           
           echo "Generated userlist:"
           cat /tmp/pgbouncer/userlist.txt
+          echo ""
+          echo "Generated databases.ini:"
+          cat /tmp/pgbouncer/databases.ini
         volumeMounts:
         - name: processed-auth
           mountPath: /tmp/pgbouncer
@@ -124,6 +119,8 @@ spec:
           value: "5432"
         - name: PGBOUNCER_USERLIST_FILE
           value: "/opt/bitnami/pgbouncer/processed-auth/userlist.txt"
+        - name: PGBOUNCER_DATABASES_FILE
+          value: "/opt/bitnami/pgbouncer/processed-auth/databases.ini"
         - name: PGBOUNCER_SERVER_TLS_SSLMODE
           value: {{ .Values.tls.sslMode | quote }}
         - name: PGBOUNCER_SERVER_TLS_CA_FILE
