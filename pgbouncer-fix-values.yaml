@@ -1,0 +1,26 @@
+auth:
+  connections:
+    - name: radarr
+      userSecret:
+        name: radarr-pg-secret
+        usernameKey: username
+        passwordKey: password
+        databaseKey: database
+    - name: sonarr
+      userSecret:
+        name: sonarr-pg-secret
+        usernameKey: username
+        passwordKey: password
+        databaseKey: database
+    - name: jellyseerr
+      userSecret:
+        name: jellyseerr-pg-secret
+        usernameKey: username
+        passwordKey: password
+        databaseKey: database
+    - name: prowlarr
+      userSecret:
+        name: prowlarr-pg-secret
+        usernameKey: username
+        passwordKey: password
+        databaseKey: database
