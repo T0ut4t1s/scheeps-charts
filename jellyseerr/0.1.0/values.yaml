@@ -25,6 +25,8 @@ main:
       enabled: true
       storageClass: longhorn-ha-2
       size: 2Gi
+      # Use an existing PVC for config storage
+      existingPvc: ""
 
 # Database configuration
 db:

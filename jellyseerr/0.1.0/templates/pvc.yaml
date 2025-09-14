@@ -1,4 +1,4 @@
-{{- if .Values.main.persistence.config.enabled }}
+{{- if and .Values.main.persistence.config.enabled (not .Values.main.persistence.config.existingPvc) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -77,7 +77,11 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
+            {{- if .Values.main.persistence.config.existingPvc }}
+            claimName: {{ .Values.main.persistence.config.existingPvc }}
+            {{- else }}
             claimName: {{ include "sonarr.fullname" . }}-config-pvc
+            {{- end }}
         {{- if .Values.main.persistence.media.enabled }}
         - name: media
           persistentVolumeClaim:

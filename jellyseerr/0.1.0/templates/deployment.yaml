@@ -75,7 +75,11 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
+            {{- if .Values.main.persistence.config.existingPvc }}
+            claimName: {{ .Values.main.persistence.config.existingPvc }}
+            {{- else }}
             claimName: {{ include "jellyseerr.fullname" . }}-config-pvc
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
