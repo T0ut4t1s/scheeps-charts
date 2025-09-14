@@ -75,7 +75,10 @@ spec:
           DATABASE=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.userSecret.name }}/{{ $connection.userSecret.databaseKey }} | tr -d '\n')
           
           # Use plain text passwords to allow PgBouncer to handle SCRAM authentication to backend
-          echo "\"$USERNAME\" \"$PASSWORD\"" >> /tmp/pgbouncer/userlist.txt
+          # Escape any quotes or backslashes in credentials to keep userlist syntax valid
+          ESCAPED_USERNAME=$(printf '%s' "$USERNAME" | sed 's/\\/\\\\/g; s/\"/\\\"/g')
+          ESCAPED_PASSWORD=$(printf '%s' "$PASSWORD" | sed 's/\\/\\\\/g; s/\"/\\\"/g')
+          echo "\"$ESCAPED_USERNAME\" \"$ESCAPED_PASSWORD\"" >> /tmp/pgbouncer/userlist.txt
           
           # Add database routing: database_name = host=backend port=5432 dbname=actual_db
           echo "$DATABASE = host={{ $.Values.postgresql.host }} port={{ $.Values.postgresql.port }} dbname=$DATABASE" >> /tmp/pgbouncer/databases.ini
