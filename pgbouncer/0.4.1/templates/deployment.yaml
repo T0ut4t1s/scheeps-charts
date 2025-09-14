@@ -195,10 +195,10 @@ spec:
           value: {{ .Values.auth.poolMode | quote }}
         - name: PGBOUNCER_PORT
           value: "5432"
-        - name: PGBOUNCER_USERLIST_FILE
-          value: "/opt/bitnami/pgbouncer/processed-auth/userlist.txt"
-        - name: PGBOUNCER_DATABASES_FILE
-          value: "/opt/bitnami/pgbouncer/processed-auth/databases.ini"
+        - name: PGBOUNCER_AUTH_FILE
+          value: "/opt/bitnami/pgbouncer/conf/userlist.txt"
+        - name: PGBOUNCER_CONF_FILE
+          value: "/opt/bitnami/pgbouncer/conf/pgbouncer.ini"
         - name: PGBOUNCER_SERVER_TLS_SSLMODE
           value: {{ .Values.tls.sslMode | quote }}
         - name: PGBOUNCER_SERVER_TLS_CA_FILE
