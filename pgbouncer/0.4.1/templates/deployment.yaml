@@ -64,7 +64,7 @@ spec:
               {{- $conn7 := dict "name" (.Values.auth.connection7Name | default "connection7") "userSecret" (dict "name" (.Values.auth.connection7SecretName | default "service7-pg-secret") "usernameKey" (.Values.auth.connection7UsernameKey | default "username") "passwordKey" (.Values.auth.connection7PasswordKey | default "password") "databaseKey" (.Values.auth.connection7DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn7 -}}
             {{- end -}}
-          {{- end -}}
+          {{- end }}
           
           echo "[databases]" > /tmp/pgbouncer/databases.ini
           
