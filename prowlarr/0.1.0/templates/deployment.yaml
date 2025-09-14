@@ -36,7 +36,7 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
-            # Database configuration
+            # Database configuration - override MainDatabase name
             - name: PROWLARR__POSTGRES__HOST
               value: {{ .Values.db.host | quote }}
             - name: PROWLARR__POSTGRES__PORT
@@ -53,6 +53,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.existingSecrets.database.name }}
                   key: {{ .Values.existingSecrets.database.password }}
+            - name: PROWLARR__POSTGRES__MAINDB
+              value: {{ .Values.db.name | quote }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
