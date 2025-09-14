@@ -265,9 +265,9 @@ questions:
   group: "Connection 3"
   show_if: "auth.connection3Enabled=true"
 
-# Connection 4 (Prowlarr)
+# Connection 4
 - variable: auth.connection4Enabled
-  default: true
+  default: false
   description: "Enable database connection 4"
   type: boolean
   label: Enable Connection 4
@@ -316,9 +316,9 @@ questions:
   group: "Connection 4"
   show_if: "auth.connection4Enabled=true"
 
-# Connection 5 (Jellyseerr Main)
+# Connection 5
 - variable: auth.connection5Enabled
-  default: true
+  default: false
   description: "Enable database connection 5"
   type: boolean
   label: Enable Connection 5
@@ -367,9 +367,9 @@ questions:
   group: "Connection 5"
   show_if: "auth.connection5Enabled=true"
 
-# Connection 6 (Prowlarr Main)
+# Connection 6
 - variable: auth.connection6Enabled
-  default: true
+  default: false
   description: "Enable database connection 6"
   type: boolean
   label: Enable Connection 6
@@ -418,9 +418,9 @@ questions:
   group: "Connection 6"
   show_if: "auth.connection6Enabled=true"
 
-# Connection 7 (Prowlarr Log)
+# Connection 7
 - variable: auth.connection7Enabled
-  default: true
+  default: false
   description: "Enable database connection 7"
   type: boolean
   label: Enable Connection 7
