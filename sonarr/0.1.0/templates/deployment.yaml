@@ -55,13 +55,15 @@ spec:
                   key: {{ .Values.existingSecrets.database.password }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe.httpGet | nindent 12 }}
+            httpGet:
+              {{- toYaml .Values.livenessProbe.httpGet | nindent 14 }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe.httpGet | nindent 12 }}
+            httpGet:
+              {{- toYaml .Values.readinessProbe.httpGet | nindent 14 }}
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           {{- end }}
