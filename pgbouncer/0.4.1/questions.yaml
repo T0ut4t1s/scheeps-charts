@@ -104,7 +104,7 @@ questions:
 
 # Database Connections Configuration
 - variable: auth.connectionCount
-  default: 4
+  default: 3
   description: "Number of database connections to configure"
   type: int
   label: Number of Database Connections
@@ -122,7 +122,7 @@ questions:
   show_if: "auth.connectionCount>=1"
 
 - variable: auth.connection1Name
-  default: "app1"
+  default: "connection1"
   description: "Connection name identifier"
   type: string
   label: Connection Name
@@ -131,7 +131,7 @@ questions:
   required: true
 
 - variable: auth.connection1SecretName
-  default: "app1-pg-secret"
+  default: "service1-pg-secret"
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
@@ -173,7 +173,7 @@ questions:
   show_if: "auth.connectionCount>=2"
 
 - variable: auth.connection2Name
-  default: "app2"
+  default: "connection2"
   description: "Connection name identifier"
   type: string
   label: Connection Name
@@ -182,7 +182,7 @@ questions:
   required: true
 
 - variable: auth.connection2SecretName
-  default: "app2-pg-secret"
+  default: "service2-pg-secret"
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
@@ -224,7 +224,7 @@ questions:
   show_if: "auth.connectionCount>=3"
 
 - variable: auth.connection3Name
-  default: "app3"
+  default: "connection3"
   description: "Connection name identifier"
   type: string
   label: Connection Name
@@ -233,7 +233,7 @@ questions:
   required: true
 
 - variable: auth.connection3SecretName
-  default: "app3-pg-secret"
+  default: "service3-pg-secret"
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
@@ -267,7 +267,7 @@ questions:
 
 # Connection 4
 - variable: auth.connection4Enabled
-  default: true
+  default: false
   description: "Enable database connection 4"
   type: boolean
   label: Enable Connection 4
@@ -275,7 +275,7 @@ questions:
   show_if: "auth.connectionCount>=4"
 
 - variable: auth.connection4Name
-  default: "app4"
+  default: "connection4"
   description: "Connection name identifier"
   type: string
   label: Connection Name
@@ -284,7 +284,7 @@ questions:
   required: true
 
 - variable: auth.connection4SecretName
-  default: "app4-pg-secret"
+  default: "service4-pg-secret"
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
@@ -315,6 +315,159 @@ questions:
   label: Database Key
   group: "Connection 4"
   show_if: "auth.connection4Enabled=true"
+
+# Connection 5
+- variable: auth.connection5Enabled
+  default: false
+  description: "Enable database connection 5"
+  type: boolean
+  label: Enable Connection 5
+  group: "Connection 5"
+  show_if: "auth.connectionCount>=5"
+
+- variable: auth.connection5Name
+  default: "connection5"
+  description: "Connection name identifier"
+  type: string
+  label: Connection Name
+  group: "Connection 5"
+  show_if: "auth.connection5Enabled=true"
+  required: true
+
+- variable: auth.connection5SecretName
+  default: "service5-pg-secret"
+  description: "Kubernetes secret containing database credentials"
+  type: string
+  label: Database Secret Name
+  group: "Connection 5"
+  show_if: "auth.connection5Enabled=true"
+  required: true
+
+- variable: auth.connection5UsernameKey
+  default: "username"
+  description: "Key in secret containing username"
+  type: string
+  label: Username Key
+  group: "Connection 5"
+  show_if: "auth.connection5Enabled=true"
+
+- variable: auth.connection5PasswordKey
+  default: "password"
+  description: "Key in secret containing password"
+  type: string
+  label: Password Key
+  group: "Connection 5"
+  show_if: "auth.connection5Enabled=true"
+
+- variable: auth.connection5DatabaseKey
+  default: "database"
+  description: "Key in secret containing database name"
+  type: string
+  label: Database Key
+  group: "Connection 5"
+  show_if: "auth.connection5Enabled=true"
+
+# Connection 6
+- variable: auth.connection6Enabled
+  default: false
+  description: "Enable database connection 6"
+  type: boolean
+  label: Enable Connection 6
+  group: "Connection 6"
+  show_if: "auth.connectionCount>=6"
+
+- variable: auth.connection6Name
+  default: "connection6"
+  description: "Connection name identifier"
+  type: string
+  label: Connection Name
+  group: "Connection 6"
+  show_if: "auth.connection6Enabled=true"
+  required: true
+
+- variable: auth.connection6SecretName
+  default: "service6-pg-secret"
+  description: "Kubernetes secret containing database credentials"
+  type: string
+  label: Database Secret Name
+  group: "Connection 6"
+  show_if: "auth.connection6Enabled=true"
+  required: true
+
+- variable: auth.connection6UsernameKey
+  default: "username"
+  description: "Key in secret containing username"
+  type: string
+  label: Username Key
+  group: "Connection 6"
+  show_if: "auth.connection6Enabled=true"
+
+- variable: auth.connection6PasswordKey
+  default: "password"
+  description: "Key in secret containing password"
+  type: string
+  label: Password Key
+  group: "Connection 6"
+  show_if: "auth.connection6Enabled=true"
+
+- variable: auth.connection6DatabaseKey
+  default: "database"
+  description: "Key in secret containing database name"
+  type: string
+  label: Database Key
+  group: "Connection 6"
+  show_if: "auth.connection6Enabled=true"
+
+# Connection 7
+- variable: auth.connection7Enabled
+  default: false
+  description: "Enable database connection 7"
+  type: boolean
+  label: Enable Connection 7
+  group: "Connection 7"
+  show_if: "auth.connectionCount>=7"
+
+- variable: auth.connection7Name
+  default: "connection7"
+  description: "Connection name identifier"
+  type: string
+  label: Connection Name
+  group: "Connection 7"
+  show_if: "auth.connection7Enabled=true"
+  required: true
+
+- variable: auth.connection7SecretName
+  default: "service7-pg-secret"
+  description: "Kubernetes secret containing database credentials"
+  type: string
+  label: Database Secret Name
+  group: "Connection 7"
+  show_if: "auth.connection7Enabled=true"
+  required: true
+
+- variable: auth.connection7UsernameKey
+  default: "username"
+  description: "Key in secret containing username"
+  type: string
+  label: Username Key
+  group: "Connection 7"
+  show_if: "auth.connection7Enabled=true"
+
+- variable: auth.connection7PasswordKey
+  default: "password"
+  description: "Key in secret containing password"
+  type: string
+  label: Password Key
+  group: "Connection 7"
+  show_if: "auth.connection7Enabled=true"
+
+- variable: auth.connection7DatabaseKey
+  default: "database"
+  description: "Key in secret containing database name"
+  type: string
+  label: Database Key
+  group: "Connection 7"
+  show_if: "auth.connection7Enabled=true"
 
 # TLS Configuration
 - variable: tls.enabled

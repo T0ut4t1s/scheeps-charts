@@ -32,35 +32,58 @@ auth:
   # Multiple user/database connections (configured via questions.yaml or direct YAML)
   connections: []
   
-  # Alternative: Questions.yaml flat structure (for Rancher UI)
-  connectionCount: 4
+  # Questions.yaml flat structure (for Rancher UI)
+  connectionCount: 3
+  
+  # Generic connection defaults
   connection1Enabled: true
-  connection1Name: "app1"
-  connection1SecretName: "app1-pg-secret"
+  connection1Name: "connection1"
+  connection1SecretName: "service1-pg-secret"
   connection1UsernameKey: "username"
   connection1PasswordKey: "password"
   connection1DatabaseKey: "database"
   
   connection2Enabled: true
-  connection2Name: "app2"
-  connection2SecretName: "app2-pg-secret"
+  connection2Name: "connection2"
+  connection2SecretName: "service2-pg-secret"
   connection2UsernameKey: "username"
   connection2PasswordKey: "password"
   connection2DatabaseKey: "database"
   
   connection3Enabled: true
-  connection3Name: "app3"
-  connection3SecretName: "app3-pg-secret"
+  connection3Name: "connection3"
+  connection3SecretName: "service3-pg-secret"
   connection3UsernameKey: "username"
   connection3PasswordKey: "password"
   connection3DatabaseKey: "database"
   
-  connection4Enabled: true
-  connection4Name: "app4"
-  connection4SecretName: "app4-pg-secret"
+  connection4Enabled: false
+  connection4Name: "connection4"
+  connection4SecretName: "service4-pg-secret"
   connection4UsernameKey: "username"
   connection4PasswordKey: "password"
   connection4DatabaseKey: "database"
+  
+  connection5Enabled: false
+  connection5Name: "connection5"
+  connection5SecretName: "service5-pg-secret"
+  connection5UsernameKey: "username"
+  connection5PasswordKey: "password"
+  connection5DatabaseKey: "database"
+  
+  connection6Enabled: false
+  connection6Name: "connection6"
+  connection6SecretName: "service6-pg-secret"
+  connection6UsernameKey: "username"
+  connection6PasswordKey: "password"
+  connection6DatabaseKey: "database"
+  
+  connection7Enabled: false
+  connection7Name: "connection7"
+  connection7SecretName: "service7-pg-secret"
+  connection7UsernameKey: "username"
+  connection7PasswordKey: "password"
+  connection7DatabaseKey: "database"
 
 tls:
   enabled: true

@@ -55,14 +55,13 @@ Convert flat connection variables from questions.yaml to connections array
 */}}
 {{- define "pgbouncer.connectionsFromQuestions" -}}
 {{- $connections := list -}}
-{{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
 
 {{/* Connection 1 */}}
-{{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
+{{- if and (.Values.auth.connection1Enabled | default false) (ge (.Values.auth.connectionCount | default 0) 1) -}}
 {{- $conn1 := dict -}}
-{{- $_ := set $conn1 "name" (.Values.auth.connection1Name | default "app1") -}}
+{{- $_ := set $conn1 "name" (.Values.auth.connection1Name | default "connection1") -}}
 {{- $userSecret := dict -}}
-{{- $_ := set $userSecret "name" (.Values.auth.connection1SecretName | default "app1-pg-secret") -}}
+{{- $_ := set $userSecret "name" (.Values.auth.connection1SecretName | default "service1-pg-secret") -}}
 {{- $_ := set $userSecret "usernameKey" (.Values.auth.connection1UsernameKey | default "username") -}}
 {{- $_ := set $userSecret "passwordKey" (.Values.auth.connection1PasswordKey | default "password") -}}
 {{- $_ := set $userSecret "databaseKey" (.Values.auth.connection1DatabaseKey | default "database") -}}
@@ -71,11 +70,11 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 2 */}}
-{{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
+{{- if and (.Values.auth.connection2Enabled | default false) (ge (.Values.auth.connectionCount | default 0) 2) -}}
 {{- $conn2 := dict -}}
-{{- $_ := set $conn2 "name" (.Values.auth.connection2Name | default "app2") -}}
+{{- $_ := set $conn2 "name" (.Values.auth.connection2Name | default "connection2") -}}
 {{- $userSecret := dict -}}
-{{- $_ := set $userSecret "name" (.Values.auth.connection2SecretName | default "app2-pg-secret") -}}
+{{- $_ := set $userSecret "name" (.Values.auth.connection2SecretName | default "service2-pg-secret") -}}
 {{- $_ := set $userSecret "usernameKey" (.Values.auth.connection2UsernameKey | default "username") -}}
 {{- $_ := set $userSecret "passwordKey" (.Values.auth.connection2PasswordKey | default "password") -}}
 {{- $_ := set $userSecret "databaseKey" (.Values.auth.connection2DatabaseKey | default "database") -}}
@@ -84,11 +83,11 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 3 */}}
-{{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
+{{- if and (.Values.auth.connection3Enabled | default false) (ge (.Values.auth.connectionCount | default 0) 3) -}}
 {{- $conn3 := dict -}}
-{{- $_ := set $conn3 "name" (.Values.auth.connection3Name | default "app3") -}}
+{{- $_ := set $conn3 "name" (.Values.auth.connection3Name | default "connection3") -}}
 {{- $userSecret := dict -}}
-{{- $_ := set $userSecret "name" (.Values.auth.connection3SecretName | default "app3-pg-secret") -}}
+{{- $_ := set $userSecret "name" (.Values.auth.connection3SecretName | default "service3-pg-secret") -}}
 {{- $_ := set $userSecret "usernameKey" (.Values.auth.connection3UsernameKey | default "username") -}}
 {{- $_ := set $userSecret "passwordKey" (.Values.auth.connection3PasswordKey | default "password") -}}
 {{- $_ := set $userSecret "databaseKey" (.Values.auth.connection3DatabaseKey | default "database") -}}
@@ -97,16 +96,55 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 4 */}}
-{{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
+{{- if and (.Values.auth.connection4Enabled | default false) (ge (.Values.auth.connectionCount | default 0) 4) -}}
 {{- $conn4 := dict -}}
-{{- $_ := set $conn4 "name" (.Values.auth.connection4Name | default "app4") -}}
+{{- $_ := set $conn4 "name" (.Values.auth.connection4Name | default "connection4") -}}
 {{- $userSecret := dict -}}
-{{- $_ := set $userSecret "name" (.Values.auth.connection4SecretName | default "app4-pg-secret") -}}
+{{- $_ := set $userSecret "name" (.Values.auth.connection4SecretName | default "service4-pg-secret") -}}
 {{- $_ := set $userSecret "usernameKey" (.Values.auth.connection4UsernameKey | default "username") -}}
 {{- $_ := set $userSecret "passwordKey" (.Values.auth.connection4PasswordKey | default "password") -}}
 {{- $_ := set $userSecret "databaseKey" (.Values.auth.connection4DatabaseKey | default "database") -}}
 {{- $_ := set $conn4 "userSecret" $userSecret -}}
 {{- $connections = append $connections $conn4 -}}
+{{- end -}}
+
+{{/* Connection 5 */}}
+{{- if and (.Values.auth.connection5Enabled | default false) (ge (.Values.auth.connectionCount | default 0) 5) -}}
+{{- $conn5 := dict -}}
+{{- $_ := set $conn5 "name" (.Values.auth.connection5Name | default "connection5") -}}
+{{- $userSecret := dict -}}
+{{- $_ := set $userSecret "name" (.Values.auth.connection5SecretName | default "service5-pg-secret") -}}
+{{- $_ := set $userSecret "usernameKey" (.Values.auth.connection5UsernameKey | default "username") -}}
+{{- $_ := set $userSecret "passwordKey" (.Values.auth.connection5PasswordKey | default "password") -}}
+{{- $_ := set $userSecret "databaseKey" (.Values.auth.connection5DatabaseKey | default "database") -}}
+{{- $_ := set $conn5 "userSecret" $userSecret -}}
+{{- $connections = append $connections $conn5 -}}
+{{- end -}}
+
+{{/* Connection 6 */}}
+{{- if and (.Values.auth.connection6Enabled | default false) (ge (.Values.auth.connectionCount | default 0) 6) -}}
+{{- $conn6 := dict -}}
+{{- $_ := set $conn6 "name" (.Values.auth.connection6Name | default "connection6") -}}
+{{- $userSecret := dict -}}
+{{- $_ := set $userSecret "name" (.Values.auth.connection6SecretName | default "service6-pg-secret") -}}
+{{- $_ := set $userSecret "usernameKey" (.Values.auth.connection6UsernameKey | default "username") -}}
+{{- $_ := set $userSecret "passwordKey" (.Values.auth.connection6PasswordKey | default "password") -}}
+{{- $_ := set $userSecret "databaseKey" (.Values.auth.connection6DatabaseKey | default "database") -}}
+{{- $_ := set $conn6 "userSecret" $userSecret -}}
+{{- $connections = append $connections $conn6 -}}
+{{- end -}}
+
+{{/* Connection 7 */}}
+{{- if and (.Values.auth.connection7Enabled | default false) (ge (.Values.auth.connectionCount | default 0) 7) -}}
+{{- $conn7 := dict -}}
+{{- $_ := set $conn7 "name" (.Values.auth.connection7Name | default "connection7") -}}
+{{- $userSecret := dict -}}
+{{- $_ := set $userSecret "name" (.Values.auth.connection7SecretName | default "service7-pg-secret") -}}
+{{- $_ := set $userSecret "usernameKey" (.Values.auth.connection7UsernameKey | default "username") -}}
+{{- $_ := set $userSecret "passwordKey" (.Values.auth.connection7PasswordKey | default "password") -}}
+{{- $_ := set $userSecret "databaseKey" (.Values.auth.connection7DatabaseKey | default "database") -}}
+{{- $_ := set $conn7 "userSecret" $userSecret -}}
+{{- $connections = append $connections $conn7 -}}
 {{- end -}}
 
 {{- $connections | toYaml -}}
