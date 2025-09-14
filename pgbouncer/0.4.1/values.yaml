@@ -35,29 +35,29 @@ auth:
   # Alternative: Questions.yaml flat structure (for Rancher UI)
   connectionCount: 4
   connection1Enabled: true
-  connection1Name: "radarr"
-  connection1SecretName: "radarr-pg-secret"
+  connection1Name: "app1"
+  connection1SecretName: "app1-pg-secret"
   connection1UsernameKey: "username"
   connection1PasswordKey: "password"
   connection1DatabaseKey: "database"
   
   connection2Enabled: true
-  connection2Name: "sonarr"
-  connection2SecretName: "sonarr-pg-secret"
+  connection2Name: "app2"
+  connection2SecretName: "app2-pg-secret"
   connection2UsernameKey: "username"
   connection2PasswordKey: "password"
   connection2DatabaseKey: "database"
   
   connection3Enabled: true
-  connection3Name: "jellyseerr"
-  connection3SecretName: "jellyseerr-pg-secret"
+  connection3Name: "app3"
+  connection3SecretName: "app3-pg-secret"
   connection3UsernameKey: "username"
   connection3PasswordKey: "password"
   connection3DatabaseKey: "database"
   
   connection4Enabled: true
-  connection4Name: "prowlarr"
-  connection4SecretName: "prowlarr-pg-secret"
+  connection4Name: "app4"
+  connection4SecretName: "app4-pg-secret"
   connection4UsernameKey: "username"
   connection4PasswordKey: "password"
   connection4DatabaseKey: "database"
