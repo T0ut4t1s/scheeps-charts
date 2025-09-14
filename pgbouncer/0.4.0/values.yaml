@@ -33,63 +33,57 @@ auth:
   connections: []
   
   # Questions.yaml flat structure (for Rancher UI)
-  connectionCount: 7
+  connectionCount: 3
   
-  # Radarr main database
+  # Generic connection defaults
   connection1Enabled: true
-  connection1Name: "radarr"
-  connection1SecretName: "radarr-pg-secret"
+  connection1Name: "connection1"
+  connection1SecretName: "service1-pg-secret"
   connection1UsernameKey: "username"
   connection1PasswordKey: "password"
   connection1DatabaseKey: "database"
   
-  # Radarr log database  
   connection2Enabled: true
-  connection2Name: "radarr-log"
-  connection2SecretName: "radarr-pg-secret"
+  connection2Name: "connection2"
+  connection2SecretName: "service2-pg-secret"
   connection2UsernameKey: "username"
   connection2PasswordKey: "password"
-  connection2DatabaseKey: "log-database"
+  connection2DatabaseKey: "database"
   
-  # Sonarr main database
   connection3Enabled: true
-  connection3Name: "sonarr"
-  connection3SecretName: "sonarr-pg-secret"
+  connection3Name: "connection3"
+  connection3SecretName: "service3-pg-secret"
   connection3UsernameKey: "username"
   connection3PasswordKey: "password"
   connection3DatabaseKey: "database"
   
-  # Sonarr log database
-  connection4Enabled: true
-  connection4Name: "sonarr-log" 
-  connection4SecretName: "sonarr-pg-secret"
+  connection4Enabled: false
+  connection4Name: "connection4"
+  connection4SecretName: "service4-pg-secret"
   connection4UsernameKey: "username"
   connection4PasswordKey: "password"
-  connection4DatabaseKey: "log-database"
+  connection4DatabaseKey: "database"
   
-  # Jellyseerr main database
-  connection5Enabled: true
-  connection5Name: "jellyseerr"
-  connection5SecretName: "jellyseerr-pg-secret"
+  connection5Enabled: false
+  connection5Name: "connection5"
+  connection5SecretName: "service5-pg-secret"
   connection5UsernameKey: "username"
   connection5PasswordKey: "password"
   connection5DatabaseKey: "database"
   
-  # Prowlarr main database
-  connection6Enabled: true
-  connection6Name: "prowlarr"
-  connection6SecretName: "prowlarr-pg-secret"
+  connection6Enabled: false
+  connection6Name: "connection6"
+  connection6SecretName: "service6-pg-secret"
   connection6UsernameKey: "username"
-  connection6PasswordKey: "password"  
+  connection6PasswordKey: "password"
   connection6DatabaseKey: "database"
   
-  # Prowlarr log database
-  connection7Enabled: true
-  connection7Name: "prowlarr-log"
-  connection7SecretName: "prowlarr-pg-secret"
+  connection7Enabled: false
+  connection7Name: "connection7"
+  connection7SecretName: "service7-pg-secret"
   connection7UsernameKey: "username"
   connection7PasswordKey: "password"
-  connection7DatabaseKey: "log-database"
+  connection7DatabaseKey: "database"
 
 tls:
   enabled: true
