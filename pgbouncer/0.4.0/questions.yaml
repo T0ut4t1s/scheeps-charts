@@ -104,7 +104,7 @@ questions:
 
 # Database Connections Configuration
 - variable: auth.connectionCount
-  default: 4
+  default: 7
   description: "Number of database connections to configure"
   type: int
   label: Number of Database Connections
@@ -112,13 +112,13 @@ questions:
   min: 1
   max: 10
 
-# Connection 1 (Radarr)
+# Connection 1 (Radarr Main)
 - variable: auth.connection1Enabled
   default: true
   description: "Enable database connection 1"
   type: boolean
   label: Enable Connection 1
-  group: "Connection 1 (Radarr)"
+  group: "Connection 1 (Radarr Main)"
   show_if: "auth.connectionCount>=1"
 
 - variable: auth.connection1Name
@@ -126,7 +126,7 @@ questions:
   description: "Connection name identifier"
   type: string
   label: Connection Name
-  group: "Connection 1 (Radarr)"
+  group: "Connection 1 (Radarr Main)"
   show_if: "auth.connection1Enabled=true"
   required: true
 
@@ -135,7 +135,7 @@ questions:
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
-  group: "Connection 1 (Radarr)"
+  group: "Connection 1 (Radarr Main)"
   show_if: "auth.connection1Enabled=true"
   required: true
 
@@ -144,7 +144,7 @@ questions:
   description: "Key in secret containing username"
   type: string
   label: Username Key
-  group: "Connection 1 (Radarr)"
+  group: "Connection 1 (Radarr Main)"
   show_if: "auth.connection1Enabled=true"
 
 - variable: auth.connection1PasswordKey
@@ -152,7 +152,7 @@ questions:
   description: "Key in secret containing password"
   type: string
   label: Password Key
-  group: "Connection 1 (Radarr)"
+  group: "Connection 1 (Radarr Main)"
   show_if: "auth.connection1Enabled=true"
 
 - variable: auth.connection1DatabaseKey
@@ -160,33 +160,33 @@ questions:
   description: "Key in secret containing database name"
   type: string
   label: Database Key
-  group: "Connection 1 (Radarr)"
+  group: "Connection 1 (Radarr Main)"
   show_if: "auth.connection1Enabled=true"
 
-# Connection 2 (Sonarr)
+# Connection 2 (Radarr Log)
 - variable: auth.connection2Enabled
   default: true
   description: "Enable database connection 2"
   type: boolean
   label: Enable Connection 2
-  group: "Connection 2 (Sonarr)"
+  group: "Connection 2 (Radarr Log)"
   show_if: "auth.connectionCount>=2"
 
 - variable: auth.connection2Name
-  default: "sonarr"
+  default: "radarr-log"
   description: "Connection name identifier"
   type: string
   label: Connection Name
-  group: "Connection 2 (Sonarr)"
+  group: "Connection 2 (Radarr Log)"
   show_if: "auth.connection2Enabled=true"
   required: true
 
 - variable: auth.connection2SecretName
-  default: "sonarr-pg-secret"
+  default: "radarr-pg-secret"
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
-  group: "Connection 2 (Sonarr)"
+  group: "Connection 2 (Radarr Log)"
   show_if: "auth.connection2Enabled=true"
   required: true
 
@@ -195,7 +195,7 @@ questions:
   description: "Key in secret containing username"
   type: string
   label: Username Key
-  group: "Connection 2 (Sonarr)"
+  group: "Connection 2 (Radarr Log)"
   show_if: "auth.connection2Enabled=true"
 
 - variable: auth.connection2PasswordKey
@@ -203,41 +203,41 @@ questions:
   description: "Key in secret containing password"
   type: string
   label: Password Key
-  group: "Connection 2 (Sonarr)"
+  group: "Connection 2 (Radarr Log)"
   show_if: "auth.connection2Enabled=true"
 
 - variable: auth.connection2DatabaseKey
-  default: "database"
-  description: "Key in secret containing database name"
+  default: "log-database"
+  description: "Key in secret containing log database name"
   type: string
-  label: Database Key
-  group: "Connection 2 (Sonarr)"
+  label: Database Key (Log DB)
+  group: "Connection 2 (Radarr Log)"
   show_if: "auth.connection2Enabled=true"
 
-# Connection 3 (Jellyseerr)
+# Connection 3 (Sonarr Main)
 - variable: auth.connection3Enabled
   default: true
   description: "Enable database connection 3"
   type: boolean
   label: Enable Connection 3
-  group: "Connection 3 (Jellyseerr)"
+  group: "Connection 3 (Sonarr Main)"
   show_if: "auth.connectionCount>=3"
 
 - variable: auth.connection3Name
-  default: "jellyseerr"
+  default: "sonarr"
   description: "Connection name identifier"
   type: string
   label: Connection Name
-  group: "Connection 3 (Jellyseerr)"
+  group: "Connection 3 (Sonarr Main)"
   show_if: "auth.connection3Enabled=true"
   required: true
 
 - variable: auth.connection3SecretName
-  default: "jellyseerr-pg-secret"
+  default: "sonarr-pg-secret"
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
-  group: "Connection 3 (Jellyseerr)"
+  group: "Connection 3 (Sonarr Main)"
   show_if: "auth.connection3Enabled=true"
   required: true
 
@@ -246,7 +246,7 @@ questions:
   description: "Key in secret containing username"
   type: string
   label: Username Key
-  group: "Connection 3 (Jellyseerr)"
+  group: "Connection 3 (Sonarr Main)"
   show_if: "auth.connection3Enabled=true"
 
 - variable: auth.connection3PasswordKey
@@ -254,7 +254,7 @@ questions:
   description: "Key in secret containing password"
   type: string
   label: Password Key
-  group: "Connection 3 (Jellyseerr)"
+  group: "Connection 3 (Sonarr Main)"
   show_if: "auth.connection3Enabled=true"
 
 - variable: auth.connection3DatabaseKey
@@ -262,7 +262,7 @@ questions:
   description: "Key in secret containing database name"
   type: string
   label: Database Key
-  group: "Connection 3 (Jellyseerr)"
+  group: "Connection 3 (Sonarr Main)"
   show_if: "auth.connection3Enabled=true"
 
 # Connection 4 (Prowlarr)
@@ -271,24 +271,24 @@ questions:
   description: "Enable database connection 4"
   type: boolean
   label: Enable Connection 4
-  group: "Connection 4 (Prowlarr)"
+  group: "Connection 4 (Sonarr Log)"
   show_if: "auth.connectionCount>=4"
 
 - variable: auth.connection4Name
-  default: "prowlarr"
+  default: "sonarr-log"
   description: "Connection name identifier"
   type: string
   label: Connection Name
-  group: "Connection 4 (Prowlarr)"
+  group: "Connection 4 (Sonarr Log)"
   show_if: "auth.connection4Enabled=true"
   required: true
 
 - variable: auth.connection4SecretName
-  default: "prowlarr-pg-secret"
+  default: "sonarr-pg-secret"
   description: "Kubernetes secret containing database credentials"
   type: string
   label: Database Secret Name
-  group: "Connection 4 (Prowlarr)"
+  group: "Connection 4 (Sonarr Log)"
   show_if: "auth.connection4Enabled=true"
   required: true
 
@@ -297,7 +297,7 @@ questions:
   description: "Key in secret containing username"
   type: string
   label: Username Key
-  group: "Connection 4 (Prowlarr)"
+  group: "Connection 4 (Sonarr Log)"
   show_if: "auth.connection4Enabled=true"
 
 - variable: auth.connection4PasswordKey
@@ -305,16 +305,169 @@ questions:
   description: "Key in secret containing password"
   type: string
   label: Password Key
-  group: "Connection 4 (Prowlarr)"
+  group: "Connection 4 (Sonarr Log)"
   show_if: "auth.connection4Enabled=true"
 
 - variable: auth.connection4DatabaseKey
+  default: "log-database"
+  description: "Key in secret containing log database name"
+  type: string
+  label: Database Key (Log DB)
+  group: "Connection 4 (Sonarr Log)"
+  show_if: "auth.connection4Enabled=true"
+
+# Connection 5 (Jellyseerr Main)
+- variable: auth.connection5Enabled
+  default: true
+  description: "Enable database connection 5"
+  type: boolean
+  label: Enable Connection 5
+  group: "Connection 5 (Jellyseerr Main)"
+  show_if: "auth.connectionCount>=5"
+
+- variable: auth.connection5Name
+  default: "jellyseerr"
+  description: "Connection name identifier"
+  type: string
+  label: Connection Name
+  group: "Connection 5 (Jellyseerr Main)"
+  show_if: "auth.connection5Enabled=true"
+  required: true
+
+- variable: auth.connection5SecretName
+  default: "jellyseerr-pg-secret"
+  description: "Kubernetes secret containing database credentials"
+  type: string
+  label: Database Secret Name
+  group: "Connection 5 (Jellyseerr Main)"
+  show_if: "auth.connection5Enabled=true"
+  required: true
+
+- variable: auth.connection5UsernameKey
+  default: "username"
+  description: "Key in secret containing username"
+  type: string
+  label: Username Key
+  group: "Connection 5 (Jellyseerr Main)"
+  show_if: "auth.connection5Enabled=true"
+
+- variable: auth.connection5PasswordKey
+  default: "password"
+  description: "Key in secret containing password"
+  type: string
+  label: Password Key
+  group: "Connection 5 (Jellyseerr Main)"
+  show_if: "auth.connection5Enabled=true"
+
+- variable: auth.connection5DatabaseKey
   default: "database"
   description: "Key in secret containing database name"
   type: string
   label: Database Key
-  group: "Connection 4 (Prowlarr)"
-  show_if: "auth.connection4Enabled=true"
+  group: "Connection 5 (Jellyseerr Main)"
+  show_if: "auth.connection5Enabled=true"
+
+# Connection 6 (Prowlarr Main)
+- variable: auth.connection6Enabled
+  default: true
+  description: "Enable database connection 6"
+  type: boolean
+  label: Enable Connection 6
+  group: "Connection 6 (Prowlarr Main)"
+  show_if: "auth.connectionCount>=6"
+
+- variable: auth.connection6Name
+  default: "prowlarr"
+  description: "Connection name identifier"
+  type: string
+  label: Connection Name
+  group: "Connection 6 (Prowlarr Main)"
+  show_if: "auth.connection6Enabled=true"
+  required: true
+
+- variable: auth.connection6SecretName
+  default: "prowlarr-pg-secret"
+  description: "Kubernetes secret containing database credentials"
+  type: string
+  label: Database Secret Name
+  group: "Connection 6 (Prowlarr Main)"
+  show_if: "auth.connection6Enabled=true"
+  required: true
+
+- variable: auth.connection6UsernameKey
+  default: "username"
+  description: "Key in secret containing username"
+  type: string
+  label: Username Key
+  group: "Connection 6 (Prowlarr Main)"
+  show_if: "auth.connection6Enabled=true"
+
+- variable: auth.connection6PasswordKey
+  default: "password"
+  description: "Key in secret containing password"
+  type: string
+  label: Password Key
+  group: "Connection 6 (Prowlarr Main)"
+  show_if: "auth.connection6Enabled=true"
+
+- variable: auth.connection6DatabaseKey
+  default: "database"
+  description: "Key in secret containing database name"
+  type: string
+  label: Database Key
+  group: "Connection 6 (Prowlarr Main)"
+  show_if: "auth.connection6Enabled=true"
+
+# Connection 7 (Prowlarr Log)
+- variable: auth.connection7Enabled
+  default: true
+  description: "Enable database connection 7"
+  type: boolean
+  label: Enable Connection 7
+  group: "Connection 7 (Prowlarr Log)"
+  show_if: "auth.connectionCount>=7"
+
+- variable: auth.connection7Name
+  default: "prowlarr-log"
+  description: "Connection name identifier"
+  type: string
+  label: Connection Name
+  group: "Connection 7 (Prowlarr Log)"
+  show_if: "auth.connection7Enabled=true"
+  required: true
+
+- variable: auth.connection7SecretName
+  default: "prowlarr-pg-secret"
+  description: "Kubernetes secret containing database credentials"
+  type: string
+  label: Database Secret Name
+  group: "Connection 7 (Prowlarr Log)"
+  show_if: "auth.connection7Enabled=true"
+  required: true
+
+- variable: auth.connection7UsernameKey
+  default: "username"
+  description: "Key in secret containing username"
+  type: string
+  label: Username Key
+  group: "Connection 7 (Prowlarr Log)"
+  show_if: "auth.connection7Enabled=true"
+
+- variable: auth.connection7PasswordKey
+  default: "password"
+  description: "Key in secret containing password"
+  type: string
+  label: Password Key
+  group: "Connection 7 (Prowlarr Log)"
+  show_if: "auth.connection7Enabled=true"
+
+- variable: auth.connection7DatabaseKey
+  default: "log-database"
+  description: "Key in secret containing log database name"
+  type: string
+  label: Database Key (Log DB)
+  group: "Connection 7 (Prowlarr Log)"
+  show_if: "auth.connection7Enabled=true"
 
 # TLS Configuration
 - variable: tls.enabled

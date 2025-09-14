@@ -32,8 +32,10 @@ auth:
   # Multiple user/database connections (configured via questions.yaml or direct YAML)
   connections: []
   
-  # Alternative: Questions.yaml flat structure (for Rancher UI)
-  connectionCount: 4
+  # Questions.yaml flat structure (for Rancher UI)
+  connectionCount: 7
+  
+  # Radarr main database
   connection1Enabled: true
   connection1Name: "radarr"
   connection1SecretName: "radarr-pg-secret"
@@ -41,26 +43,53 @@ auth:
   connection1PasswordKey: "password"
   connection1DatabaseKey: "database"
   
+  # Radarr log database  
   connection2Enabled: true
-  connection2Name: "sonarr"
-  connection2SecretName: "sonarr-pg-secret"
+  connection2Name: "radarr-log"
+  connection2SecretName: "radarr-pg-secret"
   connection2UsernameKey: "username"
   connection2PasswordKey: "password"
-  connection2DatabaseKey: "database"
+  connection2DatabaseKey: "log-database"
   
+  # Sonarr main database
   connection3Enabled: true
-  connection3Name: "jellyseerr"
-  connection3SecretName: "jellyseerr-pg-secret"
+  connection3Name: "sonarr"
+  connection3SecretName: "sonarr-pg-secret"
   connection3UsernameKey: "username"
   connection3PasswordKey: "password"
   connection3DatabaseKey: "database"
   
+  # Sonarr log database
   connection4Enabled: true
-  connection4Name: "prowlarr"
-  connection4SecretName: "prowlarr-pg-secret"
+  connection4Name: "sonarr-log" 
+  connection4SecretName: "sonarr-pg-secret"
   connection4UsernameKey: "username"
   connection4PasswordKey: "password"
-  connection4DatabaseKey: "database"
+  connection4DatabaseKey: "log-database"
+  
+  # Jellyseerr main database
+  connection5Enabled: true
+  connection5Name: "jellyseerr"
+  connection5SecretName: "jellyseerr-pg-secret"
+  connection5UsernameKey: "username"
+  connection5PasswordKey: "password"
+  connection5DatabaseKey: "database"
+  
+  # Prowlarr main database
+  connection6Enabled: true
+  connection6Name: "prowlarr"
+  connection6SecretName: "prowlarr-pg-secret"
+  connection6UsernameKey: "username"
+  connection6PasswordKey: "password"  
+  connection6DatabaseKey: "database"
+  
+  # Prowlarr log database
+  connection7Enabled: true
+  connection7Name: "prowlarr-log"
+  connection7SecretName: "prowlarr-pg-secret"
+  connection7UsernameKey: "username"
+  connection7PasswordKey: "password"
+  connection7DatabaseKey: "log-database"
 
 tls:
   enabled: true
