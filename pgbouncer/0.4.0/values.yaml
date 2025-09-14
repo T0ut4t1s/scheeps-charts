@@ -29,32 +29,8 @@ auth:
   ignoreStartupParameters: ""
   minPoolSize: 5
   
-  # Multiple user/database connections
-  connections:
-    - name: "connection1"
-      userSecret:
-        name: "service1-pg-secret"
-        usernameKey: "username"
-        passwordKey: "password"
-        databaseKey: "database"
-    - name: "connection2"
-      userSecret:
-        name: "service2-pg-secret"
-        usernameKey: "username"
-        passwordKey: "password"
-        databaseKey: "database"
-    - name: "connection3"
-      userSecret:
-        name: "service3-pg-secret"
-        usernameKey: "username"
-        passwordKey: "password"
-        databaseKey: "database"
-    - name: "connection4"
-      userSecret:
-        name: "service4-pg-secret"
-        usernameKey: "username"
-        passwordKey: "password"
-        databaseKey: "database"
+  # Multiple user/database connections (configured via questions.yaml)
+  connections: []
 
 tls:
   enabled: true
