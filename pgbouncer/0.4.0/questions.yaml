@@ -213,6 +213,43 @@ questions:
   label: Connection 3 Database Key
   group: "Connection 3"
 
+# Connection 4 Configuration
+- variable: auth.connections[3].name
+  default: "connection4"
+  description: "Name identifier for the fourth connection"
+  type: string
+  label: Connection 4 Name
+  group: "Connection 4"
+
+- variable: auth.connections[3].userSecret.name
+  default: "service4-pg-secret"
+  description: "Kubernetes secret name for connection 4 credentials"
+  type: string
+  label: Connection 4 Secret Name
+  group: "Connection 4"
+  required: true
+
+- variable: auth.connections[3].userSecret.usernameKey
+  default: "username"
+  description: "Secret key containing username for connection 4"
+  type: string
+  label: Connection 4 Username Key
+  group: "Connection 4"
+
+- variable: auth.connections[3].userSecret.passwordKey
+  default: "password"
+  description: "Secret key containing password for connection 4"
+  type: string
+  label: Connection 4 Password Key
+  group: "Connection 4"
+
+- variable: auth.connections[3].userSecret.databaseKey
+  default: "database"
+  description: "Secret key containing database name for connection 4"
+  type: string
+  label: Connection 4 Database Key
+  group: "Connection 4"
+
 # TLS Configuration
 - variable: tls.enabled
   default: true

@@ -49,6 +49,12 @@ auth:
         usernameKey: "username"
         passwordKey: "password"
         databaseKey: "database"
+    - name: "connection4"
+      userSecret:
+        name: "service4-pg-secret"
+        usernameKey: "username"
+        passwordKey: "password"
+        databaseKey: "database"
 
 tls:
   enabled: true
