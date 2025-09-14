@@ -70,9 +70,9 @@ spec:
           
           {{- range $connection := $connections }}
           echo "Processing connection: {{ $connection.name }}"
-          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}/{{ $connection.userSecret.usernameKey }} | tr -d '\n')
-          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}/{{ $connection.userSecret.passwordKey }} | tr -d '\n')
-          DATABASE=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}/{{ $connection.userSecret.databaseKey }} | tr -d '\n')
+          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.userSecret.name }}/{{ $connection.userSecret.usernameKey }} | tr -d '\n')
+          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.userSecret.name }}/{{ $connection.userSecret.passwordKey }} | tr -d '\n')
+          DATABASE=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.userSecret.name }}/{{ $connection.userSecret.databaseKey }} | tr -d '\n')
           
           # Use plain text passwords to allow PgBouncer to handle SCRAM authentication to backend
           echo "\"$USERNAME\" \"$PASSWORD\"" >> /tmp/pgbouncer/userlist.txt
@@ -125,9 +125,13 @@ spec:
             {{- $connections = append $connections $conn7 -}}
           {{- end -}}
         {{- end -}}
+        {{- $uniqueSecrets := dict }}
         {{- range $connection := $connections }}
-        - name: {{ $connection.name }}-secret
-          mountPath: /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}
+          {{- $_ := set $uniqueSecrets $connection.userSecret.name $connection.userSecret.name }}
+        {{- end }}
+        {{- range $secretName := $uniqueSecrets }}
+        - name: {{ $secretName }}-secret
+          mountPath: /opt/bitnami/pgbouncer/secrets/{{ $secretName }}
           readOnly: true
         {{- end }}
       containers:
@@ -222,8 +226,12 @@ spec:
           {{- $connections = append $connections $conn7 -}}
         {{- end -}}
       {{- end -}}
+      {{- $uniqueSecrets := dict }}
       {{- range $connection := $connections }}
-      - name: {{ $connection.name }}-secret
+        {{- $_ := set $uniqueSecrets $connection.userSecret.name $connection.userSecret.name }}
+      {{- end }}
+      {{- range $secretName := $uniqueSecrets }}
+      - name: {{ $secretName }}-secret
         secret:
-          secretName: {{ $connection.userSecret.name }}
+          secretName: {{ $secretName }}
       {{- end }}
