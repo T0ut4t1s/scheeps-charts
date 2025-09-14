@@ -161,8 +161,8 @@ spec:
           {{- end -}}
         {{- end -}}
         {{- range $index, $connection := $connections }}
-        - name: PGBOUNCER_DATABASES_{{ upper $connection.name }}
-          value: "host={{ $.Values.postgresql.host }} port={{ $.Values.postgresql.port }} dbname={{ $connection.name }}"
+        - name: PGBOUNCER_DSN_{{ $index }}
+          value: "{{ $connection.name }}=host={{ $.Values.postgresql.host }} port={{ $.Values.postgresql.port }} dbname={{ $connection.name }}"
         {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
