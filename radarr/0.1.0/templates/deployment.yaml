@@ -43,7 +43,7 @@ spec:
               value: {{ .Values.db.port | quote }}
             - name: RADARR__POSTGRES__DATABASE
               value: {{ .Values.db.name | quote }}
-            - name: RADARR__POSTGRES__USERNAME
+            - name: RADARR__POSTGRES__USER
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.existingSecrets.database.name }}
