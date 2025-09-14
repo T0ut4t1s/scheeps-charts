@@ -50,7 +50,7 @@ The following table lists the configurable parameters of the PgBouncer chart and
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `auth.type` | PostgreSQL authentication method | `md5` |
+| `auth.type` | PostgreSQL authentication method | `plain` |
 | `auth.poolMode` | PgBouncer pool mode | `transaction` |
 | `auth.minPoolSize` | Minimum pool size per user/database pair | `5` |
 | `auth.ignoreStartupParameters` | Startup parameters to ignore | `""` |
@@ -67,10 +67,10 @@ The following table lists the configurable parameters of the PgBouncer chart and
 
 #### Authentication Types
 
-- **scram-sha-256**: Secure authentication (recommended)
-- **md5**: MD5-based authentication
-- **plain**: Plain text authentication
-- **trust**: No authentication required
+- **plain**: Client authenticates with a plain password stored in `auth_file`. Recommended when PgBouncer must connect to the backend using SCRAM (needs cleartext to compute SCRAM).
+- **scram-sha-256**: Client authenticates with SCRAM. Requires SCRAM entries in `auth_file` and compatible tooling to provision them.
+- **md5**: MD5-based client authentication. Works with MD5 entries in `auth_file`, but prevents PgBouncer from doing SCRAM to the backend if only MD5 hashes are stored.
+- **trust**: No authentication required.
 
 ### TLS Configuration
 

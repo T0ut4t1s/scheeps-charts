@@ -24,7 +24,7 @@ postgresql:
 
 # Authentication Configuration  
 auth:
-  type: md5
+  type: plain
   poolMode: transaction
   ignoreStartupParameters: ""
   minPoolSize: 5
