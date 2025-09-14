@@ -40,17 +40,17 @@ spec:
           
           echo "[databases]" > /tmp/pgbouncer/databases.ini
           
-          {{- range $connections }}
-          echo "Processing connection: {{ .name }}"
-          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ .name }}/{{ .userSecret.usernameKey }} | tr -d '\n')
-          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ .name }}/{{ .userSecret.passwordKey }} | tr -d '\n')
-          DATABASE=$(cat /opt/bitnami/pgbouncer/secrets/{{ .name }}/{{ .userSecret.databaseKey }} | tr -d '\n')
+          {{- range $connection := $connections }}
+          echo "Processing connection: {{ $connection.name }}"
+          USERNAME=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}/{{ $connection.userSecret.usernameKey }} | tr -d '\n')
+          PASSWORD=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}/{{ $connection.userSecret.passwordKey }} | tr -d '\n')
+          DATABASE=$(cat /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}/{{ $connection.userSecret.databaseKey }} | tr -d '\n')
           
           # Use plain text passwords to allow PgBouncer to handle SCRAM authentication to backend
           echo "\"$USERNAME\" \"$PASSWORD\"" >> /tmp/pgbouncer/userlist.txt
           
           # Add database routing: database_name = host=backend port=5432 dbname=actual_db
-          echo "$DATABASE = host={{ .Values.postgresql.host }} port={{ .Values.postgresql.port }} dbname=$DATABASE" >> /tmp/pgbouncer/databases.ini
+          echo "$DATABASE = host={{ $.Values.postgresql.host }} port={{ $.Values.postgresql.port }} dbname=$DATABASE" >> /tmp/pgbouncer/databases.ini
           
           echo "Database mapping: $USERNAME -> $DATABASE"
           {{- end }}
@@ -67,28 +67,11 @@ spec:
         {{- if .Values.auth.connections -}}
           {{- $connections = .Values.auth.connections -}}
         {{- else -}}
-          {{/* Build connections from questions format */}}
-          {{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
-          {{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
-            {{- $conn1 := dict "name" (.Values.auth.connection1Name | default "app1") "userSecret" (dict "name" (.Values.auth.connection1SecretName | default "app1-pg-secret") "usernameKey" (.Values.auth.connection1UsernameKey | default "username") "passwordKey" (.Values.auth.connection1PasswordKey | default "password") "databaseKey" (.Values.auth.connection1DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn1 -}}
-          {{- end -}}
-          {{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
-            {{- $conn2 := dict "name" (.Values.auth.connection2Name | default "app2") "userSecret" (dict "name" (.Values.auth.connection2SecretName | default "app2-pg-secret") "usernameKey" (.Values.auth.connection2UsernameKey | default "username") "passwordKey" (.Values.auth.connection2PasswordKey | default "password") "databaseKey" (.Values.auth.connection2DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn2 -}}
-          {{- end -}}
-          {{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
-            {{- $conn3 := dict "name" (.Values.auth.connection3Name | default "app3") "userSecret" (dict "name" (.Values.auth.connection3SecretName | default "app3-pg-secret") "usernameKey" (.Values.auth.connection3UsernameKey | default "username") "passwordKey" (.Values.auth.connection3PasswordKey | default "password") "databaseKey" (.Values.auth.connection3DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn3 -}}
-          {{- end -}}
-          {{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
-            {{- $conn4 := dict "name" (.Values.auth.connection4Name | default "app4") "userSecret" (dict "name" (.Values.auth.connection4SecretName | default "app4-pg-secret") "usernameKey" (.Values.auth.connection4UsernameKey | default "username") "passwordKey" (.Values.auth.connection4PasswordKey | default "password") "databaseKey" (.Values.auth.connection4DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn4 -}}
-          {{- end -}}
+          {{- $connections = (include "pgbouncer.connectionsFromQuestions" . | fromYaml) -}}
         {{- end -}}
-        {{- range $connections }}
-        - name: {{ .name }}-secret
-          mountPath: /opt/bitnami/pgbouncer/secrets/{{ .name }}
+        {{- range $connection := $connections }}
+        - name: {{ $connection.name }}-secret
+          mountPath: /opt/bitnami/pgbouncer/secrets/{{ $connection.name }}
           readOnly: true
         {{- end }}
       containers:
@@ -134,33 +117,6 @@ spec:
         - name: PGBOUNCER_IGNORE_STARTUP_PARAMETERS
           value: {{ .Values.auth.ignoreStartupParameters | quote }}
         {{/* Database configuration for each connection */}}
-        {{- $connections := list -}}
-        {{- if .Values.auth.connections -}}
-          {{- $connections = .Values.auth.connections -}}
-        {{- else -}}
-          {{/* Build connections from questions format */}}
-          {{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
-          {{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
-            {{- $conn1 := dict "name" (.Values.auth.connection1Name | default "app1") "userSecret" (dict "name" (.Values.auth.connection1SecretName | default "app1-pg-secret") "usernameKey" (.Values.auth.connection1UsernameKey | default "username") "passwordKey" (.Values.auth.connection1PasswordKey | default "password") "databaseKey" (.Values.auth.connection1DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn1 -}}
-          {{- end -}}
-          {{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
-            {{- $conn2 := dict "name" (.Values.auth.connection2Name | default "app2") "userSecret" (dict "name" (.Values.auth.connection2SecretName | default "app2-pg-secret") "usernameKey" (.Values.auth.connection2UsernameKey | default "username") "passwordKey" (.Values.auth.connection2PasswordKey | default "password") "databaseKey" (.Values.auth.connection2DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn2 -}}
-          {{- end -}}
-          {{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
-            {{- $conn3 := dict "name" (.Values.auth.connection3Name | default "app3") "userSecret" (dict "name" (.Values.auth.connection3SecretName | default "app3-pg-secret") "usernameKey" (.Values.auth.connection3UsernameKey | default "username") "passwordKey" (.Values.auth.connection3PasswordKey | default "password") "databaseKey" (.Values.auth.connection3DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn3 -}}
-          {{- end -}}
-          {{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
-            {{- $conn4 := dict "name" (.Values.auth.connection4Name | default "app4") "userSecret" (dict "name" (.Values.auth.connection4SecretName | default "app4-pg-secret") "usernameKey" (.Values.auth.connection4UsernameKey | default "username") "passwordKey" (.Values.auth.connection4PasswordKey | default "password") "databaseKey" (.Values.auth.connection4DatabaseKey | default "database")) -}}
-            {{- $connections = append $connections $conn4 -}}
-          {{- end -}}
-        {{- end -}}
-        {{- range $index, $connection := $connections }}
-        - name: PGBOUNCER_DSN_{{ $index }}
-          value: "{{ $connection.name }}=host={{ $.Values.postgresql.host }} port={{ $.Values.postgresql.port }} dbname={{ $connection.name }}"
-        {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         volumeMounts:
@@ -180,27 +136,10 @@ spec:
       {{- if .Values.auth.connections -}}
         {{- $connections = .Values.auth.connections -}}
       {{- else -}}
-        {{/* Build connections from questions format */}}
-        {{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
-        {{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
-          {{- $conn1 := dict "name" (.Values.auth.connection1Name | default "app1") "userSecret" (dict "name" (.Values.auth.connection1SecretName | default "app1-pg-secret") "usernameKey" (.Values.auth.connection1UsernameKey | default "username") "passwordKey" (.Values.auth.connection1PasswordKey | default "password") "databaseKey" (.Values.auth.connection1DatabaseKey | default "database")) -}}
-          {{- $connections = append $connections $conn1 -}}
-        {{- end -}}
-        {{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
-          {{- $conn2 := dict "name" (.Values.auth.connection2Name | default "app2") "userSecret" (dict "name" (.Values.auth.connection2SecretName | default "app2-pg-secret") "usernameKey" (.Values.auth.connection2UsernameKey | default "username") "passwordKey" (.Values.auth.connection2PasswordKey | default "password") "databaseKey" (.Values.auth.connection2DatabaseKey | default "database")) -}}
-          {{- $connections = append $connections $conn2 -}}
-        {{- end -}}
-        {{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
-          {{- $conn3 := dict "name" (.Values.auth.connection3Name | default "app3") "userSecret" (dict "name" (.Values.auth.connection3SecretName | default "app3-pg-secret") "usernameKey" (.Values.auth.connection3UsernameKey | default "username") "passwordKey" (.Values.auth.connection3PasswordKey | default "password") "databaseKey" (.Values.auth.connection3DatabaseKey | default "database")) -}}
-          {{- $connections = append $connections $conn3 -}}
-        {{- end -}}
-        {{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
-          {{- $conn4 := dict "name" (.Values.auth.connection4Name | default "app4") "userSecret" (dict "name" (.Values.auth.connection4SecretName | default "app4-pg-secret") "usernameKey" (.Values.auth.connection4UsernameKey | default "username") "passwordKey" (.Values.auth.connection4PasswordKey | default "password") "databaseKey" (.Values.auth.connection4DatabaseKey | default "database")) -}}
-          {{- $connections = append $connections $conn4 -}}
-        {{- end -}}
+        {{- $connections = (include "pgbouncer.connectionsFromQuestions" . | fromYaml) -}}
       {{- end -}}
-      {{- range $connections }}
-      - name: {{ .name }}-secret
+      {{- range $connection := $connections }}
+      - name: {{ $connection.name }}-secret
         secret:
-          secretName: {{ .userSecret.name }}
+          secretName: {{ $connection.userSecret.name }}
       {{- end }}
