@@ -84,12 +84,12 @@ namespaceOverride: media
 
 # Security contexts
 securityContext:
-  runAsNonRoot: false
   runAsUser: 1000
   runAsGroup: 1000
   readOnlyRootFilesystem: false
 podSecurityContext:
   fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
 
 # Node selector, tolerations and affinity
 nodeSelector: {}
