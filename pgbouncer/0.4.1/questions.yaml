@@ -145,15 +145,6 @@ questions:
   group: "Pool Configuration"
 
 # Database Connections Configuration
-- variable: auth.connectionCount
-  default: 1
-  description: "Number of database connections to configure"
-  type: int
-  label: Number of Database Connections
-  group: "Database Connections"
-  min: 1
-  max: 10
-
 # Connection 1
 - variable: auth.connection1Enabled
   default: true
@@ -161,7 +152,6 @@ questions:
   type: boolean
   label: Enable Connection 1
   group: "Connection 1"
-  show_if: "auth.connectionCount>=1"
 
 - variable: auth.connection1Name
   default: "connection1"
@@ -212,7 +202,6 @@ questions:
   type: boolean
   label: Enable Connection 2
   group: "Connection 2"
-  show_if: "auth.connectionCount>=2"
 
 - variable: auth.connection2Name
   default: "connection2"
@@ -263,7 +252,6 @@ questions:
   type: boolean
   label: Enable Connection 3
   group: "Connection 3"
-  show_if: "auth.connectionCount>=3"
 
 - variable: auth.connection3Name
   default: "connection3"
@@ -314,7 +302,6 @@ questions:
   type: boolean
   label: Enable Connection 4
   group: "Connection 4"
-  show_if: "auth.connectionCount>=4"
 
 - variable: auth.connection4Name
   default: "connection4"
@@ -365,7 +352,6 @@ questions:
   type: boolean
   label: Enable Connection 5
   group: "Connection 5"
-  show_if: "auth.connectionCount>=5"
 
 - variable: auth.connection5Name
   default: "connection5"
@@ -416,7 +402,6 @@ questions:
   type: boolean
   label: Enable Connection 6
   group: "Connection 6"
-  show_if: "auth.connectionCount>=6"
 
 - variable: auth.connection6Name
   default: "connection6"
@@ -467,7 +452,6 @@ questions:
   type: boolean
   label: Enable Connection 7
   group: "Connection 7"
-  show_if: "auth.connectionCount>=7"
 
 - variable: auth.connection7Name
   default: "connection7"

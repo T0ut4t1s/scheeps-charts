@@ -57,7 +57,7 @@ Convert flat connection variables from questions.yaml to connections array
 {{- $connections := list -}}
 
 {{/* Connection 1 */}}
-{{- if and (.Values.auth.connection1Enabled | default false) (ge (.Values.auth.connectionCount | default 0 | int) 1) -}}
+{{- if .Values.auth.connection1Enabled | default false -}}
 {{- $conn1 := dict -}}
 {{- $_ := set $conn1 "name" (.Values.auth.connection1Name | default "connection1") -}}
 {{- $userSecret := dict -}}
@@ -70,7 +70,7 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 2 */}}
-{{- if and (.Values.auth.connection2Enabled | default false) (ge (.Values.auth.connectionCount | default 0 | int) 2) -}}
+{{- if .Values.auth.connection2Enabled | default false -}}
 {{- $conn2 := dict -}}
 {{- $_ := set $conn2 "name" (.Values.auth.connection2Name | default "connection2") -}}
 {{- $userSecret := dict -}}
@@ -83,7 +83,7 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 3 */}}
-{{- if and (.Values.auth.connection3Enabled | default false) (ge (.Values.auth.connectionCount | default 0 | int) 3) -}}
+{{- if .Values.auth.connection3Enabled | default false -}}
 {{- $conn3 := dict -}}
 {{- $_ := set $conn3 "name" (.Values.auth.connection3Name | default "connection3") -}}
 {{- $userSecret := dict -}}
@@ -96,7 +96,7 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 4 */}}
-{{- if and (.Values.auth.connection4Enabled | default false) (ge (.Values.auth.connectionCount | default 0 | int) 4) -}}
+{{- if .Values.auth.connection4Enabled | default false -}}
 {{- $conn4 := dict -}}
 {{- $_ := set $conn4 "name" (.Values.auth.connection4Name | default "connection4") -}}
 {{- $userSecret := dict -}}
@@ -109,7 +109,7 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 5 */}}
-{{- if and (.Values.auth.connection5Enabled | default false) (ge (.Values.auth.connectionCount | default 0 | int) 5) -}}
+{{- if .Values.auth.connection5Enabled | default false -}}
 {{- $conn5 := dict -}}
 {{- $_ := set $conn5 "name" (.Values.auth.connection5Name | default "connection5") -}}
 {{- $userSecret := dict -}}
@@ -122,7 +122,7 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 6 */}}
-{{- if and (.Values.auth.connection6Enabled | default false) (ge (.Values.auth.connectionCount | default 0 | int) 6) -}}
+{{- if .Values.auth.connection6Enabled | default false -}}
 {{- $conn6 := dict -}}
 {{- $_ := set $conn6 "name" (.Values.auth.connection6Name | default "connection6") -}}
 {{- $userSecret := dict -}}
@@ -135,7 +135,7 @@ Convert flat connection variables from questions.yaml to connections array
 {{- end -}}
 
 {{/* Connection 7 */}}
-{{- if and (.Values.auth.connection7Enabled | default false) (ge (.Values.auth.connectionCount | default 0 | int) 7) -}}
+{{- if .Values.auth.connection7Enabled | default false -}}
 {{- $conn7 := dict -}}
 {{- $_ := set $conn7 "name" (.Values.auth.connection7Name | default "connection7") -}}
 {{- $userSecret := dict -}}

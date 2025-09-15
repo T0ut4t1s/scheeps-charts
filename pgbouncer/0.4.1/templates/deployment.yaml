@@ -35,32 +35,31 @@ spec:
           {{- if .Values.auth.connections -}}
             {{- $connections = .Values.auth.connections -}}
           {{- else -}}
-            {{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
-            {{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
+            {{- if .Values.auth.connection1Enabled | default false -}}
               {{- $conn1 := dict "name" (.Values.auth.connection1Name | default "connection1") "userSecret" (dict "name" (.Values.auth.connection1SecretName | default "service1-pg-secret") "usernameKey" (.Values.auth.connection1UsernameKey | default "username") "passwordKey" (.Values.auth.connection1PasswordKey | default "password") "databaseKey" (.Values.auth.connection1DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn1 -}}
             {{- end -}}
-            {{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
+            {{- if .Values.auth.connection2Enabled | default false -}}
               {{- $conn2 := dict "name" (.Values.auth.connection2Name | default "connection2") "userSecret" (dict "name" (.Values.auth.connection2SecretName | default "service2-pg-secret") "usernameKey" (.Values.auth.connection2UsernameKey | default "username") "passwordKey" (.Values.auth.connection2PasswordKey | default "password") "databaseKey" (.Values.auth.connection2DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn2 -}}
             {{- end -}}
-            {{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
+            {{- if .Values.auth.connection3Enabled | default false -}}
               {{- $conn3 := dict "name" (.Values.auth.connection3Name | default "connection3") "userSecret" (dict "name" (.Values.auth.connection3SecretName | default "service3-pg-secret") "usernameKey" (.Values.auth.connection3UsernameKey | default "username") "passwordKey" (.Values.auth.connection3PasswordKey | default "password") "databaseKey" (.Values.auth.connection3DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn3 -}}
             {{- end -}}
-            {{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
+            {{- if .Values.auth.connection4Enabled | default false -}}
               {{- $conn4 := dict "name" (.Values.auth.connection4Name | default "connection4") "userSecret" (dict "name" (.Values.auth.connection4SecretName | default "service4-pg-secret") "usernameKey" (.Values.auth.connection4UsernameKey | default "username") "passwordKey" (.Values.auth.connection4PasswordKey | default "password") "databaseKey" (.Values.auth.connection4DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn4 -}}
             {{- end -}}
-            {{- if and (.Values.auth.connection5Enabled | default false) (ge $connectionCount 5) -}}
+            {{- if .Values.auth.connection5Enabled | default false -}}
               {{- $conn5 := dict "name" (.Values.auth.connection5Name | default "connection5") "userSecret" (dict "name" (.Values.auth.connection5SecretName | default "service5-pg-secret") "usernameKey" (.Values.auth.connection5UsernameKey | default "username") "passwordKey" (.Values.auth.connection5PasswordKey | default "password") "databaseKey" (.Values.auth.connection5DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn5 -}}
             {{- end -}}
-            {{- if and (.Values.auth.connection6Enabled | default false) (ge $connectionCount 6) -}}
+            {{- if .Values.auth.connection6Enabled | default false -}}
               {{- $conn6 := dict "name" (.Values.auth.connection6Name | default "connection6") "userSecret" (dict "name" (.Values.auth.connection6SecretName | default "service6-pg-secret") "usernameKey" (.Values.auth.connection6UsernameKey | default "username") "passwordKey" (.Values.auth.connection6PasswordKey | default "password") "databaseKey" (.Values.auth.connection6DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn6 -}}
             {{- end -}}
-            {{- if and (.Values.auth.connection7Enabled | default false) (ge $connectionCount 7) -}}
+            {{- if .Values.auth.connection7Enabled | default false -}}
               {{- $conn7 := dict "name" (.Values.auth.connection7Name | default "connection7") "userSecret" (dict "name" (.Values.auth.connection7SecretName | default "service7-pg-secret") "usernameKey" (.Values.auth.connection7UsernameKey | default "username") "passwordKey" (.Values.auth.connection7PasswordKey | default "password") "databaseKey" (.Values.auth.connection7DatabaseKey | default "database")) -}}
               {{- $connections = append $connections $conn7 -}}
             {{- end -}}
@@ -139,32 +138,31 @@ spec:
         {{- if .Values.auth.connections -}}
           {{- $connections = .Values.auth.connections -}}
         {{- else -}}
-          {{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
-          {{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
+          {{- if .Values.auth.connection1Enabled | default false -}}
             {{- $conn1 := dict "name" (.Values.auth.connection1Name | default "connection1") "userSecret" (dict "name" (.Values.auth.connection1SecretName | default "service1-pg-secret")) -}}
             {{- $connections = append $connections $conn1 -}}
           {{- end -}}
-          {{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
+          {{- if .Values.auth.connection2Enabled | default false -}}
             {{- $conn2 := dict "name" (.Values.auth.connection2Name | default "connection2") "userSecret" (dict "name" (.Values.auth.connection2SecretName | default "service2-pg-secret")) -}}
             {{- $connections = append $connections $conn2 -}}
           {{- end -}}
-          {{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
+          {{- if .Values.auth.connection3Enabled | default false -}}
             {{- $conn3 := dict "name" (.Values.auth.connection3Name | default "connection3") "userSecret" (dict "name" (.Values.auth.connection3SecretName | default "service3-pg-secret")) -}}
             {{- $connections = append $connections $conn3 -}}
           {{- end -}}
-          {{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
+          {{- if .Values.auth.connection4Enabled | default false -}}
             {{- $conn4 := dict "name" (.Values.auth.connection4Name | default "connection4") "userSecret" (dict "name" (.Values.auth.connection4SecretName | default "service4-pg-secret")) -}}
             {{- $connections = append $connections $conn4 -}}
           {{- end -}}
-          {{- if and (.Values.auth.connection5Enabled | default false) (ge $connectionCount 5) -}}
+          {{- if .Values.auth.connection5Enabled | default false -}}
             {{- $conn5 := dict "name" (.Values.auth.connection5Name | default "connection5") "userSecret" (dict "name" (.Values.auth.connection5SecretName | default "service5-pg-secret")) -}}
             {{- $connections = append $connections $conn5 -}}
           {{- end -}}
-          {{- if and (.Values.auth.connection6Enabled | default false) (ge $connectionCount 6) -}}
+          {{- if .Values.auth.connection6Enabled | default false -}}
             {{- $conn6 := dict "name" (.Values.auth.connection6Name | default "connection6") "userSecret" (dict "name" (.Values.auth.connection6SecretName | default "service6-pg-secret")) -}}
             {{- $connections = append $connections $conn6 -}}
           {{- end -}}
-          {{- if and (.Values.auth.connection7Enabled | default false) (ge $connectionCount 7) -}}
+          {{- if .Values.auth.connection7Enabled | default false -}}
             {{- $conn7 := dict "name" (.Values.auth.connection7Name | default "connection7") "userSecret" (dict "name" (.Values.auth.connection7SecretName | default "service7-pg-secret")) -}}
             {{- $connections = append $connections $conn7 -}}
           {{- end -}}
@@ -228,32 +226,31 @@ spec:
       {{- if .Values.auth.connections -}}
         {{- $connections = .Values.auth.connections -}}
       {{- else -}}
-        {{- $connectionCount := (.Values.auth.connectionCount | default 0 | int) -}}
-        {{- if and (.Values.auth.connection1Enabled | default false) (ge $connectionCount 1) -}}
+        {{- if .Values.auth.connection1Enabled | default false -}}
           {{- $conn1 := dict "name" (.Values.auth.connection1Name | default "connection1") "userSecret" (dict "name" (.Values.auth.connection1SecretName | default "service1-pg-secret")) -}}
           {{- $connections = append $connections $conn1 -}}
         {{- end -}}
-        {{- if and (.Values.auth.connection2Enabled | default false) (ge $connectionCount 2) -}}
+        {{- if .Values.auth.connection2Enabled | default false -}}
           {{- $conn2 := dict "name" (.Values.auth.connection2Name | default "connection2") "userSecret" (dict "name" (.Values.auth.connection2SecretName | default "service2-pg-secret")) -}}
           {{- $connections = append $connections $conn2 -}}
         {{- end -}}
-        {{- if and (.Values.auth.connection3Enabled | default false) (ge $connectionCount 3) -}}
+        {{- if .Values.auth.connection3Enabled | default false -}}
           {{- $conn3 := dict "name" (.Values.auth.connection3Name | default "connection3") "userSecret" (dict "name" (.Values.auth.connection3SecretName | default "service3-pg-secret")) -}}
           {{- $connections = append $connections $conn3 -}}
         {{- end -}}
-        {{- if and (.Values.auth.connection4Enabled | default false) (ge $connectionCount 4) -}}
+        {{- if .Values.auth.connection4Enabled | default false -}}
           {{- $conn4 := dict "name" (.Values.auth.connection4Name | default "connection4") "userSecret" (dict "name" (.Values.auth.connection4SecretName | default "service4-pg-secret")) -}}
           {{- $connections = append $connections $conn4 -}}
         {{- end -}}
-        {{- if and (.Values.auth.connection5Enabled | default false) (ge $connectionCount 5) -}}
+        {{- if .Values.auth.connection5Enabled | default false -}}
           {{- $conn5 := dict "name" (.Values.auth.connection5Name | default "connection5") "userSecret" (dict "name" (.Values.auth.connection5SecretName | default "service5-pg-secret")) -}}
           {{- $connections = append $connections $conn5 -}}
         {{- end -}}
-        {{- if and (.Values.auth.connection6Enabled | default false) (ge $connectionCount 6) -}}
+        {{- if .Values.auth.connection6Enabled | default false -}}
           {{- $conn6 := dict "name" (.Values.auth.connection6Name | default "connection6") "userSecret" (dict "name" (.Values.auth.connection6SecretName | default "service6-pg-secret")) -}}
           {{- $connections = append $connections $conn6 -}}
         {{- end -}}
-        {{- if and (.Values.auth.connection7Enabled | default false) (ge $connectionCount 7) -}}
+        {{- if .Values.auth.connection7Enabled | default false -}}
           {{- $conn7 := dict "name" (.Values.auth.connection7Name | default "connection7") "userSecret" (dict "name" (.Values.auth.connection7SecretName | default "service7-pg-secret")) -}}
           {{- $connections = append $connections $conn7 -}}
         {{- end -}}

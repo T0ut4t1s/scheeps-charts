@@ -54,7 +54,6 @@ helm install my-pgbouncer ./pgbouncer
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `auth.type` | Authentication method (plain/md5/scram-sha-256/trust) | `plain` |
-| `auth.connectionCount` | Number of database connections | `1` |
 
 ### Multi-Connection Setup
 
@@ -62,7 +61,6 @@ Configure multiple application connections:
 
 ```yaml
 auth:
-  connectionCount: 3
   connection1Enabled: true
   connection1Name: "app1"
   connection1SecretName: "app1-pg-secret"
@@ -134,9 +132,10 @@ pool:
 
 auth:
   type: "scram-sha-256"
-  connectionCount: 2
+  connection1Enabled: true
   connection1Name: "frontend"
   connection1SecretName: "frontend-pg-secret"
+  connection2Enabled: true
   connection2Name: "backend" 
   connection2SecretName: "backend-pg-secret"
 

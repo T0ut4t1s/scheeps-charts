@@ -42,7 +42,6 @@ auth:
   connections: []
   
   # Questions.yaml flat structure (for Rancher UI)
-  connectionCount: 1
   
   # Generic connection defaults
   connection1Enabled: true
@@ -52,14 +51,14 @@ auth:
   connection1PasswordKey: "password"
   connection1DatabaseKey: "database"
   
-  connection2Enabled: true
+  connection2Enabled: false
   connection2Name: "connection2"
   connection2SecretName: "service2-pg-secret"
   connection2UsernameKey: "username"
   connection2PasswordKey: "password"
   connection2DatabaseKey: "database"
   
-  connection3Enabled: true
+  connection3Enabled: false
   connection3Name: "connection3"
   connection3SecretName: "service3-pg-secret"
   connection3UsernameKey: "username"
