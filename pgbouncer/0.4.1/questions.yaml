@@ -77,23 +77,23 @@ questions:
     - "plain"
     - "trust"
 
-- variable: auth.poolMode
+- variable: pool.mode
   default: "transaction"
   description: "PgBouncer pool mode"
   type: enum
   label: Pool Mode
-  group: "Authentication"
+  group: "Pool Configuration"
   options:
     - "session"
     - "transaction"
     - "statement"
 
-- variable: auth.minPoolSize
+- variable: pool.minPoolSize
   default: 5
   description: "Minimum pool size per user/database pair"
   type: int
   label: Minimum Pool Size
-  group: "Authentication"
+  group: "Pool Configuration"
 
 - variable: auth.ignoreStartupParameters
   default: ""
@@ -102,9 +102,52 @@ questions:
   label: Ignore Startup Parameters
   group: "Authentication"
 
+# Advanced Pool Configuration
+- variable: pool.defaultPoolSize
+  default: 25
+  description: "Default pool size per user/database pair"
+  type: int
+  label: Default Pool Size
+  group: "Advanced Pool Configuration"
+
+- variable: pool.reservePoolSize
+  default: 0
+  description: "Reserve pool size for emergency connections"
+  type: int
+  label: Reserve Pool Size
+  group: "Advanced Pool Configuration"
+
+- variable: pool.reservePoolTimeout
+  default: 5
+  description: "Timeout for reserve pool connections (seconds)"
+  type: int
+  label: Reserve Pool Timeout
+  group: "Advanced Pool Configuration"
+
+- variable: pool.maxClientConn
+  default: 100
+  description: "Maximum number of client connections"
+  type: int
+  label: Max Client Connections
+  group: "Advanced Pool Configuration"
+
+- variable: pool.serverIdleTimeout
+  default: 600
+  description: "Server idle timeout (seconds)"
+  type: int
+  label: Server Idle Timeout
+  group: "Advanced Pool Configuration"
+
+- variable: pool.serverLifetime
+  default: 3600
+  description: "Server connection lifetime (seconds)"
+  type: int
+  label: Server Lifetime
+  group: "Advanced Pool Configuration"
+
 # Database Connections Configuration
 - variable: auth.connectionCount
-  default: 3
+  default: 1
   description: "Number of database connections to configure"
   type: int
   label: Number of Database Connections

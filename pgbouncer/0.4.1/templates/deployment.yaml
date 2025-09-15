@@ -112,8 +112,14 @@ spec:
           echo "server_tls_ca_file=/opt/bitnami/pgbouncer/certs/ca.crt" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
           echo "server_tls_cert_file=/opt/bitnami/pgbouncer/certs/tls.crt" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
           echo "server_tls_key_file=/opt/bitnami/pgbouncer/certs/tls.key" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
-          echo "pool_mode={{ $.Values.auth.poolMode }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
-          echo "min_pool_size={{ $.Values.auth.minPoolSize }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "pool_mode={{ $.Values.pool.mode }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "min_pool_size={{ $.Values.pool.minPoolSize }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "default_pool_size={{ $.Values.pool.defaultPoolSize }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "reserve_pool_size={{ $.Values.pool.reservePoolSize }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "reserve_pool_timeout={{ $.Values.pool.reservePoolTimeout }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "max_client_conn={{ $.Values.pool.maxClientConn }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "server_idle_timeout={{ $.Values.pool.serverIdleTimeout }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
+          echo "server_lifetime={{ $.Values.pool.serverLifetime }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
           echo "ignore_startup_parameters={{ $.Values.auth.ignoreStartupParameters }}" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
           echo "stats_period=60" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini
           echo "server_round_robin=0" >> /opt/bitnami/pgbouncer/conf/pgbouncer.ini

@@ -22,18 +22,27 @@ postgresql:
     usernameKey: username
     passwordKey: password
 
+# Pool Configuration
+pool:
+  mode: transaction
+  minPoolSize: 5
+  defaultPoolSize: 25
+  reservePoolSize: 0
+  reservePoolTimeout: 5
+  maxClientConn: 100
+  serverIdleTimeout: 600
+  serverLifetime: 3600
+
 # Authentication Configuration  
 auth:
   type: plain
-  poolMode: transaction
   ignoreStartupParameters: ""
-  minPoolSize: 5
   
   # Multiple user/database connections (configured via questions.yaml or direct YAML)
   connections: []
   
   # Questions.yaml flat structure (for Rancher UI)
-  connectionCount: 3
+  connectionCount: 1
   
   # Generic connection defaults
   connection1Enabled: true
