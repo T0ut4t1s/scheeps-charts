@@ -90,6 +90,7 @@ securityContext:
   readOnlyRootFilesystem: false
 podSecurityContext:
   fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
 
 # Node selector, tolerations and affinity
 nodeSelector: {}
