@@ -98,7 +98,7 @@ questions:
   required: true
 
 - variable: oauth2Proxy.oidcGroupsClaim
-  default: "resource_access_roles"
+  default: "resource_access.clientname.roles"
   description: "OIDC token claim containing user groups/roles. Examples: 'resource_access_roles' for client roles, 'realm_access_roles' for realm roles, or 'resource_access.clientname.roles' for nested client roles"
   type: string
   label: Groups Claim Path

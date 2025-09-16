@@ -9,7 +9,7 @@ The chart is configured to use client-specific roles instead of realm roles to r
 ### Key Configuration Options
 
 - **Provider**: OIDC with Keycloak
-- **Client Roles**: Uses `resource_access_roles` claim for client-specific role mapping
+- **Client Roles**: Uses nested `resource_access.clientname.roles` claim for client-specific role mapping
 - **Cookie Configuration**: Secure cookies with configurable domains and expiration
 - **PKCE Support**: Enabled with S256 code challenge method
 
@@ -23,18 +23,17 @@ The chart is configured to use client-specific roles instead of realm roles to r
 - Enter role name: `n8n-user` (or service-specific role)
 - Click **Save**
 
-### 2. Configure Client Scope Mapper
+### 2. Verify Default Client Roles Mapper
 
-- Go to **Client Scopes** → **roles** (default client scope)
-- Click **Mappers** tab
-- Look for existing "client roles" mapper or click **Add mapper** → **By configuration**
-- Select **User Client Role**
-- Configure mapper:
-  - **Name**: `client-roles-mapper`
-  - **Token Claim Name**: `resource_access_roles`
-  - **Client ID**: Your client ID (e.g., `n8n`)
-  - Enable **Add to ID token** and **Add to access token**
-- Click **Save**
+The default "client roles" mapper should already exist with:
+- Go to **Client Scopes** → **roles** → **Mappers**
+- Find the "client roles" mapper
+- Verify configuration:
+  - **Token Claim Name**: `resource_access.${client_id}.roles`
+  - **Client ID**: (empty - allows dynamic client support)
+  - **Add to ID token** and **Add to access token**: Enabled
+
+**Note**: This creates the standard nested structure: `resource_access.clientname.roles[]`
 
 ### 3. Assign Client Role to Users
 
@@ -55,7 +54,7 @@ oauth2Proxy:
   allowedGroups: n8n-user
   cookieDomains: n8n.scheeps.online
   redirectUrl: https://n8n.scheeps.online/oauth2/callback
-  oidcGroupsClaim: resource_access_roles  # Uses client roles instead of realm roles
+  oidcGroupsClaim: resource_access.n8n.roles  # Uses nested client roles path
   upstream:
     service: n8n
     namespace: n8n
@@ -76,9 +75,10 @@ secrets:
 ## Migration from Realm Roles
 
 If migrating from realm roles, update:
-- `oidcGroupsClaim` from `realm_access_roles` to `resource_access_roles`
+- `oidcGroupsClaim` from `realm_access_roles` to `resource_access.clientname.roles` (e.g., `resource_access.n8n.roles`)
 - Create client-specific roles in Keycloak
 - Reassign users to client roles instead of realm roles
+- Verify the default "client roles" mapper uses `resource_access.${client_id}.roles` claim name
 
 ## Key Changes in Keycloak 25.x
 
@@ -130,7 +130,7 @@ helm install oauth2-proxy ./oauth2-proxy -f your-values.yaml
 | `oauth2Proxy.oidcIssuerUrl` | OIDC issuer URL | `https://auth.scheeps.online/realms/scheeps` |
 | `oauth2Proxy.clientId` | OIDC client ID | `""` |
 | `oauth2Proxy.redirectUrl` | OAuth2 redirect URL | `""` |
-| `oauth2Proxy.oidcGroupsClaim` | OIDC groups claim name | `resource_access_roles` |
+| `oauth2Proxy.oidcGroupsClaim` | OIDC groups claim path | `resource_access.clientname.roles` |
 | `oauth2Proxy.allowedGroups` | Allowed user groups | `""` |
 | `oauth2Proxy.cookieDomains` | Cookie domains | `""` |
 | `oauth2Proxy.cookieExpire` | Cookie expiration time | `4h` |
@@ -174,8 +174,9 @@ data:
 ### Common Issues
 
 1. **Authentication loops**: Check redirect URLs match between chart and Keycloak
-2. **Group access denied**: Verify `allowedGroups` matches user's client roles
+2. **Group access denied**: Verify `allowedGroups` matches user's client roles and `oidcGroupsClaim` path is correct
 3. **Cookie issues**: Ensure `cookieDomains` matches your application domain
+4. **Wrong claim path**: Use `resource_access.clientname.roles` for nested client roles or `realm_access_roles` for realm roles
 
 ### View Logs
 
