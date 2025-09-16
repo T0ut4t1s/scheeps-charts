@@ -72,7 +72,7 @@ oauth2Proxy:
   # Authentication configuration
   emailDomains: "*"
   scope: "openid profile email roles"
-  oidcGroupsClaim: "realm_access_roles"
+  oidcGroupsClaim: "resource_access_roles"
   allowedGroups: "" # e.g. vlan-manager-admin,vlan-manager-user
   whitelistDomains: "auth.scheeps.online"
 
