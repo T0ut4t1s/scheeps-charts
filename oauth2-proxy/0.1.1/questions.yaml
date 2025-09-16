@@ -99,13 +99,10 @@ questions:
 
 - variable: oauth2Proxy.oidcGroupsClaim
   default: "resource_access_roles"
-  description: "OIDC token claim containing user groups/roles. Use 'resource_access_roles' for client roles (smaller cookies) or 'realm_access_roles' for realm roles"
-  type: enum
-  label: Groups Claim Type
+  description: "OIDC token claim containing user groups/roles. Examples: 'resource_access_roles' for client roles, 'realm_access_roles' for realm roles, or 'resource_access.clientname.roles' for nested client roles"
+  type: string
+  label: Groups Claim Path
   group: "Authentication"
-  options:
-    - "resource_access_roles"
-    - "realm_access_roles"
 
 - variable: oauth2Proxy.emailDomains
   default: "*"
