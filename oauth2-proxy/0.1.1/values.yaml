@@ -76,6 +76,10 @@ oauth2Proxy:
   allowedGroups: "" # e.g. vlan-manager-admin,vlan-manager-user
   whitelistDomains: "auth.scheeps.online"
 
+  # PKCE configuration
+  pkceCodeChallenge: true
+  pkceCodeChallengeMethod: "S256"  # S256 (recommended) or plain
+
   # Headers
   setAuthorizationHeader: true
   setXAuthRequest: true

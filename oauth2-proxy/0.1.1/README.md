@@ -99,6 +99,13 @@ The following table lists the configurable parameters of the OAuth2 Proxy chart 
 | `oauth2Proxy.allowedGroups` | Allowed user groups (comma-separated) | `vlan-manager-admin,vlan-manager-user` |
 | `oauth2Proxy.whitelistDomains` | Whitelisted domains | `auth.scheeps.online` |
 
+#### Security Settings
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `oauth2Proxy.pkceCodeChallenge` | Enable PKCE (Proof Key for Code Exchange) | `true` |
+| `oauth2Proxy.pkceCodeChallengeMethod` | PKCE code challenge method (S256 or plain) | `S256` |
+
 #### Header Configuration
 
 | Parameter | Description | Default |
@@ -162,6 +169,8 @@ oauth2Proxy:
   upstreams: "http://your-app-service:80"
   cookieDomains: "your-app.domain.com"
   allowedGroups: "your-admin-group,your-user-group"
+  pkceCodeChallenge: true
+  pkceCodeChallengeMethod: "S256"
 
 secrets:
   name: "your-oauth2-secret"
@@ -180,6 +189,7 @@ To use this chart with Keycloak, ensure your OIDC client is configured with:
 2. **Access Type**: Confidential
 3. **Valid Redirect URIs**: `https://your-domain.com/oauth2/callback`
 4. **Mappers**: Ensure `realm_access_roles` claim is included in tokens
+5. **PKCE Settings**: Set "Proof Key for Code Exchange Code Challenge Method" to `S256` in Advanced Settings
 
 ## Integration with Rancher
 

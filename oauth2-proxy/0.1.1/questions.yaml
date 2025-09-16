@@ -156,6 +156,25 @@ questions:
   label: Cookie Secret Key
   group: "Secrets"
 
+# Security Settings
+- variable: oauth2Proxy.pkceCodeChallenge
+  default: true
+  description: "Enable PKCE (Proof Key for Code Exchange) for enhanced security"
+  type: boolean
+  label: Enable PKCE
+  group: "Security"
+
+- variable: oauth2Proxy.pkceCodeChallengeMethod
+  default: "S256"
+  description: "PKCE code challenge method"
+  type: enum
+  label: PKCE Challenge Method
+  group: "Security"
+  options:
+    - "S256"
+    - "plain"
+  show_if: "oauth2Proxy.pkceCodeChallenge=true"
+
 # Advanced Settings
 - variable: oauth2Proxy.whitelistDomains
   default: "auth.scheeps.online"
