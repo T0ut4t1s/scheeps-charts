@@ -97,6 +97,16 @@ questions:
   group: "Authentication"
   required: true
 
+- variable: oauth2Proxy.oidcGroupsClaim
+  default: "resource_access_roles"
+  description: "OIDC token claim containing user groups/roles. Use 'resource_access_roles' for client roles (smaller cookies) or 'realm_access_roles' for realm roles"
+  type: enum
+  label: Groups Claim Type
+  group: "Authentication"
+  options:
+    - "resource_access_roles"
+    - "realm_access_roles"
+
 - variable: oauth2Proxy.emailDomains
   default: "*"
   description: "Allowed email domains (use * for all)"
@@ -181,13 +191,6 @@ questions:
   description: "Whitelisted domains for redirects"
   type: string
   label: Whitelist Domains
-  group: "Advanced"
-
-- variable: oauth2Proxy.oidcGroupsClaim
-  default: "realm_access_roles"
-  description: "OIDC token claim containing user groups"
-  type: string
-  label: Groups Claim
   group: "Advanced"
 
 # Resource Configuration
