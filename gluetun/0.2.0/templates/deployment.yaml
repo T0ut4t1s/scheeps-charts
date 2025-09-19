@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: gluetun
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # Expose proxy + metrics ports
+          ports:
+            - name: http
+              containerPort: {{ .Values.proxy.httpPort }}
+            - name: socks
+              containerPort: {{ .Values.proxy.socksPort }}
+            - name: metrics
+              containerPort: {{ .Values.prometheus.port }}
+          env:
+            - name: VPN_SERVICE_PROVIDER
+              value: "{{ .Values.vpn.provider }}"
+            - name: VPN_TYPE
+              value: "{{ .Values.vpn.type }}"
+            - name: SERVER_COUNTRIES
+              value: "{{ .Values.vpn.country }}"
+            {{- if .Values.vpn.serverCategories }}
+            - name: SERVER_CATEGORIES
+              value: "{{ .Values.vpn.serverCategories }}"
+            {{- end }}
+            - name: TZ
+              value: "{{ .Values.vpn.timezone }}"
+            - name: HTTPPROXY
+              value: "on"
+            - name: HTTPPROXY_LISTENING_ADDRESS
+              value: ":{{ .Values.proxy.httpPort }}"
+            - name: SOCKSPROXY
+              value: "on"
+            - name: SOCKSPROXY_LISTENING_ADDRESS
+              value: ":{{ .Values.proxy.socksPort }}"
+            {{- if .Values.vpn.firewall.enabled }}
+            - name: FIREWALL
+              value: "on"
+            - name: FIREWALL_OUTBOUND_SUBNETS
+              value: "{{ .Values.vpn.firewall.outboundSubnets | join "," }}"
+            {{- else }}
+            - name: FIREWALL
+              value: "off"
+            {{- end }}
+            - name: OPENVPN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ (index .Values.vpn.envFromSecrets 0).name | quote }}
+                  key: OPENVPN_USER
+            - name: OPENVPN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ (index .Values.vpn.envFromSecrets 0).name | quote }}
+                  key: OPENVPN_PASSWORD
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+          # Health checks to auto-restart on VPN failure
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources: {}

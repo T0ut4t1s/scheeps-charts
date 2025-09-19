@@ -1,0 +1,64 @@
+# Namespace where everything will be deployed
+namespace: vpn-gateway
+
+# Gluetun image settings
+image:
+  repository: qmcgaw/gluetun
+  tag: v3.40.0
+  pullPolicy: IfNotPresent
+
+# VPN / WireGuard settings
+vpn:
+  provider: nordvpn
+  type: openvpn
+  timezone: Europe/London
+  country: "United Kingdom"
+  serverCategories: ""
+  openvpn:
+    enabled: true
+    configFile: ""
+    customConfig: false
+    targetIP: ""
+    targetPort: ""
+    protocol: udp
+    encryptionPreset: strong
+  firewall:
+    enabled: true
+    outboundSubnets:
+      - 192.168.100.0/24
+      - 192.168.101.0/24
+      - 192.168.102.0/24
+      - 192.168.103.0/24
+      - 192.168.105.0/24
+  envFromSecrets:
+    - name: gluetun-vpn-secret
+
+# Proxy ports to expose
+proxy:
+  httpPort: 8888
+  socksPort: 1080
+
+# Service (LoadBalancer) settings
+service:
+  enabled: true
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 8888
+      targetPort: 8888
+    - name: socks
+      port: 1080
+      targetPort: 1080
+
+# Prometheus ServiceMonitor
+prometheus:
+  enabled: false
+  port: 8000
+  path: /v1/health
+  labels:
+    release: rancher-monitoring
+
+# Resource caps (request tun device)
+resources:
+  limits:
+    squat.ai/tun: 1

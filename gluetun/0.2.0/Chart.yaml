@@ -1,0 +1,7 @@
+apiVersion: v2
+name: gluetun
+description: Gluetun VPN proxy (WireGuard + NordVPN) with HTTP/SOCKS, kill-switch, and Prometheus health monitoring
+type: application
+version: 0.2.0
+appVersion: v3.40.0
+icon: https://raw.githubusercontent.com/qdm12/gluetun/master/docs/logo.png

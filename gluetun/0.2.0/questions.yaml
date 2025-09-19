@@ -1,0 +1,202 @@
+categories:
+- VPN
+- Networking
+- Security
+
+questions:
+# Basic Configuration
+- variable: namespace
+  default: "vpn-gateway"
+  description: "Namespace where gluetun will be deployed"
+  type: string
+  label: Namespace
+  group: "Basic Configuration"
+  required: true
+
+- variable: image.tag
+  default: "v3.40.0"
+  description: "Gluetun container image tag/version"
+  type: string
+  label: Image Version
+  group: "Basic Configuration"
+
+- variable: image.pullPolicy
+  default: "IfNotPresent"
+  description: "Image pull policy"
+  type: enum
+  label: Image Pull Policy
+  group: "Basic Configuration"
+  options:
+    - "IfNotPresent"
+    - "Always"
+    - "Never"
+
+# VPN Provider Configuration
+- variable: vpn.provider
+  default: "nordvpn"
+  description: "VPN service provider"
+  type: enum
+  label: VPN Provider
+  group: "VPN Provider"
+  options:
+    - "nordvpn"
+    - "expressvpn"
+    - "surfshark"
+    - "mullvad"
+    - "protonvpn"
+    - "pia"
+    - "cyberghost"
+    - "windscribe"
+    - "custom"
+  required: true
+
+- variable: vpn.type
+  default: "openvpn"
+  description: "VPN connection type"
+  type: enum
+  label: VPN Type
+  group: "VPN Provider"
+  options:
+    - "openvpn"
+    - "wireguard"
+  required: true
+
+- variable: vpn.country
+  default: "United Kingdom"
+  description: "VPN server country (SERVER_COUNTRIES environment variable)"
+  type: string
+  label: Server Country
+  group: "VPN Provider"
+  required: true
+
+- variable: vpn.serverCategories
+  default: ""
+  description: "VPN server categories (e.g., P2P, streaming, standard) - optional filter for server selection"
+  type: string
+  label: Server Categories
+  group: "VPN Provider"
+
+- variable: vpn.timezone
+  default: "Europe/London"
+  description: "Timezone for the container"
+  type: string
+  label: Timezone
+  group: "VPN Provider"
+
+# OpenVPN Configuration
+- variable: vpn.openvpn.enabled
+  default: true
+  description: "Enable OpenVPN-specific settings"
+  type: boolean
+  label: Enable OpenVPN Settings
+  group: "OpenVPN"
+  show_if: "vpn.type=openvpn"
+
+- variable: vpn.openvpn.protocol
+  default: "udp"
+  description: "OpenVPN protocol"
+  type: enum
+  label: Protocol
+  group: "OpenVPN"
+  options:
+    - "udp"
+    - "tcp"
+  show_if: "vpn.openvpn.enabled=true"
+
+- variable: vpn.openvpn.encryptionPreset
+  default: "strong"
+  description: "OpenVPN encryption preset"
+  type: enum
+  label: Encryption Preset
+  group: "OpenVPN"
+  options:
+    - "strong"
+    - "normal"
+    - "weak"
+  show_if: "vpn.openvpn.enabled=true"
+
+# Firewall Configuration
+- variable: vpn.firewall.enabled
+  default: true
+  description: "Enable VPN kill switch firewall"
+  type: boolean
+  label: Enable Firewall/Kill Switch
+  group: "Firewall"
+
+- variable: vpn.firewall.outboundSubnets
+  default: "192.168.100.0/24,192.168.101.0/24,192.168.102.0/24,192.168.103.0/24,192.168.105.0/24"
+  description: "Comma-separated list of allowed outbound subnets (local networks that can access the proxy)"
+  type: string
+  label: Allowed Outbound Subnets
+  group: "Firewall"
+  show_if: "vpn.firewall.enabled=true"
+
+# Proxy Configuration
+- variable: proxy.httpPort
+  default: 8888
+  description: "HTTP proxy port"
+  type: int
+  label: HTTP Proxy Port
+  group: "Proxy Settings"
+  required: true
+
+- variable: proxy.socksPort
+  default: 1080
+  description: "SOCKS proxy port"
+  type: int
+  label: SOCKS Proxy Port
+  group: "Proxy Settings"
+  required: true
+
+# Service Configuration
+- variable: service.enabled
+  default: true
+  description: "Enable Kubernetes service"
+  type: boolean
+  label: Enable Service
+  group: "Service"
+
+- variable: service.type
+  default: "LoadBalancer"
+  description: "Kubernetes service type"
+  type: enum
+  label: Service Type
+  group: "Service"
+  options:
+    - "LoadBalancer"
+    - "ClusterIP"
+    - "NodePort"
+  show_if: "service.enabled=true"
+
+# Secret Configuration
+- variable: vpn.envFromSecrets[0].name
+  default: "gluetun-vpn-secret"
+  description: "Name of Kubernetes secret containing VPN credentials (must contain OPENVPN_USER and OPENVPN_PASSWORD keys)"
+  type: string
+  label: VPN Credentials Secret Name
+  group: "Secrets"
+  required: true
+
+# Prometheus Monitoring
+- variable: prometheus.enabled
+  default: false
+  description: "Enable Prometheus ServiceMonitor for health metrics"
+  type: boolean
+  label: Enable Prometheus Monitoring
+  group: "Monitoring"
+
+- variable: prometheus.port
+  default: 8000
+  description: "Port for Prometheus health metrics endpoint"
+  type: int
+  label: Metrics Port
+  group: "Monitoring"
+  show_if: "prometheus.enabled=true"
+
+- variable: prometheus.path
+  default: "/v1/health"
+  description: "Path for Prometheus health metrics endpoint"
+  type: string
+  label: Metrics Path
+  group: "Monitoring"
+  show_if: "prometheus.enabled=true"
