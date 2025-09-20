@@ -1,0 +1,220 @@
+categories:
+- Authentication
+- Security
+- Proxy
+
+questions:
+# Basic Configuration
+- variable: replicaCount
+  default: 2
+  description: "Number of OAuth2 Proxy replicas"
+  type: int
+  label: Replica Count
+  group: "Basic Configuration"
+
+- variable: image.tag
+  default: "v7.4.0"
+  description: "OAuth2 Proxy image tag/version"
+  type: string
+  label: Image Version
+  group: "Basic Configuration"
+
+# OAuth2 Provider Configuration  
+- variable: oauth2Proxy.oidcIssuerUrl
+  default: "https://auth.scheeps.online/realms/scheeps"
+  description: "Keycloak OIDC issuer URL"
+  type: string
+  label: OIDC Issuer URL
+  group: "OAuth2 Provider"
+  required: true
+
+- variable: oauth2Proxy.clientId
+  default: "vlan-manager"
+  description: "OAuth2 client ID configured in Keycloak"
+  type: string
+  label: Client ID
+  group: "OAuth2 Provider"
+  required: true
+
+- variable: oauth2Proxy.redirectUrl
+  default: "https://vlan.scheeps.online/oauth2/callback"
+  description: "OAuth2 callback/redirect URL"
+  type: string
+  label: Redirect URL
+  group: "OAuth2 Provider"
+  required: true
+
+# Application Configuration
+- variable: oauth2Proxy.upstream.service
+  default: "vlan-manager-frontend"
+  description: "Name of the upstream service"
+  type: string
+  label: Upstream Service Name
+  group: "Application"
+  required: true
+
+- variable: oauth2Proxy.upstream.namespace
+  default: "network-management"
+  description: "Namespace of the upstream service"
+  type: string
+  label: Upstream Service Namespace
+  group: "Application"
+  required: true
+
+- variable: oauth2Proxy.upstream.port
+  default: 80
+  description: "Port of the upstream service"
+  type: int
+  label: Upstream Service Port
+  group: "Application"
+  required: true
+
+- variable: oauth2Proxy.upstream.protocol
+  default: "http"
+  description: "Protocol for upstream service (http or https)"
+  type: enum
+  label: Upstream Protocol
+  group: "Application"
+  options:
+    - "http"
+    - "https"
+  required: true
+
+- variable: oauth2Proxy.cookieDomains
+  default: "vlan.scheeps.online"
+  description: "Domain for OAuth2 cookies"
+  type: string
+  label: Cookie Domain
+  group: "Application"
+  required: true
+
+# Authentication Settings
+- variable: oauth2Proxy.allowedGroups
+  default: "vlan-manager-admin,vlan-manager-user"
+  description: "Comma-separated list of allowed Keycloak roles/groups"
+  type: string
+  label: Allowed Groups
+  group: "Authentication"
+  required: true
+
+- variable: oauth2Proxy.oidcGroupsClaim
+  default: "resource_access.clientname.roles"
+  description: "OIDC token claim containing user groups/roles. Examples: 'resource_access_roles' for client roles, 'realm_access_roles' for realm roles, or 'resource_access.clientname.roles' for nested client roles"
+  type: string
+  label: Groups Claim Path
+  group: "Authentication"
+
+- variable: oauth2Proxy.emailDomains
+  default: "*"
+  description: "Allowed email domains (use * for all)"
+  type: string
+  label: Email Domains
+  group: "Authentication"
+
+- variable: oauth2Proxy.scope
+  default: "openid profile email roles"
+  description: "OAuth2 scope to request"
+  type: string
+  label: OAuth2 Scope
+  group: "Authentication"
+
+# Cookie Settings
+- variable: oauth2Proxy.cookieExpire
+  default: "4h"
+  description: "Cookie expiration time"
+  type: string
+  label: Cookie Expiry
+  group: "Cookie Settings"
+
+- variable: oauth2Proxy.cookieRefresh
+  default: "1m"
+  description: "Cookie refresh interval"
+  type: string
+  label: Cookie Refresh
+  group: "Cookie Settings"
+
+- variable: oauth2Proxy.cookieSecure
+  default: true
+  description: "Enable secure cookies (requires HTTPS)"
+  type: boolean
+  label: Secure Cookies
+  group: "Cookie Settings"
+
+# Secret Configuration
+- variable: secrets.name
+  default: "vlan-keycloak-secret"
+  description: "Name of Kubernetes secret containing OAuth2 credentials"
+  type: string
+  label: Secret Name
+  group: "Secrets"
+  required: true
+
+- variable: secrets.clientSecretKey
+  default: "client_secret"
+  description: "Key name for client secret in the Kubernetes secret"
+  type: string
+  label: Client Secret Key
+  group: "Secrets"
+
+- variable: secrets.cookieSecretKey
+  default: "cookie_secret"
+  description: "Key name for cookie secret in the Kubernetes secret"
+  type: string
+  label: Cookie Secret Key
+  group: "Secrets"
+
+# Security Settings
+- variable: oauth2Proxy.pkceCodeChallenge
+  default: true
+  description: "Enable PKCE (Proof Key for Code Exchange) for enhanced security"
+  type: boolean
+  label: Enable PKCE
+  group: "Security"
+
+- variable: oauth2Proxy.pkceCodeChallengeMethod
+  default: "S256"
+  description: "PKCE code challenge method"
+  type: enum
+  label: PKCE Challenge Method
+  group: "Security"
+  options:
+    - "S256"
+    - "plain"
+  show_if: "oauth2Proxy.pkceCodeChallenge=true"
+
+# Advanced Settings
+- variable: oauth2Proxy.whitelistDomains
+  default: "auth.scheeps.online"
+  description: "Whitelisted domains for redirects"
+  type: string
+  label: Whitelist Domains
+  group: "Advanced"
+
+# Resource Configuration
+- variable: resources.limits.memory
+  default: "128Mi"
+  description: "Memory limit for OAuth2 Proxy pods"
+  type: string
+  label: Memory Limit
+  group: "Resources"
+
+- variable: resources.limits.cpu
+  default: "100m"
+  description: "CPU limit for OAuth2 Proxy pods"
+  type: string
+  label: CPU Limit
+  group: "Resources"
+
+- variable: resources.requests.memory
+  default: "64Mi"
+  description: "Memory request for OAuth2 Proxy pods"
+  type: string
+  label: Memory Request
+  group: "Resources"
+
+- variable: resources.requests.cpu
+  default: "50m"
+  description: "CPU request for OAuth2 Proxy pods"
+  type: string
+  label: CPU Request
+  group: "Resources"

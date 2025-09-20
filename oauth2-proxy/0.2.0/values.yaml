@@ -1,0 +1,108 @@
+# Default values for oauth2-proxy
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: quay.io/oauth2-proxy/oauth2-proxy
+  pullPolicy: IfNotPresent
+  tag: "v7.4.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 4180
+  targetPort: 4180
+  name: http
+
+ingress:
+  enabled: false
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# OAuth2 Proxy Configuration
+oauth2Proxy:
+  # Provider configuration
+  provider: "oidc"
+  oidcIssuerUrl: "https://auth.scheeps.online/realms/scheeps"
+  clientId: "" # e.g. vlan-manager
+
+  # URLs
+  redirectUrl: "" # e.g. https://vlan.scheeps.online/oauth2/callback
+  
+  # Upstream service configuration (replaces single upstreams field)
+  upstream:
+    service: "" # e.g. n8n
+    namespace: "" # e.g. n8n
+    port: 80 # e.g. 5678 for n8n
+    protocol: "http" # http or https
+
+  # Server configuration
+  httpAddress: "0.0.0.0:4180"
+  reverseProxy: true
+  skipProviderButton: true
+
+  # Cookie configuration
+  cookieDomains: "" # e.g. vlan.scheeps.online
+  cookieSecure: true
+  cookiePath: "/"
+  cookieSamesite: "lax"
+  cookieRefresh: "1m"
+  cookieExpire: "4h"
+
+  # Authentication configuration
+  emailDomains: "*"
+  scope: "openid profile email roles"
+  oidcGroupsClaim: "resource_access.clientname.roles"
+  allowedGroups: "" # e.g. vlan-manager-admin,vlan-manager-user
+  whitelistDomains: "auth.scheeps.online"
+
+  # PKCE configuration
+  pkceCodeChallenge: true
+  pkceCodeChallengeMethod: "S256"  # S256 (recommended) or plain
+
+  # Headers
+  setAuthorizationHeader: true
+  setXAuthRequest: true
+  passAuthorizationHeader: true
+
+# Secret configuration
+secrets:
+  # Name of the secret containing client_secret and cookie_secret
+  name: "" # e.g. vlan-auth-secret
+  clientSecretKey: "client_secret"
+  cookieSecretKey: "cookie_secret"
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext: {}
+
+# Security context
+securityContext: {}
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
