@@ -7,6 +7,8 @@ metadata:
     {{- include "jellyseerr.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.main.count }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "jellyseerr.selectorLabels" . | nindent 6 }}

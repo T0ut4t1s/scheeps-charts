@@ -2,5 +2,5 @@ apiVersion: v2
 name: sonarr
 description: A Helm chart for Sonarr TV series collection manager
 type: application
-version: 0.1.0
-appVersion: "4.0.9"
+version: 0.1.1
+appVersion: "4.0.15.2941-ls291"
