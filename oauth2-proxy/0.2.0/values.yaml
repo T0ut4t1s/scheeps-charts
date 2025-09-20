@@ -7,7 +7,7 @@ replicaCount: 2
 image:
   repository: quay.io/oauth2-proxy/oauth2-proxy
   pullPolicy: IfNotPresent
-  tag: "v7.4.0"
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
@@ -48,7 +48,7 @@ oauth2Proxy:
 
   # URLs
   redirectUrl: "" # e.g. https://vlan.scheeps.online/oauth2/callback
-  
+
   # Upstream service configuration (replaces single upstreams field)
   upstream:
     service: "" # e.g. n8n
@@ -78,7 +78,7 @@ oauth2Proxy:
 
   # PKCE configuration
   pkceCodeChallenge: true
-  pkceCodeChallengeMethod: "S256"  # S256 (recommended) or plain
+  pkceCodeChallengeMethod: "S256" # S256 (recommended) or plain
 
   # Headers
   setAuthorizationHeader: true
