@@ -1,0 +1,16 @@
+apiVersion: v2
+name: code-server
+description: A Helm chart for code-server, a VS Code instance accessible through a browser
+type: application
+version: 0.1.0
+appVersion: "4.104.1"
+home: https://github.com/coder/code-server
+sources:
+  - https://github.com/coder/code-server
+keywords:
+  - code-server
+  - vscode
+  - ide
+  - development
+maintainers:
+  - name: scheeps
