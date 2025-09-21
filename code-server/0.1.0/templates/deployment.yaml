@@ -39,8 +39,8 @@ spec:
             - name: PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: code-server-secret
-                  key: password
+                  name: {{ .Values.secrets.name }}
+                  key: {{ .Values.secrets.passwordKey }}
             {{- with .Values.codeServer.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

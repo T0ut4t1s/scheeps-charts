@@ -50,6 +50,13 @@ codeServer:
   # Environment variables
   extraEnv: []
 
+# Secret configuration for code-server authentication
+secrets:
+  # Name of the secret containing authentication credentials
+  name: code-server-secret
+  # Key in the secret containing the password
+  passwordKey: password
+
 # Persistent volume mounts - these should be created externally via GitOps
 volumeMounts:
   - name: workspace
