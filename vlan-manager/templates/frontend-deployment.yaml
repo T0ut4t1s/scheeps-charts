@@ -25,9 +25,9 @@ spec:
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy | default .Values.global.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.frontend.service.targetPort }}
-          {{- if .Values.frontend.resources }}
+          {{- if .Values.frontend.resourceProfile }}
           resources:
-            {{- toYaml .Values.frontend.resources | nindent 12 }}
+            {{- toYaml (index .Values.global.resources .Values.frontend.resourceProfile) | nindent 12 }}
           {{- end }}
       {{- if .Values.global.image.pullSecrets }}
       imagePullSecrets:

@@ -1,20 +1,55 @@
 # VLAN Manager Helm Chart Values
 global:
   namespace: network-management
+  
+  # Common image settings
   image:
     tag: "2.0.0"
     pullPolicy: Always
     pullSecrets:
       - name: docker-hub-secret
+  
+  # Shared database configuration
+  database:
+    host: "pgbouncer.network-management.svc.cluster.local"
+    port: "5432"
+    name: "freeradius"
+    user: "freeradius"
+    secret:
+      name: freeradius-pg-secret
+      passwordKey: password
+  
+  # Common resource profiles
+  resources:
+    small:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "200m"
+    medium:
+      requests:
+        memory: "128Mi"
+        cpu: "50m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+    large:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
 
 # API Configuration
 api:
   enabled: true
   replicaCount: 2
+  
   image:
     repository: theunis/vlan-manager-api
-    tag: "2.0.0"
-    pullPolicy: Always
   
   service:
     type: ClusterIP
@@ -25,27 +60,13 @@ api:
     create: true
     name: vlan-manager-api
   
-  env:
-    DATABASE_HOST: "pgbouncer.network-management.svc.cluster.local"
-    DATABASE_PORT: "5432"
-    DATABASE_NAME: "freeradius"
-    DATABASE_USER: "freeradius"
-  
+  # Uses global.database config + unique secrets
   secrets:
-    database:
-      secretName: freeradius-pg-secret
-      passwordKey: password
     keycloak:
       secretName: vlan-keycloak-secret
       clientSecretKey: client_secret
   
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-    limits:
-      memory: "512Mi"
-      cpu: "500m"
+  resourceProfile: large  # References global.resources.large
   
   probes:
     liveness:
@@ -65,80 +86,48 @@ api:
 frontend:
   enabled: true
   replicaCount: 2
+  
   image:
     repository: theunis/vlan-manager-frontend
-    tag: "2.0.0"
-    pullPolicy: Always
   
   service:
     type: ClusterIP
     port: 80
     targetPort: 80
   
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "50m"
-    limits:
-      memory: "128Mi"
-      cpu: "200m"
+  resourceProfile: small  # References global.resources.small
 
 # Notification Service Configuration
 notification:
   enabled: true
   replicaCount: 1  # Only one replica to avoid duplicate notifications
+  
   image:
     repository: theunis/vlan-manager-notification
-    tag: "2.0.0"
-    pullPolicy: Always
   
-  env:
-    DATABASE_HOST: "pgbouncer.network-management.svc.cluster.local"
-    DATABASE_PORT: "5432"
-    DATABASE_NAME: "freeradius"
-    DATABASE_USER: "freeradius"
-  
+  # Uses global.database config + unique secrets
   secrets:
-    database:
-      secretName: freeradius-pg-secret
-      passwordKey: password
     telegram:
       secretName: telegram-bot-secret
       tokenKey: token
       chatIdKey: chat_id
   
-  resources:
-    requests:
-      memory: "128Mi"
-      cpu: "50m"
-    limits:
-      memory: "256Mi"
-      cpu: "200m"
+  resourceProfile: medium  # References global.resources.medium
 
 # Sync Service Configuration (for manual job template only)
 sync:
   image:
     repository: theunis/vlan-manager-sync
-    tag: "2.0.0"
-    pullPolicy: Always
   
   job:
     ttlSecondsAfterFinished: 3600  # 1 hour for manual jobs
   
-  env:
-    POSTGRES_HOST: "pgbouncer.network-management.svc.cluster.local"
-    POSTGRES_PORT: "5432"
-    POSTGRES_DB: "freeradius"
-    POSTGRES_USER: "freeradius"
-  
+  # Uses global.database config (postgres env vars) + unique secrets
   secrets:
     unifi:
       secretName: unifi-credentials
       controllerUrlKey: controller_url
       usernameKey: username
-      passwordKey: password
-    postgres:
-      secretName: freeradius-pg-secret
       passwordKey: password
 
 # ConfigMaps

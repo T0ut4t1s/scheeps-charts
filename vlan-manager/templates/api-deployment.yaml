@@ -28,18 +28,18 @@ spec:
             - containerPort: {{ .Values.api.service.targetPort }}
           env:
             - name: DATABASE_HOST
-              value: {{ .Values.api.env.DATABASE_HOST | quote }}
+              value: {{ .Values.global.database.host | quote }}
             - name: DATABASE_PORT
-              value: {{ .Values.api.env.DATABASE_PORT | quote }}
+              value: {{ .Values.global.database.port | quote }}
             - name: DATABASE_NAME
-              value: {{ .Values.api.env.DATABASE_NAME | quote }}
+              value: {{ .Values.global.database.name | quote }}
             - name: DATABASE_USER
-              value: {{ .Values.api.env.DATABASE_USER | quote }}
+              value: {{ .Values.global.database.user | quote }}
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.api.secrets.database.secretName }}
-                  key: {{ .Values.api.secrets.database.passwordKey }}
+                  name: {{ .Values.global.database.secret.name }}
+                  key: {{ .Values.global.database.secret.passwordKey }}
             - name: KEYCLOAK_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -53,9 +53,9 @@ spec:
           readinessProbe:
             {{- toYaml .Values.api.probes.readiness | nindent 12 }}
           {{- end }}
-          {{- if .Values.api.resources }}
+          {{- if .Values.api.resourceProfile }}
           resources:
-            {{- toYaml .Values.api.resources | nindent 12 }}
+            {{- toYaml (index .Values.global.resources .Values.api.resourceProfile) | nindent 12 }}
           {{- end }}
       {{- if .Values.global.image.pullSecrets }}
       imagePullSecrets:

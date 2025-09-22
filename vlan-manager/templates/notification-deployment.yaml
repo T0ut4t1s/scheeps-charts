@@ -25,18 +25,18 @@ spec:
           imagePullPolicy: {{ .Values.notification.image.pullPolicy | default .Values.global.image.pullPolicy }}
           env:
             - name: DATABASE_HOST
-              value: {{ .Values.notification.env.DATABASE_HOST | quote }}
+              value: {{ .Values.global.database.host | quote }}
             - name: DATABASE_PORT
-              value: {{ .Values.notification.env.DATABASE_PORT | quote }}
+              value: {{ .Values.global.database.port | quote }}
             - name: DATABASE_NAME
-              value: {{ .Values.notification.env.DATABASE_NAME | quote }}
+              value: {{ .Values.global.database.name | quote }}
             - name: DATABASE_USER
-              value: {{ .Values.notification.env.DATABASE_USER | quote }}
+              value: {{ .Values.global.database.user | quote }}
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.notification.secrets.database.secretName }}
-                  key: {{ .Values.notification.secrets.database.passwordKey }}
+                  name: {{ .Values.global.database.secret.name }}
+                  key: {{ .Values.global.database.secret.passwordKey }}
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -47,9 +47,9 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.notification.secrets.telegram.secretName }}
                   key: {{ .Values.notification.secrets.telegram.chatIdKey }}
-          {{- if .Values.notification.resources }}
+          {{- if .Values.notification.resourceProfile }}
           resources:
-            {{- toYaml .Values.notification.resources | nindent 12 }}
+            {{- toYaml (index .Values.global.resources .Values.notification.resourceProfile) | nindent 12 }}
           {{- end }}
       {{- if .Values.global.image.pullSecrets }}
       imagePullSecrets:
