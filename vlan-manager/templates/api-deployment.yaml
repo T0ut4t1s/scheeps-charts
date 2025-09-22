@@ -40,11 +40,6 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.global.database.secret.name }}
                   key: {{ .Values.global.database.secret.passwordKey }}
-            - name: KEYCLOAK_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.api.secrets.keycloak.secretName }}
-                  key: {{ .Values.api.secrets.keycloak.clientSecretKey }}
           {{- if .Values.api.probes.liveness }}
           livenessProbe:
             {{- toYaml .Values.api.probes.liveness | nindent 12 }}

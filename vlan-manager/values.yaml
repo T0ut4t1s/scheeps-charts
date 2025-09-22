@@ -60,11 +60,7 @@ api:
     create: true
     name: vlan-manager-api
   
-  # Uses global.database config + unique secrets
-  secrets:
-    keycloak:
-      secretName: vlan-keycloak-secret
-      clientSecretKey: client_secret
+  # Uses global.database config
   
   resourceProfile: large  # References global.resources.large
   
