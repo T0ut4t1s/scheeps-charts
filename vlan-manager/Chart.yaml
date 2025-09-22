@@ -1,0 +1,16 @@
+apiVersion: v2
+name: vlan-manager
+description: A Helm chart for VLAN Manager - complete network device VLAN management solution
+type: application
+version: 2.0.0
+appVersion: "2.0.0"
+home: https://github.com/T0ut4t1s/vlan-manager
+sources:
+  - https://github.com/T0ut4t1s/vlan-manager
+maintainers:
+  - name: theunis
+keywords:
+  - networking
+  - vlan
+  - unifi
+  - device-management

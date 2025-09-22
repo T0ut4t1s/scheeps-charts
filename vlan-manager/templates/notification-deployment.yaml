@@ -1,0 +1,58 @@
+{{- if .Values.notification.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vlan-manager.fullname" . }}-notification
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vlan-manager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: notification
+spec:
+  replicas: {{ .Values.notification.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "vlan-manager.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: notification
+  template:
+    metadata:
+      labels:
+        {{- include "vlan-manager.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: notification
+    spec:
+      containers:
+        - name: notifier
+          image: "{{ .Values.notification.image.repository }}:{{ .Values.notification.image.tag | default .Values.global.image.tag }}"
+          imagePullPolicy: {{ .Values.notification.image.pullPolicy | default .Values.global.image.pullPolicy }}
+          env:
+            - name: DATABASE_HOST
+              value: {{ .Values.notification.env.DATABASE_HOST | quote }}
+            - name: DATABASE_PORT
+              value: {{ .Values.notification.env.DATABASE_PORT | quote }}
+            - name: DATABASE_NAME
+              value: {{ .Values.notification.env.DATABASE_NAME | quote }}
+            - name: DATABASE_USER
+              value: {{ .Values.notification.env.DATABASE_USER | quote }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.notification.secrets.database.secretName }}
+                  key: {{ .Values.notification.secrets.database.passwordKey }}
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.notification.secrets.telegram.secretName }}
+                  key: {{ .Values.notification.secrets.telegram.tokenKey }}
+            - name: TELEGRAM_CHAT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.notification.secrets.telegram.secretName }}
+                  key: {{ .Values.notification.secrets.telegram.chatIdKey }}
+          {{- if .Values.notification.resources }}
+          resources:
+            {{- toYaml .Values.notification.resources | nindent 12 }}
+          {{- end }}
+      {{- if .Values.global.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.image.pullSecrets | nindent 8 }}
+      {{- end }}
+{{- end }}
