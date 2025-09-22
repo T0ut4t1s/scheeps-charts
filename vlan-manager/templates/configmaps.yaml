@@ -1,18 +1,3 @@
-{{- if .Values.configMaps.vlanManagerConfig.enabled }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "vlan-manager.fullname" . }}-config
-  namespace: {{ .Values.global.namespace }}
-  labels:
-    {{- include "vlan-manager.labels" . | nindent 4 }}
-data:
-  # Add your vlan-manager configuration here
-  config.yaml: |
-    # VLAN Manager configuration
-    # Add your specific configuration values
-{{- end }}
----
 {{- if .Values.configMaps.unifiFieldMappings.enabled }}
 apiVersion: v1
 kind: ConfigMap

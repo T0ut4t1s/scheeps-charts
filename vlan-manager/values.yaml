@@ -143,10 +143,6 @@ sync:
 
 # ConfigMaps
 configMaps:
-  vlanManagerConfig:
-    enabled: true
-    # Add your config data here
-    
   unifiFieldMappings:
     enabled: true
     data:
