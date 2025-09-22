@@ -25,6 +25,76 @@ data:
   {{- toYaml .Values.configMaps.unifiFieldMappings.data | nindent 2 }}
 {{- end }}
 ---
+{{- if .Values.configMaps.syncJobTemplate.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vlan-manager.fullname" . }}-sync-job-template
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vlan-manager.labels" . | nindent 4 }}
+data:
+  job.yaml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      generateName: {{ include "vlan-manager.fullname" . }}-sync-manual-
+      namespace: {{ .Values.global.namespace }}
+      labels:
+        {{- include "vlan-manager.labels" . | nindent 8 }}
+        app.kubernetes.io/component: sync
+    spec:
+      ttlSecondsAfterFinished: {{ .Values.sync.job.ttlSecondsAfterFinished }}
+      template:
+        spec:
+          containers:
+          - name: sync
+            image: "{{ .Values.sync.image.repository }}:{{ .Values.sync.image.tag | default .Values.global.image.tag }}"
+            env:
+            - name: UNIFI_CONTROLLER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sync.secrets.unifi.secretName }}
+                  key: {{ .Values.sync.secrets.unifi.controllerUrlKey }}
+            - name: UNIFI_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sync.secrets.unifi.secretName }}
+                  key: {{ .Values.sync.secrets.unifi.usernameKey }}
+            - name: UNIFI_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sync.secrets.unifi.secretName }}
+                  key: {{ .Values.sync.secrets.unifi.passwordKey }}
+            - name: POSTGRES_HOST
+              value: {{ .Values.sync.env.POSTGRES_HOST | quote }}
+            - name: POSTGRES_PORT
+              value: {{ .Values.sync.env.POSTGRES_PORT | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.sync.env.POSTGRES_DB | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.sync.env.POSTGRES_USER | quote }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sync.secrets.postgres.secretName }}
+                  key: {{ .Values.sync.secrets.postgres.passwordKey }}
+            volumeMounts:
+            - name: config
+              mountPath: /config/field_mappings.yaml
+              subPath: field_mappings.yaml
+              readOnly: true
+          volumes:
+          - name: config
+            configMap:
+              name: {{ include "vlan-manager.fullname" . }}-unifi-field-mappings
+          restartPolicy: OnFailure
+          {{- if .Values.global.image.pullSecrets }}
+          imagePullSecrets:
+            {{- toYaml .Values.global.image.pullSecrets | nindent 10 }}
+          {{- end }}
+{{- end }}
+---
 {{- if .Values.sync.enabled }}
 apiVersion: v1
 kind: ConfigMap

@@ -115,20 +115,12 @@ notification:
       memory: "256Mi"
       cpu: "200m"
 
-# Sync Service Configuration
+# Sync Service Configuration (for manual job template only)
 sync:
-  enabled: true
   image:
     repository: theunis/vlan-manager-sync
     tag: "2.0.0"
     pullPolicy: Always
-  
-  cronjob:
-    enabled: true
-    schedule: "0 */6 * * *"  # Every 6 hours
-    successfulJobsHistoryLimit: 3
-    failedJobsHistoryLimit: 1
-    ttlSecondsAfterFinished: 86400  # 24 hours
   
   job:
     ttlSecondsAfterFinished: 3600  # 1 hour for manual jobs
@@ -148,14 +140,6 @@ sync:
     postgres:
       secretName: freeradius-pg-secret
       passwordKey: password
-  
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-    limits:
-      memory: "512Mi"
-      cpu: "500m"
 
 # ConfigMaps
 configMaps:
@@ -176,39 +160,6 @@ configMaps:
           last_seen: "last_seen"
           adopted: "adopted"
           disabled: "disabled"
-
-# Ingress Configuration
-ingress:
-  enabled: true
-  className: traefik
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.middlewares: network-management-oauth2-proxy@kubernetescrd
   
-  hosts:
-    - host: vlan.scheeps.online
-      paths:
-        - path: /
-          pathType: Prefix
-          service: vlan-manager-frontend
-          port: 80
-        - path: /api
-          pathType: Prefix  
-          service: vlan-manager-api
-          port: 8000
-  
-  tls:
-    - secretName: vlan-tls-secret
-      hosts:
-        - vlan.scheeps.online
-
-# RBAC Configuration
-rbac:
-  create: true
-  rules:
-    - apiGroups: ["batch"]
-      resources: ["jobs"]
-      verbs: ["create", "get", "list", "watch"]
-    - apiGroups: [""]
-      resources: ["configmaps"]
-      verbs: ["get", "list"]
+  syncJobTemplate:
+    enabled: true
