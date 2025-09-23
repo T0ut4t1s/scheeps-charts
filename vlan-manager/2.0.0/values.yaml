@@ -46,7 +46,7 @@ global:
 # API Configuration
 api:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
 
   image:
     repository: theunis/vlan-manager-api
@@ -81,7 +81,7 @@ api:
 # Frontend Configuration
 frontend:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
 
   image:
     repository: theunis/vlan-manager-frontend
@@ -150,7 +150,7 @@ configMaps:
           uptime: uptime
   syncJobTemplate:
     enabled: true
-  
+
   dbCleanupScript:
     enabled: true
     retentionPeriods:
