@@ -150,3 +150,10 @@ configMaps:
           uptime: uptime
   syncJobTemplate:
     enabled: true
+  
+  dbCleanupScript:
+    enabled: true
+    retentionPeriods:
+      deviceStatus: "30 days"
+      processedNotifications: "7 days"
+      auditLogs: "90 days"

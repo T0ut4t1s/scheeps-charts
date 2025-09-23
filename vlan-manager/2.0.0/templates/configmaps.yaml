@@ -79,3 +79,32 @@ data:
             {{- toYaml .Values.global.image.pullSecrets | nindent 10 }}
           {{- end }}
 {{- end }}
+---
+{{- if .Values.configMaps.dbCleanupScript.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vlan-manager.fullname" . }}-db-cleanup-script
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vlan-manager.labels" . | nindent 4 }}
+data:
+  cleanup.sql: |
+    -- Delete device status older than {{ .Values.configMaps.dbCleanupScript.retentionPeriods.deviceStatus }}
+    DELETE FROM device_status
+    WHERE sync_time < (CURRENT_TIMESTAMP - INTERVAL '{{ .Values.configMaps.dbCleanupScript.retentionPeriods.deviceStatus }}');
+
+    -- Delete processed notifications older than {{ .Values.configMaps.dbCleanupScript.retentionPeriods.processedNotifications }}
+    DELETE FROM notification_queue
+    WHERE processed = true
+    AND processed_at < (CURRENT_TIMESTAMP - INTERVAL '{{ .Values.configMaps.dbCleanupScript.retentionPeriods.processedNotifications }}');
+
+    -- Archive audit logs older than {{ .Values.configMaps.dbCleanupScript.retentionPeriods.auditLogs }}
+    DELETE FROM vlan_change_log
+    WHERE changed_at < (CURRENT_TIMESTAMP - INTERVAL '{{ .Values.configMaps.dbCleanupScript.retentionPeriods.auditLogs }}');
+
+    -- Vacuum and analyze tables for performance
+    VACUUM ANALYZE device_status;
+    VACUUM ANALYZE notification_queue;
+    VACUUM ANALYZE vlan_change_log;
+{{- end }}
