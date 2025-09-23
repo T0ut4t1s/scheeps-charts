@@ -1,14 +1,14 @@
 # VLAN Manager Helm Chart Values
 global:
   namespace: network-management
-  
+
   # Common image settings
   image:
     tag: "2.0.0"
     pullPolicy: Always
     pullSecrets:
       - name: docker-hub-secret
-  
+
   # Shared database configuration
   database:
     host: "pgbouncer.network-management.svc.cluster.local"
@@ -18,7 +18,7 @@ global:
     secret:
       name: freeradius-pg-secret
       passwordKey: password
-  
+
   # Common resource profiles
   resources:
     small:
@@ -47,23 +47,23 @@ global:
 api:
   enabled: true
   replicaCount: 2
-  
+
   image:
     repository: theunis/vlan-manager-api
-  
+
   service:
     type: ClusterIP
     port: 8000
     targetPort: 8000
-  
+
   serviceAccount:
     create: true
     name: vlan-manager-api
-  
+
   # Uses global.database config
-  
-  resourceProfile: large  # References global.resources.large
-  
+
+  resourceProfile: large # References global.resources.large
+
   probes:
     liveness:
       httpGet:
@@ -78,46 +78,46 @@ api:
       initialDelaySeconds: 5
       periodSeconds: 5
 
-# Frontend Configuration  
+# Frontend Configuration
 frontend:
   enabled: true
   replicaCount: 2
-  
+
   image:
     repository: theunis/vlan-manager-frontend
-  
+
   service:
     type: ClusterIP
     port: 80
     targetPort: 80
-  
-  resourceProfile: small  # References global.resources.small
+
+  resourceProfile: small # References global.resources.small
 
 # Notification Service Configuration
 notification:
   enabled: true
-  replicaCount: 1  # Only one replica to avoid duplicate notifications
-  
+  replicaCount: 1 # Only one replica to avoid duplicate notifications
+
   image:
     repository: theunis/vlan-manager-notification
-  
+
   # Uses global.database config + unique secrets
   secrets:
     telegram:
       secretName: telegram-bot-secret
       tokenKey: token
       chatIdKey: chat_id
-  
-  resourceProfile: medium  # References global.resources.medium
+
+  resourceProfile: medium # References global.resources.medium
 
 # Sync Service Configuration (for manual job template only)
 sync:
   image:
     repository: theunis/vlan-manager-sync
-  
+
   job:
-    ttlSecondsAfterFinished: 3600  # 1 hour for manual jobs
-  
+    ttlSecondsAfterFinished: 3600 # 1 hour for manual jobs
+
   # Uses global.database config (postgres env vars) + unique secrets
   secrets:
     unifi:
@@ -134,13 +134,19 @@ configMaps:
       field_mappings.yaml: |
         # UniFi field mappings configuration
         device_fields:
-          mac: "mac"
-          name: "name"
-          model: "model"
-          ip: "ip"
-          last_seen: "last_seen"
-          adopted: "adopted"
-          disabled: "disabled"
-  
+          mac_address: mac
+          hostname: hostname
+          device_name: name
+          manufacturer: oui
+          first_seen: first_seen
+          is_wired: is_wired
+          vlan: vlan
+          network: network
+          use_fixedip: use_fixedip
+          virtual_network_override_id: virtual_network_override_id
+          ip_address: ip
+          last_uplink: last_uplink_name
+          last_seen: last_seen
+          uptime: uptime
   syncJobTemplate:
     enabled: true
