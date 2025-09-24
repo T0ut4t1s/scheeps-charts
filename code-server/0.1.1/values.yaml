@@ -1,0 +1,96 @@
+# Default values for code-server.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: codercom/code-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+
+codeServer:
+  # Code-server configuration
+  port: 8080
+  bind: "0.0.0.0"
+  auth: "password"
+  # Additional arguments to pass to code-server
+  extraArgs: []
+  # Environment variables
+  extraEnv: []
+
+# Secret configuration for code-server authentication
+secrets:
+  # Name of the secret containing authentication credentials
+  name: code-server-secret
+  # Key in the secret containing the password
+  passwordKey: password
+
+# Init container configuration for enabling sudo
+initContainer:
+  enabled: false
+  image:
+    repository: ubuntu
+    tag: "22.04"
+    pullPolicy: IfNotPresent
+
+# Kubectl configuration
+kubeconfig:
+  enabled: false
+  secretName: kubectl-config-secret
+
+# Persistent volume mounts - these should be created externally via GitOps
+volumeMounts:
+  - name: workspace
+    mountPath: /home/coder/workspace
+    # PVC name should match your GitOps PVC
+    claimName: code-server-workspace
+  - name: config
+    mountPath: /home/coder/.local/share/code-server
+    # PVC name should match your GitOps PVC
+    claimName: code-server-config
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
