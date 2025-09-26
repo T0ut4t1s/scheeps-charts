@@ -36,7 +36,7 @@ affinity: {}
 # Persistence configuration (PVC managed outside helm)
 persistence:
   # Name of existing PVC
-  existingClaim: "ha-config"
+  existingClaim: "ha-config-pvc"
   mountPath: "/config"
 
 # Home Assistant Configuration
