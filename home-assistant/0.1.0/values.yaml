@@ -57,19 +57,20 @@ database:
   # Hardcoded connection details
   host: "pgbouncer.home-automation.svc.cluster.local"
   port: 5432
-  # Secret containing credentials
-  secretName: "ha-pg-secret"
-  # Keys in the secret (only credentials now)
-  usernameKey: "username"
-  passwordKey: "password"
-  databaseKey: "database"
 
 # External Secret reference (managed outside helm)
 secrets:
-  # Name of the existing secret for OAuth2 authentication
-  authSecret: "ha-auth-secret"
-  # Name of the existing secret for PostgreSQL connection
-  postgresSecret: "ha-pg-secret"
+  # OAuth2 authentication secret
+  authSecret:
+    name: "ha-auth-secret"
+    clientIdKey: "client_id"
+    clientSecretKey: "client_secret"
+  # PostgreSQL credentials secret
+  postgresSecret:
+    name: "ha-pg-secret"
+    usernameKey: "username"
+    passwordKey: "password"
+    databaseKey: "database"
 
 # Pod annotations
 podAnnotations: {}

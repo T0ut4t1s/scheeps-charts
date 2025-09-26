@@ -56,30 +56,30 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.database.secretName }}
-                  key: {{ .Values.database.usernameKey }}
+                  name: {{ .Values.secrets.postgresSecret.name }}
+                  key: {{ .Values.secrets.postgresSecret.usernameKey }}
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.database.secretName }}
-                  key: {{ .Values.database.passwordKey }}
+                  name: {{ .Values.secrets.postgresSecret.name }}
+                  key: {{ .Values.secrets.postgresSecret.passwordKey }}
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.database.secretName }}
-                  key: {{ .Values.database.databaseKey }}
+                  name: {{ .Values.secrets.postgresSecret.name }}
+                  key: {{ .Values.secrets.postgresSecret.databaseKey }}
             {{- end }}
             {{- if .Values.secrets.authSecret }}
             - name: OIDC_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.secrets.authSecret }}
-                  key: client_id
+                  name: {{ .Values.secrets.authSecret.name }}
+                  key: {{ .Values.secrets.authSecret.clientIdKey }}
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.secrets.authSecret }}
-                  key: client_secret
+                  name: {{ .Values.secrets.authSecret.name }}
+                  key: {{ .Values.secrets.authSecret.clientSecretKey }}
             {{- end }}
           livenessProbe:
             httpGet:
