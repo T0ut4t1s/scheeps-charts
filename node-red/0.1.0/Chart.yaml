@@ -3,7 +3,7 @@ name: node-red
 description: Node-RED flow-based development tool for visual programming
 type: application
 version: 0.1.0
-appVersion: 4.0.8
+appVersion: 4.1.0
 maintainers:
   - name: theunis
 keywords:
