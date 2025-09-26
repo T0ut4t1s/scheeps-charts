@@ -68,22 +68,24 @@ mqtt:
     log_type information
     connection_messages true
 
-  # User credentials - referenced from External Secret
+  # User accounts to create from secret
   users:
     homeassistant:
       enabled: true
-      secretKey: "ha_password"
     nodered:
       enabled: true
-      secretKey: "nodered_password"
     frigate:
       enabled: true
-      secretKey: "frigate_password"
 
 # External Secret reference (managed outside helm)
 secrets:
   # Name of the existing secret containing MQTT user credentials
   credentialsSecret: "mqtt-credentials-secret"
+  # Keys expected in the secret (can be overridden if your secret uses different key names)
+  keys:
+    homeassistantPassword: "ha_password"
+    noderedPassword: "nodered_password"
+    frigatePassword: "frigate_password"
 
 # Pod annotations
 podAnnotations: {}

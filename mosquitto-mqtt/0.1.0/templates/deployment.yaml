@@ -41,13 +41,13 @@ spec:
               # Create password file from secrets
               touch /mosquitto/config/passwd
               {{- if .Values.mqtt.users.homeassistant.enabled }}
-              echo "homeassistant:$(cat /tmp/secrets/{{ .Values.mqtt.users.homeassistant.secretKey }})" >> /mosquitto/config/passwd
+              echo "homeassistant:$(cat /tmp/secrets/{{ .Values.secrets.keys.homeassistantPassword }})" >> /mosquitto/config/passwd
               {{- end }}
               {{- if .Values.mqtt.users.nodered.enabled }}
-              echo "nodered:$(cat /tmp/secrets/{{ .Values.mqtt.users.nodered.secretKey }})" >> /mosquitto/config/passwd
+              echo "nodered:$(cat /tmp/secrets/{{ .Values.secrets.keys.noderedPassword }})" >> /mosquitto/config/passwd
               {{- end }}
               {{- if .Values.mqtt.users.frigate.enabled }}
-              echo "frigate:$(cat /tmp/secrets/{{ .Values.mqtt.users.frigate.secretKey }})" >> /mosquitto/config/passwd
+              echo "frigate:$(cat /tmp/secrets/{{ .Values.secrets.keys.frigatePassword }})" >> /mosquitto/config/passwd
               {{- end }}
               
               # Hash passwords
