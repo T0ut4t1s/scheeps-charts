@@ -50,15 +50,9 @@ spec:
               value: {{ .Values.homeAssistant.timezone }}
             {{- if .Values.database.enabled }}
             - name: POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.database.secretName }}
-                  key: {{ .Values.database.hostKey }}
+              value: {{ .Values.database.host | quote }}
             - name: POSTGRES_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.database.secretName }}
-                  key: {{ .Values.database.portKey }}
+              value: {{ .Values.database.port | quote }}
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:

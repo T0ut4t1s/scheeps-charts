@@ -42,7 +42,7 @@ persistence:
 # Home Assistant Configuration
 homeAssistant:
   # Timezone
-  timezone: "America/New_York"
+  timezone: "Europe/London"
   
   # Enable privileged mode for device access
   privileged: false
@@ -52,12 +52,14 @@ homeAssistant:
 
 # Database configuration (PostgreSQL managed outside helm)
 database:
-  # PostgreSQL connection details from external secret
+  # PostgreSQL connection details
   enabled: true
+  # Hardcoded connection details
+  host: "pgbouncer.home-automation.svc.cluster.local"
+  port: 5432
+  # Secret containing credentials
   secretName: "ha-pg-secret"
-  # Keys in the secret
-  hostKey: "host"
-  portKey: "port" 
+  # Keys in the secret (only credentials now)
   usernameKey: "username"
   passwordKey: "password"
   databaseKey: "database"
