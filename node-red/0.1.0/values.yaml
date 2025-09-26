@@ -71,11 +71,6 @@ nodeRed:
         }
     };
 
-# External Secret reference (managed outside helm)
-secrets:
-  # Name of the existing secret for OAuth2 authentication
-  authSecret: "nodered-auth-secret"
-
 # Pod annotations
 podAnnotations: {}
 
