@@ -1,0 +1,17 @@
+apiVersion: v2
+name: node-red
+description: Node-RED flow-based development tool for visual programming
+type: application
+version: 0.1.0
+appVersion: 4.0.8
+maintainers:
+  - name: theunis
+keywords:
+  - node-red
+  - automation
+  - flow
+  - home-automation
+  - iot
+home: https://nodered.org/
+sources:
+  - https://github.com/node-red/node-red

@@ -1,0 +1,105 @@
+# Default values for mosquitto-mqtt
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: eclipse-mosquitto
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: LoadBalancer
+  mqtt:
+    port: 1883
+    targetPort: 1883
+    name: mqtt
+  websocket:
+    enabled: true
+    port: 9001
+    targetPort: 9001
+    name: websocket
+
+# LoadBalancer IP allocation from MetalLB
+loadBalancerIP: ""
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Persistence configuration (PVC managed outside helm)
+persistence:
+  # Name of existing PVC
+  existingClaim: "mqtt-config"
+  mountPath: "/mosquitto"
+
+# MQTT Configuration
+mqtt:
+  # Config file content
+  config: |
+    listener 1883
+    allow_anonymous false
+    password_file /mosquitto/config/passwd
+    
+    listener 9001
+    protocol websockets
+    allow_anonymous false
+    password_file /mosquitto/config/passwd
+    
+    log_dest stdout
+    log_type error
+    log_type warning
+    log_type notice
+    log_type information
+    connection_messages true
+
+  # User credentials - referenced from External Secret
+  users:
+    homeassistant:
+      enabled: true
+      secretKey: "ha_password"
+    nodered:
+      enabled: true
+      secretKey: "nodered_password"
+    frigate:
+      enabled: true
+      secretKey: "frigate_password"
+
+# External Secret reference (managed outside helm)
+secrets:
+  # Name of the existing secret containing MQTT user credentials
+  credentialsSecret: "mqtt-credentials-secret"
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1883
+
+# Security context
+securityContext:
+  runAsUser: 1883
+  runAsGroup: 1883
+  runAsNonRoot: true
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""

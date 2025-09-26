@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mosquitto-mqtt.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mosquitto-mqtt.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mosquitto-mqtt.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mosquitto-mqtt.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mosquitto-mqtt.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: setup-mosquitto
+          image: busybox:1.35
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Create mosquitto user and set proper permissions
+              adduser -D -u 1883 mosquitto || true
+              mkdir -p /mosquitto/data /mosquitto/log /mosquitto/config
+              chown -R 1883:1883 /mosquitto
+              
+              # Create password file from secrets
+              touch /mosquitto/config/passwd
+              {{- if .Values.mqtt.users.homeassistant.enabled }}
+              echo "homeassistant:$(cat /tmp/secrets/{{ .Values.mqtt.users.homeassistant.secretKey }})" >> /mosquitto/config/passwd
+              {{- end }}
+              {{- if .Values.mqtt.users.nodered.enabled }}
+              echo "nodered:$(cat /tmp/secrets/{{ .Values.mqtt.users.nodered.secretKey }})" >> /mosquitto/config/passwd
+              {{- end }}
+              {{- if .Values.mqtt.users.frigate.enabled }}
+              echo "frigate:$(cat /tmp/secrets/{{ .Values.mqtt.users.frigate.secretKey }})" >> /mosquitto/config/passwd
+              {{- end }}
+              
+              # Hash passwords
+              mosquitto_passwd -U /mosquitto/config/passwd
+              chown 1883:1883 /mosquitto/config/passwd
+          volumeMounts:
+            - name: mosquitto-data
+              mountPath: /mosquitto
+            - name: credentials-secret
+              mountPath: /tmp/secrets
+              readOnly: true
+          securityContext:
+            runAsUser: 0
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: mqtt
+              containerPort: {{ .Values.service.mqtt.targetPort }}
+              protocol: TCP
+            {{- if .Values.service.websocket.enabled }}
+            - name: websocket
+              containerPort: {{ .Values.service.websocket.targetPort }}
+              protocol: TCP
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: mqtt
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: mqtt
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: mosquitto-data
+              mountPath: {{ .Values.persistence.mountPath }}
+            - name: mosquitto-config
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+      volumes:
+        - name: mosquitto-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
+        - name: mosquitto-config
+          configMap:
+            name: {{ include "mosquitto-mqtt.fullname" . }}-config
+        - name: credentials-secret
+          secret:
+            secretName: {{ .Values.secrets.credentialsSecret }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

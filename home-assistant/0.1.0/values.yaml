@@ -1,0 +1,89 @@
+# Default values for home-assistant
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/home-assistant/home-assistant
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8123
+  name: http
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Persistence configuration (PVC managed outside helm)
+persistence:
+  # Name of existing PVC
+  existingClaim: "ha-config"
+  mountPath: "/config"
+
+# Home Assistant Configuration
+homeAssistant:
+  # Timezone
+  timezone: "America/New_York"
+  
+  # Enable privileged mode for device access
+  privileged: false
+  
+  # Host network for discovery
+  hostNetwork: false
+
+# Database configuration (PostgreSQL managed outside helm)
+database:
+  # PostgreSQL connection details from external secret
+  enabled: true
+  secretName: "ha-pg-secret"
+  # Keys in the secret
+  hostKey: "host"
+  portKey: "port" 
+  usernameKey: "username"
+  passwordKey: "password"
+  databaseKey: "database"
+
+# External Secret reference (managed outside helm)
+secrets:
+  # Name of the existing secret for OAuth2 authentication
+  authSecret: "ha-auth-secret"
+  # Name of the existing secret for PostgreSQL connection
+  postgresSecret: "ha-pg-secret"
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+
+# Security context
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""

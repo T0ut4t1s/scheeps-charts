@@ -1,0 +1,17 @@
+apiVersion: v2
+name: home-assistant
+description: Open source home automation that puts local control and privacy first
+type: application
+version: 0.1.0
+appVersion: 2024.12.4
+maintainers:
+  - name: theunis
+keywords:
+  - home-assistant
+  - automation
+  - smart-home
+  - iot
+  - hass
+home: https://www.home-assistant.io/
+sources:
+  - https://github.com/home-assistant/core

@@ -1,0 +1,17 @@
+apiVersion: v2
+name: mosquitto-mqtt
+description: Eclipse Mosquitto MQTT broker for home automation messaging
+type: application
+version: 0.1.0
+appVersion: 2.0.22
+maintainers:
+  - name: theunis
+keywords:
+  - mqtt
+  - messaging
+  - mosquitto
+  - home-automation
+  - iot
+home: https://mosquitto.org/
+sources:
+  - https://github.com/eclipse/mosquitto
