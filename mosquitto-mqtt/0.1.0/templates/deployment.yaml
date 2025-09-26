@@ -28,31 +28,30 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: setup-mosquitto
-          image: busybox:1.35
+          image: eclipse-mosquitto:2.0.22
           command:
             - /bin/sh
             - -c
             - |
-              # Create mosquitto user and set proper permissions
-              adduser -D -u 1883 mosquitto || true
+              # Create directories and set proper permissions
               mkdir -p /mosquitto/data /mosquitto/log /mosquitto/config
-              chown -R 1883:1883 /mosquitto
               
-              # Create password file from secrets
+              # Create password file with proper hashing
               touch /mosquitto/config/passwd
               {{- if .Values.mqtt.users.homeassistant.enabled }}
-              echo "homeassistant:$(cat /tmp/secrets/{{ .Values.secrets.keys.homeassistantPassword }})" >> /mosquitto/config/passwd
+              mosquitto_passwd -b /mosquitto/config/passwd homeassistant "$(cat /tmp/secrets/{{ .Values.secrets.keys.homeassistantPassword }})"
               {{- end }}
               {{- if .Values.mqtt.users.nodered.enabled }}
-              echo "nodered:$(cat /tmp/secrets/{{ .Values.secrets.keys.noderedPassword }})" >> /mosquitto/config/passwd
+              mosquitto_passwd -b /mosquitto/config/passwd nodered "$(cat /tmp/secrets/{{ .Values.secrets.keys.noderedPassword }})"
               {{- end }}
               {{- if .Values.mqtt.users.frigate.enabled }}
-              echo "frigate:$(cat /tmp/secrets/{{ .Values.secrets.keys.frigatePassword }})" >> /mosquitto/config/passwd
+              mosquitto_passwd -b /mosquitto/config/passwd frigate "$(cat /tmp/secrets/{{ .Values.secrets.keys.frigatePassword }})"
               {{- end }}
               
-              # Hash passwords
-              mosquitto_passwd -U /mosquitto/config/passwd
+              # Set proper permissions
+              chmod 0600 /mosquitto/config/passwd
               chown 1883:1883 /mosquitto/config/passwd
+              chown -R 1883:1883 /mosquitto
           volumeMounts:
             - name: mosquitto-data
               mountPath: /mosquitto
