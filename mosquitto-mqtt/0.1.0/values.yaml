@@ -52,14 +52,14 @@ persistence:
 mqtt:
   # Config file content
   config: |
+    password_file /mosquitto/config/passwd
+    
     listener 1883
     allow_anonymous false
-    password_file /mosquitto/config/passwd
     
     listener 9001
     protocol websockets
     allow_anonymous false
-    password_file /mosquitto/config/passwd
     
     log_dest stdout
     log_type error
