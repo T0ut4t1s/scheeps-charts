@@ -69,6 +69,18 @@ spec:
                   name: {{ .Values.database.secretName }}
                   key: {{ .Values.database.databaseKey }}
             {{- end }}
+            {{- if .Values.secrets.authSecret }}
+            - name: OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.authSecret }}
+                  key: client_id
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.authSecret }}
+                  key: client_secret
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /
