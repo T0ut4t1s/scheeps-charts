@@ -50,7 +50,19 @@ persistence:
 
 # MQTT Configuration
 mqtt:
-  # Config file content
+  # Logging configuration
+  logging:
+    connectionMessages: false
+    logTypes:
+      - error
+      - warning
+      - notice
+      - information
+      # Uncomment to log MQTT activity:
+      # - subscribe
+      # - unsubscribe
+
+  # Config file content (generated from above settings)
   config: |
     password_file /mosquitto/config/passwd
     
@@ -62,11 +74,10 @@ mqtt:
     allow_anonymous false
     
     log_dest stdout
-    log_type error
-    log_type warning
-    log_type notice
-    log_type information
-    connection_messages true
+    {{- range .Values.mqtt.logging.logTypes }}
+    log_type {{ . }}
+    {{- end }}
+    connection_messages {{ .Values.mqtt.logging.connectionMessages }}
 
   # User accounts to create from secret
   users:

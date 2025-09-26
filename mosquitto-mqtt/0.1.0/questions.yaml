@@ -1,0 +1,198 @@
+questions:
+# Basic Configuration
+- variable: replicaCount
+  default: 1
+  description: "Number of Mosquitto replicas"
+  type: int
+  min: 1
+  max: 1
+  group: "Basic Configuration"
+
+- variable: image.tag
+  default: ""
+  description: "Mosquitto Docker image tag (leave empty for chart default)"
+  type: string
+  group: "Basic Configuration"
+
+# Service Configuration
+- variable: service.type
+  default: "LoadBalancer"
+  description: "Service type"
+  type: enum
+  options:
+    - "LoadBalancer"
+    - "ClusterIP"
+    - "NodePort"
+  group: "Service Configuration"
+
+- variable: loadBalancerIP
+  default: ""
+  description: "Static LoadBalancer IP (optional)"
+  type: string
+  group: "Service Configuration"
+  show_if: "service.type=LoadBalancer"
+
+- variable: service.mqtt.port
+  default: 1883
+  description: "MQTT service port"
+  type: int
+  min: 1
+  max: 65535
+  group: "Service Configuration"
+
+- variable: service.websocket.enabled
+  default: true
+  description: "Enable WebSocket listener"
+  type: boolean
+  group: "Service Configuration"
+
+- variable: service.websocket.port
+  default: 9001
+  description: "WebSocket service port"
+  type: int
+  min: 1
+  max: 65535
+  group: "Service Configuration"
+  show_if: "service.websocket.enabled=true"
+
+# MQTT Configuration
+- variable: mqtt.logging.connectionMessages
+  default: false
+  description: "Log MQTT connection/disconnection messages"
+  type: boolean
+  group: "MQTT Configuration"
+
+- variable: mqtt.logging.logTypes
+  default:
+    - "error"
+    - "warning"
+    - "notice"
+    - "information"
+  description: "MQTT log types to enable"
+  type: multiselect
+  options:
+    - "error"
+    - "warning" 
+    - "notice"
+    - "information"
+    - "subscribe"
+    - "unsubscribe"
+    - "websockets"
+    - "debug"
+  group: "MQTT Configuration"
+
+# User Configuration
+- variable: mqtt.users.homeassistant.enabled
+  default: true
+  description: "Enable Home Assistant user"
+  type: boolean
+  group: "User Configuration"
+
+- variable: mqtt.users.nodered.enabled
+  default: true
+  description: "Enable Node-RED user"
+  type: boolean
+  group: "User Configuration"
+
+- variable: mqtt.users.frigate.enabled
+  default: true
+  description: "Enable Frigate user"
+  type: boolean
+  group: "User Configuration"
+
+# Storage Configuration
+- variable: persistence.existingClaim
+  default: "mqtt-config-pvc"
+  description: "Name of existing PersistentVolumeClaim"
+  type: string
+  required: true
+  group: "Storage Configuration"
+
+- variable: persistence.mountPath
+  default: "/mosquitto"
+  description: "Mount path for persistent storage"
+  type: string
+  required: true
+  group: "Storage Configuration"
+
+# Secret Configuration
+- variable: secrets.credentialsSecret
+  default: "mqtt-credentials"
+  description: "Name of secret containing MQTT user credentials"
+  type: string
+  required: true
+  group: "Secret Configuration"
+
+- variable: secrets.keys.homeassistantPassword
+  default: "ha-password"
+  description: "Secret key for Home Assistant password"
+  type: string
+  required: true
+  group: "Secret Configuration"
+  show_if: "mqtt.users.homeassistant.enabled=true"
+
+- variable: secrets.keys.noderedPassword
+  default: "nodered-password"
+  description: "Secret key for Node-RED password"
+  type: string
+  required: true
+  group: "Secret Configuration"
+  show_if: "mqtt.users.nodered.enabled=true"
+
+- variable: secrets.keys.frigatePassword
+  default: "frigate-password"
+  description: "Secret key for Frigate password"
+  type: string
+  required: true
+  group: "Secret Configuration"
+  show_if: "mqtt.users.frigate.enabled=true"
+
+# Resource Configuration
+- variable: resources.requests.cpu
+  default: "50m"
+  description: "CPU request"
+  type: string
+  group: "Resource Configuration"
+
+- variable: resources.requests.memory
+  default: "64Mi"
+  description: "Memory request"
+  type: string
+  group: "Resource Configuration"
+
+- variable: resources.limits.cpu
+  default: "100m"
+  description: "CPU limit"
+  type: string
+  group: "Resource Configuration"
+
+- variable: resources.limits.memory
+  default: "128Mi"
+  description: "Memory limit"
+  type: string
+  group: "Resource Configuration"
+
+# Advanced Configuration
+- variable: nodeSelector
+  default: {}
+  description: "Node selector for pod assignment"
+  type: map[string]
+  group: "Advanced Configuration"
+
+- variable: tolerations
+  default: []
+  description: "Tolerations for pod assignment"
+  type: array[map[string]]
+  group: "Advanced Configuration"
+
+- variable: affinity
+  default: {}
+  description: "Affinity rules for pod assignment"
+  type: map[string]
+  group: "Advanced Configuration"
+
+- variable: podAnnotations
+  default: {}
+  description: "Annotations to add to pods"
+  type: map[string]
+  group: "Advanced Configuration"
