@@ -45,7 +45,7 @@ affinity: {}
 # Persistence configuration (PVC managed outside helm)
 persistence:
   # Name of existing PVC
-  existingClaim: "mqtt-config"
+  existingClaim: "mqtt-config-pvc"
   mountPath: "/mosquitto"
 
 # MQTT Configuration
@@ -80,12 +80,12 @@ mqtt:
 # External Secret reference (managed outside helm)
 secrets:
   # Name of the existing secret containing MQTT user credentials
-  credentialsSecret: "mqtt-credentials-secret"
+  credentialsSecret: "mqtt-credentials"
   # Keys expected in the secret (can be overridden if your secret uses different key names)
   keys:
-    homeassistantPassword: "ha_password"
-    noderedPassword: "nodered_password"
-    frigatePassword: "frigate_password"
+    homeassistantPassword: "ha-password"
+    noderedPassword: "nodered-password"
+    frigatePassword: "frigate-password"
 
 # Pod annotations
 podAnnotations: {}
