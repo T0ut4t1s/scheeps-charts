@@ -36,7 +36,7 @@ affinity: {}
 # Persistence configuration (PVC managed outside helm)
 persistence:
   # Name of existing PVC
-  existingClaim: "nodered-config"
+  existingClaim: "nodered-config-pvc"
   mountPath: "/data"
 
 # Node-RED Configuration
