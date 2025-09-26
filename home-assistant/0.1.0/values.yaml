@@ -57,7 +57,7 @@ homeAssistant:
 
   # OIDC Configuration
   oidc:
-    issuer: "https://keycloak.scheeps.online/realms/scheeps"
+    issuer: "https://auth.scheeps.online/realms/scheeps"
     groupsClaim: "home-assistant.roles"
 
 # Database configuration (PostgreSQL managed outside helm)
