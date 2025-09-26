@@ -7,4 +7,17 @@ metadata:
     {{- include "mosquitto-mqtt.labels" . | nindent 4 }}
 data:
   mosquitto.conf: |
-{{ .Values.mqtt.config | indent 4 }}
+    password_file /mosquitto/config/passwd
+    
+    listener 1883
+    allow_anonymous false
+    
+    listener 9001
+    protocol websockets
+    allow_anonymous false
+    
+    log_dest stdout
+    {{- range .Values.mqtt.logging.logTypes }}
+    log_type {{ . }}
+    {{- end }}
+    connection_messages {{ .Values.mqtt.logging.connectionMessages }}

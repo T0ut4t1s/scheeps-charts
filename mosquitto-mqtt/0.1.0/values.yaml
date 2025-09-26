@@ -62,22 +62,7 @@ mqtt:
       # - subscribe
       # - unsubscribe
 
-  # Config file content (generated from above settings)
-  config: |
-    password_file /mosquitto/config/passwd
-    
-    listener 1883
-    allow_anonymous false
-    
-    listener 9001
-    protocol websockets
-    allow_anonymous false
-    
-    log_dest stdout
-    {{- range .Values.mqtt.logging.logTypes }}
-    log_type {{ . }}
-    {{- end }}
-    connection_messages {{ .Values.mqtt.logging.connectionMessages }}
+  # Configuration is generated in templates/configmap.yaml from logging settings above
 
   # User accounts to create from secret
   users:
