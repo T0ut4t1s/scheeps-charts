@@ -42,7 +42,7 @@ persistence:
 # Node-RED Configuration
 nodeRed:
   # Timezone
-  timezone: "America/New_York"
+  timezone: "Europe/London"
   
   # Enable projects feature
   enableProjects: true
