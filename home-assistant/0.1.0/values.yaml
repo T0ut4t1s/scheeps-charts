@@ -55,11 +55,6 @@ homeAssistant:
     - "10.42.0.0/16"  # Pod CIDR
     - "10.43.0.0/16"  # Service CIDR
 
-  # OIDC Configuration
-  oidc:
-    issuer: "https://auth.scheeps.online/realms/scheeps"
-    groupsClaim: "resource_access.home-assistant.roles"
-
 # Database configuration (PostgreSQL managed outside helm)
 database:
   # PostgreSQL connection details
@@ -70,11 +65,6 @@ database:
 
 # External Secret reference (managed outside helm)
 secrets:
-  # OAuth2 authentication secret
-  authSecret:
-    name: "ha-auth-secret"
-    clientIdKey: "client_id"
-    clientSecretKey: "client_secret"
   # PostgreSQL credentials secret
   postgresSecret:
     name: "ha-pg-secret"

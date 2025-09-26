@@ -24,21 +24,3 @@ data:
       db_url: !env_var DATABASE_URL
     {{- end }}
 
-    {{- if .Values.secrets.authSecret }}
-    # OIDC Authentication
-    auth_providers:
-      - type: command_line
-      - type: oidc
-        name: Keycloak
-        client_id: !env_var OIDC_CLIENT_ID
-        client_secret: !env_var OIDC_CLIENT_SECRET
-        issuer: {{ .Values.homeAssistant.oidc.issuer }}
-        scopes:
-          - openid
-          - profile
-          - email
-        user_mapping:
-          name: name
-          email: email
-          groups: "{{ .Values.homeAssistant.oidc.groupsClaim | default "groups" }}"
-    {{- end }}
