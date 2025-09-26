@@ -68,6 +68,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secrets.postgresSecret.name }}
                   key: {{ .Values.secrets.postgresSecret.databaseKey }}
+            - name: DATABASE_URL
+              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)"
             {{- end }}
             {{- if .Values.secrets.authSecret }}
             - name: OIDC_CLIENT_ID
@@ -100,10 +102,16 @@ spec:
           volumeMounts:
             - name: home-assistant-config
               mountPath: {{ .Values.persistence.mountPath }}
+            - name: ha-configuration
+              mountPath: /config/configuration.yaml
+              subPath: configuration.yaml
       volumes:
         - name: home-assistant-config
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim }}
+        - name: ha-configuration
+          configMap:
+            name: {{ include "home-assistant.fullname" . }}-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -43,12 +43,22 @@ persistence:
 homeAssistant:
   # Timezone
   timezone: "Europe/London"
-  
+
   # Enable privileged mode for device access
   privileged: false
-  
+
   # Host network for discovery
   hostNetwork: false
+
+  # Trusted proxies for reverse proxy support
+  trustedProxies:
+    - "10.42.0.0/16"  # Pod CIDR
+    - "10.43.0.0/16"  # Service CIDR
+
+  # OIDC Configuration
+  oidc:
+    issuer: "https://keycloak.scheeps.online/realms/scheeps"
+    groupsClaim: "home-assistant.roles"
 
 # Database configuration (PostgreSQL managed outside helm)
 database:

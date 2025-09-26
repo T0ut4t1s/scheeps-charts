@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "home-assistant.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "home-assistant.labels" . | nindent 4 }}
+data:
+  configuration.yaml: |
+    # Home Assistant reverse proxy configuration
+    http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        {{- range .Values.homeAssistant.trustedProxies }}
+        - {{ . }}
+        {{- end }}
+
+    # Default configuration
+    default_config:
+
+    {{- if .Values.database.enabled }}
+    # Database configuration
+    recorder:
+      db_url: !env_var DATABASE_URL
+    {{- end }}
+
+    {{- if .Values.secrets.authSecret }}
+    # OIDC Authentication
+    auth_providers:
+      - type: command_line
+      - type: oidc
+        name: Keycloak
+        client_id: !env_var OIDC_CLIENT_ID
+        client_secret: !env_var OIDC_CLIENT_SECRET
+        issuer: {{ .Values.homeAssistant.oidc.issuer }}
+        scopes:
+          - openid
+          - profile
+          - email
+        user_mapping:
+          name: name
+          email: email
+          groups: "{{ .Values.homeAssistant.oidc.groupsClaim | default "groups" }}"
+    {{- end }}
