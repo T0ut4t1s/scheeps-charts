@@ -55,6 +55,10 @@ spec:
         {{- end }}
         - name: OAUTH2_PROXY_SKIP_PROVIDER_BUTTON
           value: {{ .Values.oauth2Proxy.skipProviderButton | quote }}
+        {{- if .Values.oauth2Proxy.skipAuthRegex }}
+        - name: OAUTH2_PROXY_SKIP_AUTH_REGEX
+          value: {{ .Values.oauth2Proxy.skipAuthRegex | quote }}
+        {{- end }}
         - name: OAUTH2_PROXY_REVERSE_PROXY
           value: {{ .Values.oauth2Proxy.reverseProxy | quote }}
         - name: OAUTH2_PROXY_HTTP_ADDRESS

@@ -60,6 +60,7 @@ oauth2Proxy:
   httpAddress: "0.0.0.0:4180"
   reverseProxy: true
   skipProviderButton: true
+  skipAuthRegex: "" # Optional regex to skip auth for certain paths
 
   # Cookie configuration
   cookieDomains: "" # e.g. vlan.scheeps.online
