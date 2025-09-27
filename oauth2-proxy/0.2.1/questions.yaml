@@ -183,6 +183,13 @@ questions:
   show_if: "oauth2Proxy.pkceCodeChallenge=true"
 
 # Advanced Settings
+- variable: oauth2Proxy.skipAuthRegex
+  default: ""
+  description: "Regular expression to skip OAuth2 authentication for certain paths. For Home Assistant use: ^/(auth|api/(onboarding|hassio|websocket|config)|static|frontend_latest|local|service_worker\\.js|manifest\\.json|favicon\\.ico)$"
+  type: string
+  label: Skip Auth Regex
+  group: "Advanced"
+
 - variable: oauth2Proxy.whitelistDomains
   default: "auth.scheeps.online"
   description: "Whitelisted domains for redirects"
