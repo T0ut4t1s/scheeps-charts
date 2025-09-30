@@ -1,0 +1,32 @@
+{{- if .Values.loadBalancerService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "home-assistant.fullname" . }}-lb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "home-assistant.labels" . | nindent 4 }}
+    service-type: loadbalancer
+  {{- with .Values.loadBalancerService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: LoadBalancer
+  {{- if .Values.loadBalancerService.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.loadBalancerService.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.loadBalancerService.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- range .Values.loadBalancerService.loadBalancerSourceRanges }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.loadBalancerService.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: {{ .Values.loadBalancerService.name }}
+  selector:
+    {{- include "home-assistant.selectorLabels" . | nindent 4 }}
+{{- end }}

@@ -19,6 +19,20 @@ service:
   targetPort: 8123
   name: http
 
+# LoadBalancer service for external access (e.g., IoT VLAN)
+loadBalancerService:
+  enabled: false
+  port: 8123
+  name: http-external
+  # Specific IP address for LoadBalancer (leave empty for MetalLB auto-assignment)
+  loadBalancerIP: ""
+  # IP ranges allowed to access LoadBalancer
+  loadBalancerSourceRanges:
+    - "192.168.101.0/24"  # IoT VLAN
+  # Additional annotations for LoadBalancer service
+  annotations: {}
+    # metallb.universe.tf/loadBalancerIPs: "192.168.101.210"
+
 resources:
   limits:
     cpu: 1000m

@@ -1,0 +1,173 @@
+categories:
+  - Smart Home
+  - IoT
+  - Automation
+
+questions:
+  # General Configuration
+  - variable: image.tag
+    default: ""
+    description: "Home Assistant version (leave empty for chart default)"
+    type: string
+    label: Home Assistant Version
+    group: "General Configuration"
+
+  - variable: homeAssistant.timezone
+    default: "Europe/London"
+    description: "Timezone for Home Assistant"
+    type: string
+    label: Timezone
+    group: "General Configuration"
+
+  # Service Configuration
+  - variable: service.type
+    default: "ClusterIP"
+    description: "Internal service type for cluster access"
+    type: enum
+    label: Internal Service Type
+    group: "Service Configuration"
+    options:
+      - "ClusterIP"
+      - "NodePort"
+
+  # LoadBalancer Service Configuration
+  - variable: loadBalancerService.enabled
+    default: false
+    description: "Enable LoadBalancer service for external access (e.g., IoT VLAN)"
+    type: boolean
+    label: Enable LoadBalancer Service
+    group: "LoadBalancer Configuration"
+    show_subquestion_if: true
+    subquestions:
+      - variable: loadBalancerService.port
+        default: 8123
+        description: "External port for LoadBalancer service"
+        type: int
+        label: LoadBalancer Port
+        min: 1
+        max: 65535
+      
+      - variable: loadBalancerService.loadBalancerIP
+        default: ""
+        description: "Specific IP address for LoadBalancer (leave empty for MetalLB auto-assignment)"
+        type: string
+        label: LoadBalancer IP Address
+      
+      - variable: loadBalancerService.loadBalancerSourceRanges[0]
+        default: "192.168.101.0/24"
+        description: "IP ranges allowed to access LoadBalancer (CIDR notation)"
+        type: string
+        label: Allowed Source Range 1
+      
+      - variable: loadBalancerService.loadBalancerSourceRanges[1]
+        default: ""
+        description: "Additional IP range (optional)"
+        type: string
+        label: Allowed Source Range 2
+
+  # Database Configuration
+  - variable: database.enabled
+    default: true
+    description: "Enable PostgreSQL database integration"
+    type: boolean
+    label: Enable Database Integration
+    group: "Database Configuration"
+    show_subquestion_if: true
+    subquestions:
+      - variable: database.host
+        default: "pgbouncer.home-automation.svc.cluster.local"
+        description: "PostgreSQL host address"
+        type: string
+        label: Database Host
+      
+      - variable: database.port
+        default: 5432
+        description: "PostgreSQL port"
+        type: int
+        label: Database Port
+        min: 1
+        max: 65535
+
+  # Persistence Configuration
+  - variable: persistence.existingClaim
+    default: "ha-config-pvc"
+    description: "Name of existing PVC for Home Assistant configuration"
+    type: string
+    label: Existing PVC Name
+    group: "Storage Configuration"
+    required: true
+
+  - variable: persistence.mountPath
+    default: "/config"
+    description: "Mount path for configuration volume"
+    type: string
+    label: Config Mount Path
+    group: "Storage Configuration"
+
+  # Security Configuration
+  - variable: homeAssistant.privileged
+    default: false
+    description: "Enable privileged mode for device access (security risk)"
+    type: boolean
+    label: Privileged Mode
+    group: "Security Configuration"
+
+  - variable: homeAssistant.hostNetwork
+    default: false
+    description: "Use host network for device discovery (security risk)"
+    type: boolean
+    label: Host Network Mode
+    group: "Security Configuration"
+
+  # Resource Configuration
+  - variable: resources.requests.cpu
+    default: "500m"
+    description: "CPU request"
+    type: string
+    label: CPU Request
+    group: "Resource Limits"
+
+  - variable: resources.requests.memory
+    default: "512Mi"
+    description: "Memory request"
+    type: string
+    label: Memory Request
+    group: "Resource Limits"
+
+  - variable: resources.limits.cpu
+    default: "1000m"
+    description: "CPU limit"
+    type: string
+    label: CPU Limit
+    group: "Resource Limits"
+
+  - variable: resources.limits.memory
+    default: "1Gi"
+    description: "Memory limit"
+    type: string
+    label: Memory Limit
+    group: "Resource Limits"
+
+  # Secret Configuration
+  - variable: secrets.postgresSecret.name
+    default: "ha-pg-secret"
+    description: "Name of secret containing PostgreSQL credentials"
+    type: string
+    label: PostgreSQL Secret Name
+    group: "Secrets Configuration"
+    show_if: "database.enabled=true"
+
+  # Advanced Configuration
+  - variable: homeAssistant.trustedProxies[0]
+    default: "10.42.0.0/16"
+    description: "Pod CIDR for trusted proxies"
+    type: string
+    label: Pod CIDR
+    group: "Advanced Configuration"
+
+  - variable: homeAssistant.trustedProxies[1]
+    default: "10.43.0.0/16"
+    description: "Service CIDR for trusted proxies"
+    type: string
+    label: Service CIDR
+    group: "Advanced Configuration"
